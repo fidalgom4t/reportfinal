@@ -86,6 +86,29 @@
     .toggle-btns button.active {
       background-color: #005c6b;
     }
+    #executiveSummary {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      padding: 20px;
+      border: 1px solid #ddd;
+      background: #f3fafa;
+      margin-top: 30px;
+      margin-bottom: 40px;
+      font-size: 16px;
+    }
+    .summary-item {
+      flex: 1 1 200px;
+      margin: 10px;
+    }
+    .summary-label {
+      font-weight: bold;
+      color: #007c91;
+    }
+    .summary-value {
+      font-size: 20px;
+      margin-top: 4px;
+    }
   </style>
 </head>
 <body>
@@ -113,6 +136,11 @@
     <div class="select-box" onclick="toggleDropdown('textWrapper')">Selecionar perguntas</div>
     <div class="checkboxes" id="textQuestionSelect"></div>
   </div>
+
+  <label>Formador:</label>
+  <input type="text" id="trainerInput" placeholder="Nome do formador" style="margin-bottom: 20px; padding: 5px; width: 250px;">
+
+  <div id="executiveSummary"></div>
 
   <div class="toggle-btns">
     <button onclick="setSection('assessment')" id="btn-assessment" class="active">Assessment</button>
@@ -198,16 +226,63 @@
       const program = document.getElementById("programSelect").value;
       const turmas = getChecked("turmaSelect");
       const selectedQuestions = getChecked("textQuestionSelect");
+      const trainer = document.getElementById("trainerInput").value || 'N/A';
 
       const filtered = rawData.filter(d =>
         (!client || d.client === client) &&
         (!program || d.program === program) &&
-        (!turmas.length || turmas.includes(d.turma)) &&
-        d.section === currentSection
+        (!turmas.length || turmas.includes(d.turma))
       );
 
-      const numeric = filtered.filter(d => typeof d.value === 'number');
-      const text = filtered.filter(d => typeof d.value !== 'number' && selectedQuestions.includes(d.question));
+      const evalDates = filtered
+        .filter(d => d.section === 'evaluation' && d.date)
+        .map(d => new Date(d.date));
+      const assessDates = filtered
+        .filter(d => d.section === 'assessment' && d.date)
+        .map(d => new Date(d.date));
+
+      const firstEval = evalDates.length ? new Intl.DateTimeFormat('pt-PT', { month: 'long', year: 'numeric' }).format(new Date(Math.min(...evalDates))) : 'N/A';
+      const firstAssess = assessDates.length ? new Intl.DateTimeFormat('pt-PT', { month: 'long', year: 'numeric' }).format(new Date(Math.min(...assessDates))) : 'N/A';
+
+      const summaryData = {
+        trainer,
+        firstEval,
+        firstAssess,
+        evalResponses: filtered.filter(d => d.section === 'evaluation' && typeof d.value === 'number').length,
+        assessResponses: filtered.filter(d => d.section === 'assessment' && typeof d.value === 'number').length,
+        classCount: new Set(filtered.map(d => d.turma)).size
+      };
+
+      document.getElementById("executiveSummary").innerHTML = `
+        <div class="summary-item">
+          <div class="summary-label">Primeira submissão avaliação</div>
+          <div class="summary-value">${summaryData.firstEval}</div>
+        </div>
+        <div class="summary-item">
+          <div class="summary-label">Primeira submissão assessment</div>
+          <div class="summary-value">${summaryData.firstAssess}</div>
+        </div>
+        <div class="summary-item">
+          <div class="summary-label">Formador</div>
+          <div class="summary-value">${summaryData.trainer}</div>
+        </div>
+        <div class="summary-item">
+          <div class="summary-label">Respostas avaliação</div>
+          <div class="summary-value">${summaryData.evalResponses}</div>
+        </div>
+        <div class="summary-item">
+          <div class="summary-label">Respostas assessment</div>
+          <div class="summary-value">${summaryData.assessResponses}</div>
+        </div>
+        <div class="summary-item">
+          <div class="summary-label">Nº Turmas</div>
+          <div class="summary-value">${summaryData.classCount}</div>
+        </div>
+      `;
+
+      const filteredForCurrentSection = filtered.filter(d => d.section === currentSection);
+      const numeric = filteredForCurrentSection.filter(d => typeof d.value === 'number');
+      const text = filteredForCurrentSection.filter(d => typeof d.value !== 'number' && selectedQuestions.includes(d.question));
 
       drawCharts(numeric, turmas);
       drawTextQuestions(text);

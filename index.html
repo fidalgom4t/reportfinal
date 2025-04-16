@@ -112,13 +112,11 @@
         const assessmentData = progData.filter(d => d.section === 'assessment');
         const evaluationData = progData.filter(d => d.section === 'evaluation');
 
-        // Datas de submissão
         const parseDate = str => new Date(str);
         const formatDate = date => date.toLocaleDateString('pt-PT', { month: 'long', year: 'numeric' });
         const start = formatDate(new Date(Math.min(...assessmentData.map(d => parseDate(d.submitted_at)))));
         const end = formatDate(new Date(Math.min(...evaluationData.map(d => parseDate(d.submitted_at)))));
 
-        // Formador
         const trainers = [...new Set(progData.map(d => d.trainer).filter(Boolean))];
 
         section.innerHTML = `
@@ -146,8 +144,23 @@
         renderChart(chartE, evaluationData);
 
         const textContainer = document.createElement('div');
+        const allTextQuestions = [...new Set([...assessmentData, ...evaluationData].filter(d => typeof d.value !== 'number').map(d => d.question))].sort();
+        const textSelector = document.createElement('select');
+        textSelector.setAttribute('multiple', true);
+        textSelector.style.marginBottom = '20px';
+        allTextQuestions.forEach(q => {
+          const opt = document.createElement('option');
+          opt.value = q;
+          opt.textContent = q.length > 60 ? q.slice(0, 60) + '…' : q;
+          textSelector.appendChild(opt);
+        });
+        textSelector.onchange = () => {
+          const selectedQuestions = Array.from(textSelector.selectedOptions).map(o => o.value);
+          renderTextQuestions(textContainer, [...assessmentData, ...evaluationData], selectedQuestions);
+        };
+        section.appendChild(textSelector);
         section.appendChild(textContainer);
-        renderTextQuestions(textContainer, [...assessmentData, ...evaluationData]);
+        renderTextQuestions(textContainer, [...assessmentData, ...evaluationData], allTextQuestions);
 
         content.appendChild(section);
       });
@@ -181,8 +194,9 @@
       });
     }
 
-    function renderTextQuestions(container, data) {
-      const textQs = data.filter(d => typeof d.value !== 'number');
+    function renderTextQuestions(container, data, filterQuestions = []) {
+      container.innerHTML = '';
+      const textQs = data.filter(d => typeof d.value !== 'number' && (filterQuestions.includes(d.question)));
       const grouped = {};
       textQs.forEach(d => {
         if (!grouped[d.question]) grouped[d.question] = [];

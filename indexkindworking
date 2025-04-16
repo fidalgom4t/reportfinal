@@ -31,8 +31,7 @@
     }
     select[multiple] {
       width: 250px;
-      height: 100px;
-      overflow-y: scroll;
+      height: 120px;
     }
     .chart-container {
       width: 100%;
@@ -110,7 +109,6 @@
       .then(data => {
         rawData = data;
         populateClientFilter();
-        applyFilters();
       });
 
     function setSection(section) {
@@ -120,13 +118,13 @@
       applyFilters();
     }
 
-    function fillSelect(id, values, multiple = false) {
+    function fillSelect(id, values) {
       const select = document.getElementById(id);
-      select.innerHTML = multiple ? '' : '<option value="">(todos)</option>';
+      select.innerHTML = '';
       values.forEach(val => {
         const opt = document.createElement("option");
         opt.value = val;
-        opt.textContent = val.length > 50 ? val.slice(0, 47) + '…' : val;
+        opt.textContent = val.length > 80 ? val.slice(0, 77) + '…' : val;
         select.appendChild(opt);
       });
     }
@@ -153,9 +151,9 @@
       const program = document.getElementById("programSelect").value;
       const filtered = rawData.filter(d => d.client === client && d.program === program);
       const turmas = [...new Set(filtered.map(d => d.turma))].sort();
-      fillSelect("turmaSelect", turmas, true);
+      fillSelect("turmaSelect", turmas);
       const textQs = [...new Set(filtered.filter(d => typeof d.value !== 'number').map(d => d.question))].sort();
-      fillSelect("textQuestionSelect", textQs, true);
+      fillSelect("textQuestionSelect", textQs);
       applyFilters();
     }
 
@@ -195,7 +193,9 @@
       const container = document.getElementById("turmaCharts");
       container.innerHTML = "";
 
-      if (Object.keys(byTurma).length > 1) {
+      const turmaKeys = Object.keys(byTurma);
+
+      if (turmaKeys.length > 1) {
         const overallData = Object.entries(overall).map(([q, vals]) => ({
           question: q,
           average: vals.reduce((a, b) => a + b, 0) / vals.length
@@ -205,7 +205,7 @@
         document.getElementById("overallChart").innerHTML = "";
       }
 
-      Object.entries(byTurma).forEach(([turma, questions], idx) => {
+      turmaKeys.forEach((turma, idx) => {
         const chartId = `turmaChart${idx}`;
         const title = document.createElement("div");
         title.className = "turma-title";
@@ -216,11 +216,11 @@
         container.appendChild(title);
         container.appendChild(div);
 
-        const data = Object.entries(questions).map(([q, vals]) => ({
+        const chartData = Object.entries(byTurma[turma]).map(([q, vals]) => ({
           question: q,
           average: vals.reduce((a, b) => a + b, 0) / vals.length
         }));
-        drawBarChart(chartId, data);
+        drawBarChart(chartId, chartData);
       });
     }
 
@@ -246,29 +246,31 @@
     }
 
     function drawTextQuestions(data) {
-      const textDiv = document.getElementById("textQuestions");
-      textDiv.innerHTML = "";
-      const byQuestion = {};
+      const container = document.getElementById("textQuestions");
+      container.innerHTML = "";
+      const grouped = {};
       data.forEach(d => {
-        if (!byQuestion[d.question]) byQuestion[d.question] = [];
-        byQuestion[d.question].push(d.value);
+        if (!grouped[d.question]) grouped[d.question] = [];
+        grouped[d.question].push(d.value);
       });
 
-      Object.entries(byQuestion).forEach(([q, answers]) => {
+      Object.entries(grouped).forEach(([q, answers]) => {
         const box = document.createElement("div");
         box.className = "text-question";
+
         const title = document.createElement("div");
         title.className = "text-question-title";
         title.textContent = q;
-        const ul = document.createElement("ul");
-        answers.forEach(txt => {
-          const li = document.createElement("li");
-          li.textContent = txt;
-          ul.appendChild(li);
-        });
         box.appendChild(title);
-        box.appendChild(ul);
-        textDiv.appendChild(box);
+
+        const list = document.createElement("ul");
+        answers.forEach(answer => {
+          const li = document.createElement("li");
+          li.textContent = answer;
+          list.appendChild(li);
+        });
+        box.appendChild(list);
+        container.appendChild(box);
       });
     }
   </script>

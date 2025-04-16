@@ -3,12 +3,13 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Controlo de Relatório</title>
+  <title>Relatório de Formação</title>
+  <script src="https://cdn.jsdelivr.net/npm/echarts@5"></script>
   <style>
     body {
       font-family: 'Segoe UI', sans-serif;
       padding: 30px;
-      background-color: #f9f9f9;
+      background-color: #fff;
       color: #333;
     }
     header {
@@ -24,127 +25,46 @@
       color: #007c91;
       margin-left: 15px;
     }
-    label {
-      display: block;
-      margin: 15px 0 5px;
-      font-weight: bold;
-    }
-    select, input[type="text"], input[type="month"] {
+    .chart-container {
       width: 100%;
-      padding: 8px;
-      margin-bottom: 20px;
+      height: 400px;
+      margin-bottom: 40px;
     }
     .section {
-      border: 1px solid #007c91;
+      margin-top: 50px;
       padding: 20px;
-      background: #fff;
+      border-top: 2px solid #007c91;
+    }
+    .summary-box {
+      border: 1px solid #007c91;
+      background: #f4f9fa;
+      padding: 20px;
+      margin-bottom: 20px;
+    }
+    .text-question {
+      border: 1px solid #007c91;
+      border-left: 6px solid #007c91;
+      padding: 16px;
       margin-bottom: 30px;
+      background: #f9f9f9;
     }
-    button {
-      background-color: #007c91;
-      color: #fff;
-      border: none;
-      padding: 10px 20px;
-      cursor: pointer;
-    }
-    button:hover {
-      background-color: #005c6b;
+    .text-question-title {
+      font-weight: bold;
+      margin-bottom: 8px;
+      font-size: 16px;
+      color: #007c91;
     }
   </style>
 </head>
 <body>
   <header>
     <img src="logo.png" alt="Logo" height="50">
-    <div class="logo-text">MIND4TIME<br><span style="font-weight: normal; font-size: 14px;">Controlo do Relatório</span></div>
+    <div class="logo-text">MIND4TIME<br><span style="font-weight: normal; font-size: 14px;">Productivity Consulting</span></div>
   </header>
 
-  <div class="section">
-    <label>Clientes:</label>
-    <select id="clientSelect" multiple></select>
-
-    <label>Programas:</label>
-    <select id="programSelect" multiple></select>
-
-    <label>Turmas:</label>
-    <select id="turmaSelect" multiple></select>
-
-    <label>Formador:</label>
-    <input type="text" id="trainerInput" placeholder="Nome do formador">
-
-    <label>Início (Assessment):</label>
-    <input type="month" id="startMonth">
-
-    <label>Fim (Avaliação):</label>
-    <input type="month" id="endMonth">
-
-    <button onclick="generateReport()">Gerar Relatório</button>
-  </div>
+  <h1>Relatório de Formação</h1>
+  <div id="content"></div>
 
   <script>
     let rawData = [];
-
-    fetch('data.json')
-      .then(res => res.json())
-      .then(data => {
-        rawData = data;
-        initFilters();
-      });
-
-    function initFilters() {
-      const clients = [...new Set(rawData.map(d => d.client))].sort();
-      const programs = [...new Set(rawData.map(d => d.program))].sort();
-      const turmas = [...new Set(rawData.map(d => d.turma))].sort();
-
-      populateSelect("clientSelect", clients);
-      populateSelect("programSelect", programs);
-      populateSelect("turmaSelect", turmas);
-
-      const assessmentDates = rawData.filter(d => d.section === 'assessment' && d.submitted_at)
-        .map(d => new Date(d.submitted_at));
-      const evaluationDates = rawData.filter(d => d.section === 'evaluation' && d.submitted_at)
-        .map(d => new Date(d.submitted_at));
-
-      const start = new Date(Math.min(...assessmentDates));
-      const end = new Date(Math.min(...evaluationDates));
-
-      document.getElementById("startMonth").value = start.toISOString().slice(0, 7);
-      document.getElementById("endMonth").value = end.toISOString().slice(0, 7);
-    }
-
-    function populateSelect(id, values) {
-      const select = document.getElementById(id);
-      values.forEach(v => {
-        const opt = document.createElement("option");
-        opt.value = v;
-        opt.textContent = v;
-        select.appendChild(opt);
-      });
-    }
-
-    function getSelectedValues(id) {
-      return Array.from(document.getElementById(id).selectedOptions).map(o => o.value);
-    }
-
-    function generateReport() {
-      const selectedClients = getSelectedValues("clientSelect");
-      const selectedPrograms = getSelectedValues("programSelect");
-      const selectedTurmas = getSelectedValues("turmaSelect");
-      const trainer = document.getElementById("trainerInput").value;
-      const start = document.getElementById("startMonth").value;
-      const end = document.getElementById("endMonth").value;
-
-      // Aqui, envia os filtros para index.html ou armazena-os para uso posterior
-      localStorage.setItem("reportFilters", JSON.stringify({
-        clients: selectedClients,
-        programs: selectedPrograms,
-        turmas: selectedTurmas,
-        trainer,
-        start,
-        end
-      }));
-
-      window.location.href = "index.html";
-    }
-  </script>
-</body>
-</html>
+    let filters = JSON.parse(localStorage.getItem("reportFilters") ||

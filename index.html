@@ -47,6 +47,21 @@
       margin-bottom: 10px;
       color: #007c91;
     }
+
+    .text-question {
+      border: 1px solid #007c91;
+      border-left: 6px solid #007c91;
+      padding: 16px;
+      margin-bottom: 30px;
+      background: #f9f9f9;
+    }
+
+    .text-question-title {
+      font-weight: bold;
+      margin-bottom: 8px;
+      font-size: 16px;
+      color: #007c91;
+    }
   </style>
 </head>
 <body>
@@ -66,29 +81,65 @@
   <label>Turmas:</label>
   <select id="turmaSelect" multiple></select>
 
+  <label>Perguntas Abertas:</label>
+  <select id="textQuestionSelect" multiple></select>
+
   <div class="chart-container" id="overallChart"></div>
   <div id="turmaCharts"></div>
+  <div id="textQuestions"></div>
 
   <script>
     let rawData = [];
 
-    // Substituir pelo caminho do teu ficheiro JSON exportado
     fetch('data.json')
       .then(res => res.json())
       .then(data => {
         rawData = data;
-        populateFilters();
+        populateClientFilter();
         applyFilters();
       });
 
-    function populateFilters() {
+    function populateClientFilter() {
       const clients = [...new Set(rawData.map(d => d.client))].sort();
-      const programs = [...new Set(rawData.map(d => d.program))].sort();
-      const turmas = [...new Set(rawData.map(d => d.turma))].sort();
-
       fillSelect("clientSelect", clients);
+      document.getElementById("clientSelect").onchange = () => {
+        populateProgramFilter();
+        applyFilters();
+      };
+    }
+
+    function populateProgramFilter() {
+      const selectedClient = document.getElementById("clientSelect").value;
+      const filtered = rawData.filter(d => d.client === selectedClient);
+      const programs = [...new Set(filtered.map(d => d.program))].sort();
       fillSelect("programSelect", programs);
+      document.getElementById("programSelect").onchange = () => {
+        populateTurmaFilter();
+        applyFilters();
+      };
+      populateTurmaFilter();
+    }
+
+    function populateTurmaFilter() {
+      const selectedClient = document.getElementById("clientSelect").value;
+      const selectedProgram = document.getElementById("programSelect").value;
+      const filtered = rawData.filter(d =>
+        d.client === selectedClient && d.program === selectedProgram
+      );
+      const turmas = [...new Set(filtered.map(d => d.turma))].sort();
       fillSelect("turmaSelect", turmas, true);
+      document.getElementById("turmaSelect").onchange = applyFilters;
+      populateTextQuestionFilter(filtered);
+    }
+
+    function populateTextQuestionFilter(filtered) {
+      const textQuestions = [...new Set(
+        filtered
+          .filter(d => typeof d.value !== "number" && d.value.trim())
+          .map(d => d.question)
+      )].sort();
+      fillSelect("textQuestionSelect", textQuestions, true);
+      document.getElementById("textQuestionSelect").onchange = applyFilters;
     }
 
     function fillSelect(id, values, multiple = false) {
@@ -100,11 +151,15 @@
         opt.textContent = val;
         select.appendChild(opt);
       });
-      select.onchange = applyFilters;
     }
 
     function getSelectedTurmas() {
       const select = document.getElementById("turmaSelect");
+      return Array.from(select.selectedOptions).map(o => o.value);
+    }
+
+    function getSelectedTextQuestions() {
+      const select = document.getElementById("textQuestionSelect");
       return Array.from(select.selectedOptions).map(o => o.value);
     }
 
@@ -115,16 +170,19 @@
         turma: getSelectedTurmas()
       };
 
+      const selectedTextQuestions = getSelectedTextQuestions();
+
       const filtered = rawData.filter(d =>
         (!filters.client || d.client === filters.client) &&
         (!filters.program || d.program === filters.program) &&
         (!filters.turma.length || filters.turma.includes(d.turma))
       );
 
-      drawCharts(filtered);
+      drawCharts(filtered, filters);
+      renderTextQuestions(filtered, selectedTextQuestions);
     }
 
-    function drawCharts(filtered) {
+    function drawCharts(filtered, filters) {
       const turmaMap = {};
       const globalGroup = {};
 
@@ -140,16 +198,22 @@
         globalGroup[question].push(value);
       });
 
-      const overallData = Object.keys(globalGroup).map(q => {
-        const values = globalGroup[q];
-        const avg = values.reduce((a, b) => a + b, 0) / values.length;
-        return { question: q, average: avg };
-      });
-
-      drawBarChart("overallChart", overallData);
+      const turmas = getSelectedTurmas();
 
       const container = document.getElementById("turmaCharts");
       container.innerHTML = "";
+
+      if (turmas.length > 1) {
+        const overallData = Object.keys(globalGroup).map(q => {
+          const values = globalGroup[q];
+          const avg = values.reduce((a, b) => a + b, 0) / values.length;
+          return { question: q, average: avg };
+        });
+        drawBarChart("overallChart", overallData);
+      } else {
+        document.getElementById("overallChart").innerHTML = "";
+      }
+
       Object.entries(turmaMap).forEach(([turma, questionData], i) => {
         const chartId = `turmaChart${i}`;
         const chartData = Object.entries(questionData).map(([q, vals]) => ({
@@ -168,6 +232,34 @@
         container.appendChild(div);
 
         drawBarChart(chartId, chartData);
+      });
+    }
+
+    function renderTextQuestions(filtered, selectedQuestions) {
+      const textDiv = document.getElementById("textQuestions");
+      textDiv.innerHTML = "";
+
+      selectedQuestions.forEach(q => {
+        const answers = filtered.filter(d => d.question === q && typeof d.value !== "number" && d.value.trim());
+        if (answers.length > 0) {
+          const block = document.createElement("div");
+          block.className = "text-question";
+
+          const title = document.createElement("div");
+          title.className = "text-question-title";
+          title.textContent = q;
+
+          const ul = document.createElement("ul");
+          answers.forEach(a => {
+            const li = document.createElement("li");
+            li.textContent = a.value;
+            ul.appendChild(li);
+          });
+
+          block.appendChild(title);
+          block.appendChild(ul);
+          textDiv.appendChild(block);
+        }
       });
     }
 

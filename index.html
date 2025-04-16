@@ -97,12 +97,18 @@
   <label>Perguntas Abertas:</label>
   <select id="textQuestionSelect" multiple></select>
 
+  <div class="toggle-btns">
+    <button onclick="setSection('assessment')" id="btn-assessment" class="active">Assessment</button>
+    <button onclick="setSection('evaluation')" id="btn-evaluation">Avaliação</button>
+  </div>
+
   <div id="overallChart" class="chart-container"></div>
   <div id="turmaCharts"></div>
   <div id="textQuestions"></div>
 
   <script>
     let rawData = [];
+    let currentSection = 'assessment';
 
     fetch('data.json')
       .then(res => res.json())
@@ -111,6 +117,13 @@
         populateClientFilter();
         applyFilters();
       });
+
+    function setSection(section) {
+      currentSection = section;
+      document.getElementById("btn-assessment").classList.toggle("active", section === 'assessment');
+      document.getElementById("btn-evaluation").classList.toggle("active", section === 'evaluation');
+      applyFilters();
+    }
 
     function populateClientFilter() {
       const clients = [...new Set(rawData.map(d => d.client))].sort();
@@ -188,7 +201,8 @@
       const filtered = rawData.filter(d =>
         (!filters.client || d.client === filters.client) &&
         (!filters.program || d.program === filters.program) &&
-        (!filters.turma.length || filters.turma.includes(d.turma))
+        (!filters.turma.length || filters.turma.includes(d.turma)) &&
+        (d.section === currentSection)
       );
 
       drawCharts(filtered);
@@ -212,7 +226,6 @@
       });
 
       const turmas = getSelectedTurmas();
-
       const container = document.getElementById("turmaCharts");
       container.innerHTML = "";
 
@@ -222,7 +235,7 @@
           const avg = values.reduce((a, b) => a + b, 0) / values.length;
           return { question: q, average: avg };
         });
-        drawBarChart("overallChart", overallData);
+        drawBarChart("overallChart", overallData, currentSection);
       } else {
         document.getElementById("overallChart").innerHTML = "";
       }
@@ -244,7 +257,7 @@
         div.id = chartId;
         container.appendChild(div);
 
-        drawBarChart(chartId, chartData);
+        drawBarChart(chartId, chartData, currentSection);
       });
     }
 
@@ -276,10 +289,15 @@
       });
     }
 
-    function drawBarChart(containerId, data) {
+    function drawBarChart(containerId, data, section) {
       const chart = echarts.init(document.getElementById(containerId));
       const questions = data.map(d => d.question);
       const values = data.map(d => d.average);
+
+      let colorFunc = '#61c277';
+      if (section === 'assessment') {
+        colorFunc = val => val.value < 3 ? '#d94e5d' : val.value < 4 ? '#f2c037' : '#61c277';
+      }
 
       chart.setOption({
         tooltip: {},
@@ -299,7 +317,7 @@
           type: "bar",
           data: values,
           itemStyle: {
-            color: val => val.value < 3 ? '#d94e5d' : val.value < 4 ? '#f2c037' : '#61c277'
+            color: colorFunc
           },
           label: {
             show: true,

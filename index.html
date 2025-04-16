@@ -25,13 +25,14 @@
       color: #007c91;
       margin-left: 15px;
     }
-    select {
-      margin: 10px;
-      padding: 5px;
+    .checkbox-group {
+      display: flex;
+      flex-wrap: wrap;
+      margin: 10px 0;
     }
-    select[multiple] {
-      width: 250px;
-      height: 120px;
+    .checkbox-group label {
+      margin-right: 20px;
+      white-space: nowrap;
     }
     .chart-container {
       width: 100%;
@@ -86,10 +87,10 @@
   <select id="programSelect"></select>
 
   <label>Turmas:</label>
-  <select id="turmaSelect" multiple></select>
+  <div id="turmaCheckboxGroup" class="checkbox-group"></div>
 
   <label>Perguntas Abertas:</label>
-  <select id="textQuestionSelect" multiple></select>
+  <div id="textQuestionCheckboxGroup" class="checkbox-group"></div>
 
   <div class="toggle-btns">
     <button onclick="setSection('assessment')" id="btn-assessment" class="active">Assessment</button>
@@ -109,6 +110,7 @@
       .then(data => {
         rawData = data;
         populateClientFilter();
+        applyFilters();
       });
 
     function setSection(section) {
@@ -116,21 +118,6 @@
       document.getElementById("btn-assessment").classList.toggle("active", section === 'assessment');
       document.getElementById("btn-evaluation").classList.toggle("active", section === 'evaluation');
       applyFilters();
-    }
-
-    function fillSelect(id, values) {
-      const select = document.getElementById(id);
-      select.innerHTML = '';
-      values.forEach(val => {
-        const opt = document.createElement("option");
-        opt.value = val;
-        opt.textContent = val.length > 80 ? val.slice(0, 77) + '…' : val;
-        select.appendChild(opt);
-      });
-    }
-
-    function getSelected(id) {
-      return Array.from(document.getElementById(id).selectedOptions).map(o => o.value);
     }
 
     function populateClientFilter() {
@@ -141,27 +128,56 @@
         const filtered = rawData.filter(d => d.client === selectedClient);
         const programs = [...new Set(filtered.map(d => d.program))].sort();
         fillSelect("programSelect", programs);
-        document.getElementById("programSelect").onchange = populateTurmas;
-        populateTurmas();
+        document.getElementById("programSelect").onchange = populateCheckboxGroups;
+        populateCheckboxGroups();
       };
     }
 
-    function populateTurmas() {
+    function fillSelect(id, values) {
+      const select = document.getElementById(id);
+      select.innerHTML = '<option value="">(todos)</option>';
+      values.forEach(val => {
+        const opt = document.createElement("option");
+        opt.value = val;
+        opt.textContent = val;
+        select.appendChild(opt);
+      });
+    }
+
+    function populateCheckboxGroups() {
       const client = document.getElementById("clientSelect").value;
       const program = document.getElementById("programSelect").value;
       const filtered = rawData.filter(d => d.client === client && d.program === program);
       const turmas = [...new Set(filtered.map(d => d.turma))].sort();
-      fillSelect("turmaSelect", turmas);
       const textQs = [...new Set(filtered.filter(d => typeof d.value !== 'number').map(d => d.question))].sort();
-      fillSelect("textQuestionSelect", textQs);
+
+      const turmaGroup = document.getElementById("turmaCheckboxGroup");
+      turmaGroup.innerHTML = "";
+      turmas.forEach(val => {
+        const label = document.createElement("label");
+        label.innerHTML = `<input type='checkbox' value='${val}' checked> ${val}`;
+        turmaGroup.appendChild(label);
+      });
+
+      const textGroup = document.getElementById("textQuestionCheckboxGroup");
+      textGroup.innerHTML = "";
+      textQs.forEach(val => {
+        const label = document.createElement("label");
+        label.innerHTML = `<input type='checkbox' value='${val}' checked> ${val.length > 50 ? val.slice(0, 47) + '…' : val}`;
+        textGroup.appendChild(label);
+      });
       applyFilters();
+    }
+
+    function getCheckedValues(groupId) {
+      return Array.from(document.querySelectorAll(`#${groupId} input[type='checkbox']:checked`)).map(el => el.value);
     }
 
     function applyFilters() {
       const client = document.getElementById("clientSelect").value;
       const program = document.getElementById("programSelect").value;
-      const turmas = getSelected("turmaSelect");
-      const selectedQuestions = getSelected("textQuestionSelect");
+      const turmas = getCheckedValues("turmaCheckboxGroup");
+      const selectedQuestions = getCheckedValues("textQuestionCheckboxGroup");
 
       const filtered = rawData.filter(d =>
         (!client || d.client === client) &&
@@ -193,19 +209,18 @@
       const container = document.getElementById("turmaCharts");
       container.innerHTML = "";
 
-      const turmaKeys = Object.keys(byTurma);
-
-      if (turmaKeys.length > 1) {
+      if (Object.keys(byTurma).length > 1) {
         const overallData = Object.entries(overall).map(([q, vals]) => ({
           question: q,
           average: vals.reduce((a, b) => a + b, 0) / vals.length
         }));
+        document.getElementById("overallChart").style.display = "block";
         drawBarChart("overallChart", overallData);
       } else {
-        document.getElementById("overallChart").innerHTML = "";
+        document.getElementById("overallChart").style.display = "none";
       }
 
-      turmaKeys.forEach((turma, idx) => {
+      Object.entries(byTurma).forEach(([turma, questions], idx) => {
         const chartId = `turmaChart${idx}`;
         const title = document.createElement("div");
         title.className = "turma-title";
@@ -216,11 +231,11 @@
         container.appendChild(title);
         container.appendChild(div);
 
-        const chartData = Object.entries(byTurma[turma]).map(([q, vals]) => ({
+        const data = Object.entries(questions).map(([q, vals]) => ({
           question: q,
           average: vals.reduce((a, b) => a + b, 0) / vals.length
         }));
-        drawBarChart(chartId, chartData);
+        drawBarChart(chartId, data);
       });
     }
 
@@ -246,31 +261,29 @@
     }
 
     function drawTextQuestions(data) {
-      const container = document.getElementById("textQuestions");
-      container.innerHTML = "";
-      const grouped = {};
+      const textDiv = document.getElementById("textQuestions");
+      textDiv.innerHTML = "";
+      const byQuestion = {};
       data.forEach(d => {
-        if (!grouped[d.question]) grouped[d.question] = [];
-        grouped[d.question].push(d.value);
+        if (!byQuestion[d.question]) byQuestion[d.question] = [];
+        byQuestion[d.question].push(d.value);
       });
 
-      Object.entries(grouped).forEach(([q, answers]) => {
+      Object.entries(byQuestion).forEach(([q, answers]) => {
         const box = document.createElement("div");
         box.className = "text-question";
-
         const title = document.createElement("div");
         title.className = "text-question-title";
         title.textContent = q;
-        box.appendChild(title);
-
-        const list = document.createElement("ul");
-        answers.forEach(answer => {
+        const ul = document.createElement("ul");
+        answers.forEach(txt => {
           const li = document.createElement("li");
-          li.textContent = answer;
-          list.appendChild(li);
+          li.textContent = txt;
+          ul.appendChild(li);
         });
-        box.appendChild(list);
-        container.appendChild(box);
+        box.appendChild(title);
+        box.appendChild(ul);
+        textDiv.appendChild(box);
       });
     }
   </script>

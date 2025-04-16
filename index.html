@@ -1,8 +1,8 @@
 <!DOCTYPE html>
 <html lang="pt">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Relatório de Formação</title>
   <script src="https://cdn.jsdelivr.net/npm/echarts@5"></script>
   <style>
@@ -86,28 +86,45 @@
     .toggle-btns button.active {
       background-color: #005c6b;
     }
-    #executiveSummary {
+    .hero-banner {
       display: flex;
-      flex-wrap: wrap;
-      justify-content: space-between;
-      padding: 20px;
-      border: 1px solid #ddd;
-      background: #f3fafa;
-      margin-top: 30px;
-      margin-bottom: 40px;
-      font-size: 16px;
+      align-items: center;
+      margin: 40px 0;
+      border-bottom: 1px solid #ccc;
+      padding-bottom: 30px;
     }
-    .summary-item {
-      flex: 1 1 200px;
-      margin: 10px;
+    .hero-left {
+      flex: 0 0 300px;
     }
-    .summary-label {
-      font-weight: bold;
-      color: #007c91;
+    .hero-img {
+      max-width: 100%;
     }
-    .summary-value {
+    .hero-right {
+      flex: 1;
+      padding-left: 40px;
+    }
+    .hero-subtitle {
+      font-style: italic;
+      color: #337d88;
+      font-size: 18px;
+      margin-bottom: 10px;
+    }
+    .hero-title {
+      font-size: 50px;
+      color: #337d88;
+      font-weight: 500;
+    }
+    .hero-tagline {
+      color: #337d88;
       font-size: 20px;
-      margin-top: 4px;
+      margin-bottom: 30px;
+    }
+    .hero-meta {
+      font-size: 18px;
+      color: #444;
+    }
+    .italic {
+      font-style: italic;
     }
   </style>
 </head>
@@ -117,7 +134,21 @@
     <div class="logo-text">MIND4TIME<br><span style="font-weight: normal; font-size: 14px;">Productivity Consulting</span></div>
   </header>
 
-  <h1>Relatório de Formação</h1>
+  <div id="executiveSummary" class="hero-banner">
+    <div class="hero-left">
+      <img src="cube.png" alt="Formação" class="hero-img" />
+    </div>
+    <div class="hero-right">
+      <div class="hero-subtitle" id="hero-subtitle"></div>
+      <div class="hero-title" id="hero-title"></div>
+      <div class="hero-tagline" id="hero-tagline"></div>
+      <div class="hero-meta">
+        <div><span class="italic">scope</span> temporal</div>
+        <div id="hero-date"></div>
+        <div id="hero-trainer"></div>
+      </div>
+    </div>
+  </div>
 
   <label>Cliente:</label>
   <select id="clientSelect"></select>
@@ -140,8 +171,6 @@
   <label>Formador:</label>
   <input type="text" id="trainerInput" placeholder="Nome do formador" style="margin-bottom: 20px; padding: 5px; width: 250px;">
 
-  <div id="executiveSummary"></div>
-
   <div class="toggle-btns">
     <button onclick="setSection('assessment')" id="btn-assessment" class="active">Assessment</button>
     <button onclick="setSection('evaluation')" id="btn-evaluation">Avaliação</button>
@@ -153,15 +182,18 @@
 
   <script>
     let rawData = [];
+    let metaConfig = { labels: [], titles: [] };
     let currentSection = 'assessment';
 
-    fetch('data.json')
-      .then(res => res.json())
-      .then(data => {
-        rawData = data;
-        populateClientFilter();
-        applyFilters();
-      });
+    Promise.all([
+      fetch('data.json').then(res => res.json()),
+      fetch('meta.json').then(res => res.json())
+    ]).then(([data, meta]) => {
+      rawData = data;
+      metaConfig = meta;
+      populateClientFilter();
+      applyFilters();
+    });
 
     function toggleDropdown(wrapperId) {
       document.getElementById(wrapperId).classList.toggle('open');
@@ -228,88 +260,54 @@
       const selectedQuestions = getChecked("textQuestionSelect");
       const trainer = document.getElementById("trainerInput").value || 'N/A';
 
+      const titleMeta = metaConfig.titles.find(t => t.programId === program);
+      if (titleMeta) {
+        document.getElementById("hero-title").textContent = titleMeta.title;
+        document.getElementById("hero-subtitle").textContent = titleMeta.subtitle;
+        document.getElementById("hero-tagline").textContent = titleMeta.tagline;
+      }
+
+      document.getElementById("hero-trainer").textContent = trainer;
+
       const filtered = rawData.filter(d =>
         (!client || d.client === client) &&
         (!program || d.program === program) &&
         (!turmas.length || turmas.includes(d.turma))
       );
 
-      const evalDates = filtered
-        .filter(d => d.section === 'evaluation' && d.date)
-        .map(d => new Date(d.date));
-      const assessDates = filtered
-        .filter(d => d.section === 'assessment' && d.date)
-        .map(d => new Date(d.date));
+      const evalDates = filtered.filter(d => d.section === 'evaluation' && d.date).map(d => new Date(d.date));
+      const assessDates = filtered.filter(d => d.section === 'assessment' && d.date).map(d => new Date(d.date));
+      const firstEval = evalDates.length ? new Intl.DateTimeFormat('pt-PT', { month: 'long', year: 'numeric' }).format(Math.min(...evalDates)) : 'N/A';
+      const firstAssess = assessDates.length ? new Intl.DateTimeFormat('pt-PT', { month: 'long', year: 'numeric' }).format(Math.min(...assessDates)) : 'N/A';
+      document.getElementById("hero-date").textContent = `${firstAssess || ''}${firstEval && firstEval !== firstAssess ? ' - ' + firstEval : ''}`;
 
-      const firstEval = evalDates.length ? new Intl.DateTimeFormat('pt-PT', { month: 'long', year: 'numeric' }).format(new Date(Math.min(...evalDates))) : 'N/A';
-      const firstAssess = assessDates.length ? new Intl.DateTimeFormat('pt-PT', { month: 'long', year: 'numeric' }).format(new Date(Math.min(...assessDates))) : 'N/A';
+      const filteredForSection = filtered.filter(d => d.section === currentSection);
+      const numeric = filteredForSection.filter(d => typeof d.value === 'number');
+      const text = filteredForSection.filter(d => typeof d.value !== 'number' && selectedQuestions.includes(d.question));
 
-      const summaryData = {
-        trainer,
-        firstEval,
-        firstAssess,
-        evalResponses: filtered.filter(d => d.section === 'evaluation' && typeof d.value === 'number').length,
-        assessResponses: filtered.filter(d => d.section === 'assessment' && typeof d.value === 'number').length,
-        classCount: new Set(filtered.map(d => d.turma)).size
-      };
-
-      document.getElementById("executiveSummary").innerHTML = `
-        <div class="summary-item">
-          <div class="summary-label">Primeira submissão avaliação</div>
-          <div class="summary-value">${summaryData.firstEval}</div>
-        </div>
-        <div class="summary-item">
-          <div class="summary-label">Primeira submissão assessment</div>
-          <div class="summary-value">${summaryData.firstAssess}</div>
-        </div>
-        <div class="summary-item">
-          <div class="summary-label">Formador</div>
-          <div class="summary-value">${summaryData.trainer}</div>
-        </div>
-        <div class="summary-item">
-          <div class="summary-label">Respostas avaliação</div>
-          <div class="summary-value">${summaryData.evalResponses}</div>
-        </div>
-        <div class="summary-item">
-          <div class="summary-label">Respostas assessment</div>
-          <div class="summary-value">${summaryData.assessResponses}</div>
-        </div>
-        <div class="summary-item">
-          <div class="summary-label">Nº Turmas</div>
-          <div class="summary-value">${summaryData.classCount}</div>
-        </div>
-      `;
-
-      const filteredForCurrentSection = filtered.filter(d => d.section === currentSection);
-      const numeric = filteredForCurrentSection.filter(d => typeof d.value === 'number');
-      const text = filteredForCurrentSection.filter(d => typeof d.value !== 'number' && selectedQuestions.includes(d.question));
-
-      drawCharts(numeric, turmas);
+      drawCharts(numeric, turmas, program);
       drawTextQuestions(text);
     }
 
-    function drawCharts(data, turmas) {
+    function drawCharts(data, turmas, program) {
       const byTurma = {};
       const overall = {};
-
       data.forEach(({ turma, question, value }) => {
         if (!byTurma[turma]) byTurma[turma] = {};
         if (!byTurma[turma][question]) byTurma[turma][question] = [];
         byTurma[turma][question].push(value);
-
         if (!overall[question]) overall[question] = [];
         overall[question].push(value);
       });
 
       const container = document.getElementById("turmaCharts");
       container.innerHTML = "";
-
       if (turmas.length > 1) {
         const overallData = Object.entries(overall).map(([q, vals]) => ({
           question: q,
           average: vals.reduce((a, b) => a + b, 0) / vals.length
         }));
-        drawBarChart("overallChart", overallData);
+        drawBarChart("overallChart", overallData, program);
       } else {
         document.getElementById("overallChart").innerHTML = "";
       }
@@ -324,31 +322,38 @@
         div.className = "chart-container";
         container.appendChild(title);
         container.appendChild(div);
-
         const data = Object.entries(questions).map(([q, vals]) => ({
           question: q,
           average: vals.reduce((a, b) => a + b, 0) / vals.length
         }));
-        drawBarChart(chartId, data);
+        drawBarChart(chartId, data, program);
       });
     }
 
-    function drawBarChart(containerId, data) {
+    function drawBarChart(containerId, data, program) {
       const chart = echarts.init(document.getElementById(containerId));
-      const questions = data.map(d => d.question);
+      const labelMap = {}, orderMap = {};
+      metaConfig.labels.filter(l => l.programId === program).forEach(({ questionId, label, sortOrder }) => {
+        labelMap[questionId] = label;
+        orderMap[questionId] = +sortOrder;
+      });
+
+      data.sort((a, b) => (orderMap[a.question] || 999) - (orderMap[b.question] || 999));
+      const questions = data.map(d => labelMap[d.question] || d.question);
       const values = data.map(d => d.average);
-      const color = currentSection === 'assessment'
-        ? val => val.value < 3 ? '#d94e5d' : val.value < 4 ? '#f2c037' : '#61c277'
-        : '#61c277';
 
       chart.setOption({
         tooltip: {},
         xAxis: { type: 'category', data: questions, axisLabel: { rotate: 30 } },
-        yAxis: { type: 'value', min: 0, max: 5, axisLabel: { show: false } },
+        yAxis: { type: 'value', min: 0, max: 5 },
         series: [{
           type: 'bar',
           data: values,
-          itemStyle: { color },
+          itemStyle: {
+            color: currentSection === 'assessment'
+              ? val => val.value < 3 ? '#d94e5d' : val.value < 4 ? '#f2c037' : '#61c277'
+              : '#61c277'
+          },
           label: { show: true, position: 'top', formatter: '{c}' }
         }]
       });
@@ -362,7 +367,6 @@
         if (!byQuestion[d.question]) byQuestion[d.question] = [];
         byQuestion[d.question].push(d.value);
       });
-
       Object.entries(byQuestion).forEach(([q, answers]) => {
         const box = document.createElement("div");
         box.className = "text-question";

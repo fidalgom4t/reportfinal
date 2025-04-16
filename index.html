@@ -62,6 +62,19 @@
       font-size: 16px;
       color: #007c91;
     }
+
+    .toggle-btns button {
+      margin: 5px;
+      padding: 8px 16px;
+      border: none;
+      background-color: #007c91;
+      color: #fff;
+      cursor: pointer;
+    }
+
+    .toggle-btns button.active {
+      background-color: #005c6b;
+    }
   </style>
 </head>
 <body>
@@ -84,12 +97,18 @@
   <label>Perguntas Abertas:</label>
   <select id="textQuestionSelect" multiple></select>
 
-  <div class="chart-container" id="overallChart"></div>
+  <div class="toggle-btns">
+    <button onclick="setSection('assessment')" id="btn-assessment" class="active">Assessment</button>
+    <button onclick="setSection('evaluation')" id="btn-evaluation">Avaliação</button>
+  </div>
+
+  <div id="overallChart" class="chart-container"></div>
   <div id="turmaCharts"></div>
   <div id="textQuestions"></div>
 
   <script>
     let rawData = [];
+    let currentSection = 'assessment';
 
     fetch('data.json')
       .then(res => res.json())
@@ -98,6 +117,13 @@
         populateClientFilter();
         applyFilters();
       });
+
+    function setSection(section) {
+      currentSection = section;
+      document.getElementById("btn-assessment").classList.toggle("active", section === 'assessment');
+      document.getElementById("btn-evaluation").classList.toggle("active", section === 'evaluation');
+      applyFilters();
+    }
 
     function populateClientFilter() {
       const clients = [...new Set(rawData.map(d => d.client))].sort();
@@ -175,7 +201,8 @@
       const filtered = rawData.filter(d =>
         (!filters.client || d.client === filters.client) &&
         (!filters.program || d.program === filters.program) &&
-        (!filters.turma.length || filters.turma.includes(d.turma))
+        (!filters.turma.length || filters.turma.includes(d.turma)) &&
+        (d.section === currentSection)
       );
 
       drawCharts(filtered, filters);

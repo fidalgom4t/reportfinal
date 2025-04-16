@@ -54,7 +54,8 @@
       font-size: 16px;
       color: #007c91;
     }
-    .toggle-btns button {
+    .program-buttons button,
+    .section-toggle button {
       margin: 5px;
       padding: 8px 16px;
       border: none;
@@ -62,11 +63,23 @@
       color: #fff;
       cursor: pointer;
     }
-    .toggle-btns button.active {
-      background-color: #005c6b;
+    .section {
+      display: none;
+      margin-top: 30px;
     }
-    .filter-group {
-      margin-bottom: 20px;
+    .active-section {
+      display: block;
+    }
+    .summary-box {
+      border: 2px solid #007c91;
+      padding: 20px;
+      margin-bottom: 30px;
+    }
+    .summary-box h2 {
+      margin-top: 0;
+    }
+    .formador-select {
+      margin-top: 10px;
     }
   </style>
 </head>
@@ -76,209 +89,141 @@
     <div class="logo-text">MIND4TIME<br><span style="font-weight: normal; font-size: 14px;">Productivity Consulting</span></div>
   </header>
 
-  <h1>Relatório de Formação</h1>
-
-  <div class="filter-group">
-    <label>Cliente:</label>
-    <select id="clientSelect"></select>
-
-    <label>Turmas:</label>
-    <select id="turmaSelect" multiple></select>
-
-    <label>Perguntas Abertas:</label>
-    <select id="textQuestionSelect" multiple></select>
+  <div id="welcome">
+    <img src="welcome.png" alt="Página Inicial" style="width: 100%; max-width: 900px;">
   </div>
 
-  <div class="toggle-btns" id="programButtons"></div>
+  <h1>Relatório de Formação</h1>
+  <label>Cliente:</label>
+  <select id="clientSelect"></select>
 
-  <div id="reportContainer"></div>
+  <div class="program-buttons" id="programButtons"></div>
+  <div id="programSections"></div>
 
   <script>
     let rawData = [];
-    let currentProgram = null;
-    const reportContainer = document.getElementById('reportContainer');
 
     fetch('data.json')
       .then(res => res.json())
       .then(data => {
         rawData = data;
-        populateClientFilter();
+        populateClients();
       });
 
-    function fillSelect(id, values, multiple = false) {
-      const select = document.getElementById(id);
-      select.innerHTML = '';
-      values.forEach(val => {
-        const opt = document.createElement("option");
-        opt.value = val;
-        opt.textContent = val.length > 50 ? val.slice(0, 47) + '…' : val;
-        select.appendChild(opt);
-      });
-    }
-
-    function getSelected(id) {
-      return Array.from(document.getElementById(id).selectedOptions).map(o => o.value);
-    }
-
-    function populateClientFilter() {
+    function populateClients() {
+      const clientSelect = document.getElementById("clientSelect");
       const clients = [...new Set(rawData.map(d => d.client))].sort();
-      fillSelect("clientSelect", clients);
-      document.getElementById("clientSelect").onchange = () => {
-        const selectedClient = document.getElementById("clientSelect").value;
-        const filtered = rawData.filter(d => d.client === selectedClient);
-        const programs = [...new Set(filtered.map(d => d.program))].sort();
-
-        // Create toggle buttons for programs
-        const programBtns = document.getElementById("programButtons");
-        programBtns.innerHTML = '';
-        programs.forEach(p => {
-          const btn = document.createElement("button");
-          btn.textContent = p;
-          btn.className = "toggle-btn";
-          btn.onclick = () => setProgram(p);
-          programBtns.appendChild(btn);
-        });
-
-        // default selection
-        setProgram(programs[0]);
-      };
+      clients.forEach(client => {
+        const opt = document.createElement("option");
+        opt.value = client;
+        opt.textContent = client;
+        clientSelect.appendChild(opt);
+      });
+      clientSelect.onchange = () => generateProgramButtons(clientSelect.value);
     }
 
-    function setProgram(program) {
-      currentProgram = program;
-      const client = document.getElementById("clientSelect").value;
-      const filtered = rawData.filter(d => d.client === client && d.program === program);
-      const turmas = [...new Set(filtered.map(d => d.turma))].sort();
-      const textQs = [...new Set(filtered.filter(d => typeof d.value !== 'number').map(d => d.question))].sort();
+    function generateProgramButtons(client) {
+      const container = document.getElementById("programButtons");
+      container.innerHTML = '';
+      const programs = [...new Set(rawData.filter(d => d.client === client).map(d => d.program))];
+      const sectionContainer = document.getElementById("programSections");
+      sectionContainer.innerHTML = '';
 
-      fillSelect("turmaSelect", turmas, true);
-      fillSelect("textQuestionSelect", textQs, true);
+      programs.forEach(program => {
+        const btn = document.createElement("button");
+        btn.textContent = program;
+        btn.onclick = () => showProgramSection(program);
+        container.appendChild(btn);
 
-      document.getElementById("turmaSelect").onchange = renderReport;
-      document.getElementById("textQuestionSelect").onchange = renderReport;
-      renderReport();
+        const section = document.createElement("div");
+        section.id = `section-${program}`;
+        section.className = 'section';
+        sectionContainer.appendChild(section);
+
+        renderProgramSection(section, client, program);
+      });
     }
 
-    function renderReport() {
-      const client = document.getElementById("clientSelect").value;
-      const turmas = getSelected("turmaSelect");
-      const selectedTextQs = getSelected("textQuestionSelect");
-      const sectionData = rawData.filter(d =>
-        d.client === client &&
-        d.program === currentProgram &&
-        (!turmas.length || turmas.includes(d.turma))
-      );
-
-      const assessments = sectionData.filter(d => d.section === 'assessment');
-      const evaluations = sectionData.filter(d => d.section === 'evaluation');
-
-      reportContainer.innerHTML = '';
-
-      if (assessments.length > 0) {
-        addSection('Assessment', assessments, turmas, selectedTextQs, true);
-      }
-      if (evaluations.length > 0) {
-        addSection('Avaliação', evaluations, turmas, selectedTextQs, false);
-      }
+    function showProgramSection(program) {
+      document.querySelectorAll('.section').forEach(div => div.classList.remove('active-section'));
+      document.getElementById(`section-${program}`).classList.add('active-section');
     }
 
-    function addSection(title, data, turmas, textQs, useHeatmap) {
-      const titleEl = document.createElement('h2');
-      titleEl.textContent = `${title} - ${currentProgram}`;
-      reportContainer.appendChild(titleEl);
+    function renderProgramSection(container, client, program) {
+      const data = rawData.filter(d => d.client === client && d.program === program);
+      const assessment = data.filter(d => d.section === 'assessment');
+      const evaluation = data.filter(d => d.section === 'evaluation');
 
-      const chartDiv = document.createElement('div');
-      chartDiv.className = 'chart-container';
-      chartDiv.id = `${title}-overall`; 
-      if (turmas.length > 1) reportContainer.appendChild(chartDiv);
+      const months = str => new Date(str).toLocaleDateString('pt-PT', { month: 'long', year: 'numeric' });
+      const scope = `${months(assessment[0]?.submitted_at)} - ${months(evaluation[0]?.submitted_at)}`;
 
-      const turmaContainer = document.createElement('div');
-      reportContainer.appendChild(turmaContainer);
+      const formadorSet = new Set(data.map(d => d.trainer).filter(Boolean));
+      const formadores = Array.from(formadorSet).sort();
 
-      const byTurma = {};
-      const overall = {};
+      const summary = `
+        <div class="summary-box">
+          <h2>${program}</h2>
+          <p><strong>Scope Temporal:</strong> ${scope}</p>
+          <p><strong>Respostas Assessment:</strong> ${assessment.length}</p>
+          <p><strong>Respostas Avaliação:</strong> ${evaluation.length}</p>
+          <label>Formador:</label>
+          <select class="formador-select">
+            ${formadores.map(f => `<option>${f}</option>`).join('')}
+          </select>
+        </div>`;
 
-      data.forEach(({ turma, question, value }) => {
-        if (typeof value === 'number') {
-          if (!byTurma[turma]) byTurma[turma] = {};
-          if (!byTurma[turma][question]) byTurma[turma][question] = [];
-          byTurma[turma][question].push(value);
+      const chartDiv = `<div id="chart-${program}" class="chart-container"></div>`;
+      const textDiv = `<div id="text-${program}"></div>`;
+      container.innerHTML = summary + chartDiv + textDiv;
 
-          if (!overall[question]) overall[question] = [];
-          overall[question].push(value);
+      const chartData = {};
+      assessment.concat(evaluation).forEach(d => {
+        if (typeof d.value === 'number') {
+          if (!chartData[d.question]) chartData[d.question] = [];
+          chartData[d.question].push(d.value);
         }
       });
 
-      if (turmas.length > 1) {
-        const overallData = Object.entries(overall).map(([q, vals]) => ({
-          question: q,
-          average: vals.reduce((a, b) => a + b, 0) / vals.length
-        }));
-        drawBarChart(`${title}-overall`, overallData, useHeatmap);
-      }
+      const chartDataset = Object.entries(chartData).map(([q, vals]) => ({
+        question: q,
+        average: vals.reduce((a, b) => a + b, 0) / vals.length
+      }));
+      drawBarChart(`chart-${program}`, chartDataset);
 
-      Object.entries(byTurma).forEach(([turma, questions], i) => {
-        const chartId = `${title}-turma-${i}`;
-        const title = document.createElement("div");
-        title.className = "turma-title";
-        title.textContent = `Turma: ${turma}`;
-        const div = document.createElement("div");
-        div.id = chartId;
-        div.className = "chart-container";
-        turmaContainer.appendChild(title);
-        turmaContainer.appendChild(div);
-
-        const chartData = Object.entries(questions).map(([q, vals]) => ({
-          question: q,
-          average: vals.reduce((a, b) => a + b, 0) / vals.length
-        }));
-        drawBarChart(chartId, chartData, useHeatmap);
+      const textMap = {};
+      data.filter(d => typeof d.value !== 'number').forEach(d => {
+        if (!textMap[d.question]) textMap[d.question] = [];
+        textMap[d.question].push(d.value);
       });
-
-      const textData = data.filter(d => typeof d.value !== 'number' && textQs.includes(d.question));
-      const textDiv = document.createElement('div');
-      reportContainer.appendChild(textDiv);
-      const byQuestion = {};
-      textData.forEach(d => {
-        if (!byQuestion[d.question]) byQuestion[d.question] = [];
-        byQuestion[d.question].push(d.value);
-      });
-
-      Object.entries(byQuestion).forEach(([q, answers]) => {
+      const textContainer = document.getElementById(`text-${program}`);
+      Object.entries(textMap).forEach(([q, answers]) => {
         const box = document.createElement("div");
         box.className = "text-question";
-        const title = document.createElement("div");
-        title.className = "text-question-title";
-        title.textContent = q;
-        const ul = document.createElement("ul");
-        answers.forEach(txt => {
-          const li = document.createElement("li");
-          li.textContent = txt;
-          ul.appendChild(li);
-        });
-        box.appendChild(title);
-        box.appendChild(ul);
-        textDiv.appendChild(box);
+        box.innerHTML = `<div class="text-question-title">${q}</div>` + answers.map(a => `<p>${a}</p>`).join('');
+        textContainer.appendChild(box);
       });
     }
 
-    function drawBarChart(containerId, data, useHeatmap) {
+    function drawBarChart(containerId, data) {
       const chart = echarts.init(document.getElementById(containerId));
       const questions = data.map(d => d.question);
       const values = data.map(d => d.average);
-      const color = useHeatmap
-        ? val => val.value < 3 ? '#d94e5d' : val.value < 4 ? '#f2c037' : '#61c277'
-        : '#61c277';
 
       chart.setOption({
         tooltip: {},
         xAxis: { type: 'category', data: questions, axisLabel: { rotate: 30 } },
-        yAxis: { type: 'value', min: 0, max: 5, axisLabel: { show: false } },
+        yAxis: { type: 'value', min: 0, max: 5 },
         series: [{
           type: 'bar',
           data: values,
-          itemStyle: { color },
-          label: { show: true, position: 'top', formatter: '{c}' }
+          itemStyle: {
+            color: val => val.value < 3 ? '#d94e5d' : val.value < 4 ? '#f2c037' : '#61c277'
+          },
+          label: {
+            show: true,
+            position: 'top',
+            formatter: '{c}'
+          }
         }]
       });
     }

@@ -1,9 +1,8 @@
-<!-- index.html - Web app version hosted via GitHub Pages or any static hosting -->
 <!DOCTYPE html>
 <html lang="pt">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Relatório de Formação</title>
   <script src="https://cdn.jsdelivr.net/npm/echarts@5"></script>
   <style>
@@ -13,7 +12,6 @@
       background-color: #fff;
       color: #333;
     }
-
     header {
       display: flex;
       align-items: center;
@@ -21,25 +19,26 @@
       padding-bottom: 10px;
       margin-bottom: 30px;
     }
-
     .logo-text {
       font-size: 20px;
       font-weight: bold;
       color: #007c91;
       margin-left: 15px;
     }
-
     select {
       margin: 10px;
       padding: 5px;
     }
-
+    select[multiple] {
+      width: 250px;
+      height: 100px;
+      overflow-y: scroll;
+    }
     .chart-container {
       width: 100%;
       height: 400px;
       margin-bottom: 40px;
     }
-
     .turma-title {
       font-size: 18px;
       font-weight: bold;
@@ -47,7 +46,6 @@
       margin-bottom: 10px;
       color: #007c91;
     }
-
     .text-question {
       border: 1px solid #007c91;
       border-left: 6px solid #007c91;
@@ -55,14 +53,12 @@
       margin-bottom: 30px;
       background: #f9f9f9;
     }
-
     .text-question-title {
       font-weight: bold;
       margin-bottom: 8px;
       font-size: 16px;
       color: #007c91;
     }
-
     .toggle-btns button {
       margin: 5px;
       padding: 8px 16px;
@@ -71,7 +67,6 @@
       color: #fff;
       cursor: pointer;
     }
-
     .toggle-btns button.active {
       background-color: #005c6b;
     }
@@ -125,207 +120,155 @@
       applyFilters();
     }
 
-    function populateClientFilter() {
-      const clients = [...new Set(rawData.map(d => d.client))].sort();
-      fillSelect("clientSelect", clients);
-      document.getElementById("clientSelect").onchange = () => {
-        populateProgramFilter();
-        applyFilters();
-      };
-    }
-
-    function populateProgramFilter() {
-      const selectedClient = document.getElementById("clientSelect").value;
-      const filtered = rawData.filter(d => d.client === selectedClient);
-      const programs = [...new Set(filtered.map(d => d.program))].sort();
-      fillSelect("programSelect", programs);
-      document.getElementById("programSelect").onchange = () => {
-        populateTurmaFilter();
-        applyFilters();
-      };
-      populateTurmaFilter();
-    }
-
-    function populateTurmaFilter() {
-      const selectedClient = document.getElementById("clientSelect").value;
-      const selectedProgram = document.getElementById("programSelect").value;
-      const filtered = rawData.filter(d =>
-        d.client === selectedClient && d.program === selectedProgram
-      );
-      const turmas = [...new Set(filtered.map(d => d.turma))].sort();
-      fillSelect("turmaSelect", turmas, true);
-      document.getElementById("turmaSelect").onchange = applyFilters;
-      populateTextQuestionFilter(filtered);
-    }
-
-    function populateTextQuestionFilter(filtered) {
-      const textQuestions = [...new Set(
-        filtered
-          .filter(d => typeof d.value !== "number" && d.value.trim())
-          .map(d => d.question)
-      )].sort();
-      fillSelect("textQuestionSelect", textQuestions, true);
-      document.getElementById("textQuestionSelect").onchange = applyFilters;
-    }
-
     function fillSelect(id, values, multiple = false) {
       const select = document.getElementById(id);
       select.innerHTML = multiple ? '' : '<option value="">(todos)</option>';
       values.forEach(val => {
         const opt = document.createElement("option");
         opt.value = val;
-        opt.textContent = val;
+        opt.textContent = val.length > 50 ? val.slice(0, 47) + '…' : val;
         select.appendChild(opt);
       });
     }
 
-    function getSelectedTurmas() {
-      const select = document.getElementById("turmaSelect");
-      return Array.from(select.selectedOptions).map(o => o.value);
+    function getSelected(id) {
+      return Array.from(document.getElementById(id).selectedOptions).map(o => o.value);
     }
 
-    function getSelectedTextQuestions() {
-      const select = document.getElementById("textQuestionSelect");
-      return Array.from(select.selectedOptions).map(o => o.value);
+    function populateClientFilter() {
+      const clients = [...new Set(rawData.map(d => d.client))].sort();
+      fillSelect("clientSelect", clients);
+      document.getElementById("clientSelect").onchange = () => {
+        const selectedClient = document.getElementById("clientSelect").value;
+        const filtered = rawData.filter(d => d.client === selectedClient);
+        const programs = [...new Set(filtered.map(d => d.program))].sort();
+        fillSelect("programSelect", programs);
+        document.getElementById("programSelect").onchange = populateTurmas;
+        populateTurmas();
+      };
+    }
+
+    function populateTurmas() {
+      const client = document.getElementById("clientSelect").value;
+      const program = document.getElementById("programSelect").value;
+      const filtered = rawData.filter(d => d.client === client && d.program === program);
+      const turmas = [...new Set(filtered.map(d => d.turma))].sort();
+      fillSelect("turmaSelect", turmas, true);
+      const textQs = [...new Set(filtered.filter(d => typeof d.value !== 'number').map(d => d.question))].sort();
+      fillSelect("textQuestionSelect", textQs, true);
+      applyFilters();
     }
 
     function applyFilters() {
-      const filters = {
-        client: document.getElementById("clientSelect").value,
-        program: document.getElementById("programSelect").value,
-        turma: getSelectedTurmas()
-      };
-
-      const selectedTextQuestions = getSelectedTextQuestions();
+      const client = document.getElementById("clientSelect").value;
+      const program = document.getElementById("programSelect").value;
+      const turmas = getSelected("turmaSelect");
+      const selectedQuestions = getSelected("textQuestionSelect");
 
       const filtered = rawData.filter(d =>
-        (!filters.client || d.client === filters.client) &&
-        (!filters.program || d.program === filters.program) &&
-        (!filters.turma.length || filters.turma.includes(d.turma)) &&
-        (d.section === currentSection)
+        (!client || d.client === client) &&
+        (!program || d.program === program) &&
+        (!turmas.length || turmas.includes(d.turma)) &&
+        d.section === currentSection
       );
 
-      drawCharts(filtered);
-      renderTextQuestions(filtered, selectedTextQuestions);
+      const numeric = filtered.filter(d => typeof d.value === 'number');
+      const text = filtered.filter(d => typeof d.value !== 'number' && selectedQuestions.includes(d.question));
+
+      drawCharts(numeric);
+      drawTextQuestions(text);
     }
 
-    function drawCharts(filtered) {
-      const turmaMap = {};
-      const globalGroup = {};
+    function drawCharts(data) {
+      const byTurma = {};
+      const overall = {};
 
-      filtered.forEach(entry => {
-        const { turma, question, value } = entry;
-        if (typeof value !== "number") return;
+      data.forEach(({ turma, question, value }) => {
+        if (!byTurma[turma]) byTurma[turma] = {};
+        if (!byTurma[turma][question]) byTurma[turma][question] = [];
+        byTurma[turma][question].push(value);
 
-        if (!turmaMap[turma]) turmaMap[turma] = {};
-        if (!turmaMap[turma][question]) turmaMap[turma][question] = [];
-        turmaMap[turma][question].push(value);
-
-        if (!globalGroup[question]) globalGroup[question] = [];
-        globalGroup[question].push(value);
+        if (!overall[question]) overall[question] = [];
+        overall[question].push(value);
       });
 
-      const turmas = getSelectedTurmas();
       const container = document.getElementById("turmaCharts");
       container.innerHTML = "";
 
-      if (turmas.length > 1 || turmas.length === 0) {
-        const overallData = Object.keys(globalGroup).map(q => {
-          const values = globalGroup[q];
-          const avg = values.reduce((a, b) => a + b, 0) / values.length;
-          return { question: q, average: avg };
-        });
-        drawBarChart("overallChart", overallData, currentSection);
+      if (Object.keys(byTurma).length > 1) {
+        const overallData = Object.entries(overall).map(([q, vals]) => ({
+          question: q,
+          average: vals.reduce((a, b) => a + b, 0) / vals.length
+        }));
+        drawBarChart("overallChart", overallData);
       } else {
         document.getElementById("overallChart").innerHTML = "";
       }
 
-      Object.entries(turmaMap).forEach(([turma, questionData], i) => {
-        const chartId = `turmaChart${i}`;
-        const chartData = Object.entries(questionData).map(([q, vals]) => ({
-          question: q,
-          average: vals.reduce((a, b) => a + b, 0) / vals.length
-        }));
-
+      Object.entries(byTurma).forEach(([turma, questions], idx) => {
+        const chartId = `turmaChart${idx}`;
         const title = document.createElement("div");
         title.className = "turma-title";
         title.textContent = `Turma: ${turma}`;
-        container.appendChild(title);
-
         const div = document.createElement("div");
-        div.className = "chart-container";
         div.id = chartId;
+        div.className = "chart-container";
+        container.appendChild(title);
         container.appendChild(div);
 
-        drawBarChart(chartId, chartData, currentSection);
+        const data = Object.entries(questions).map(([q, vals]) => ({
+          question: q,
+          average: vals.reduce((a, b) => a + b, 0) / vals.length
+        }));
+        drawBarChart(chartId, data);
       });
     }
 
-    function renderTextQuestions(filtered, selectedQuestions) {
-      const textDiv = document.getElementById("textQuestions");
-      textDiv.innerHTML = "";
-
-      selectedQuestions.forEach(q => {
-        const answers = filtered.filter(d => d.question === q && typeof d.value !== "number" && d.value.trim());
-        if (answers.length > 0) {
-          const block = document.createElement("div");
-          block.className = "text-question";
-
-          const title = document.createElement("div");
-          title.className = "text-question-title";
-          title.textContent = q;
-
-          const ul = document.createElement("ul");
-          answers.forEach(a => {
-            const li = document.createElement("li");
-            li.textContent = a.value;
-            ul.appendChild(li);
-          });
-
-          block.appendChild(title);
-          block.appendChild(ul);
-          textDiv.appendChild(block);
-        }
-      });
-    }
-
-    function drawBarChart(containerId, data, section) {
+    function drawBarChart(containerId, data) {
       const chart = echarts.init(document.getElementById(containerId));
       const questions = data.map(d => d.question);
       const values = data.map(d => d.average);
-
-      let colorFunc = '#61c277';
-      if (section === 'assessment') {
-        colorFunc = val => val.value < 3 ? '#d94e5d' : val.value < 4 ? '#f2c037' : '#61c277';
-      }
+      const color = currentSection === 'assessment'
+        ? val => val.value < 3 ? '#d94e5d' : val.value < 4 ? '#f2c037' : '#61c277'
+        : '#61c277';
 
       chart.setOption({
         tooltip: {},
-        xAxis: {
-          type: "category",
-          data: questions,
-          axisLabel: { rotate: 30, color: "#333" }
-        },
-        yAxis: {
-          type: "value",
-          min: 0,
-          max: 5,
-          axisLabel: { show: false },
-          splitLine: { show: false }
-        },
+        xAxis: { type: 'category', data: questions, axisLabel: { rotate: 30 } },
+        yAxis: { type: 'value', min: 0, max: 5, axisLabel: { show: false } },
         series: [{
-          type: "bar",
+          type: 'bar',
           data: values,
-          itemStyle: {
-            color: colorFunc
-          },
-          label: {
-            show: true,
-            position: "top",
-            formatter: '{c}',
-            color: "#333"
-          }
+          itemStyle: { color },
+          label: { show: true, position: 'top', formatter: '{c}' }
         }]
+      });
+    }
+
+    function drawTextQuestions(data) {
+      const textDiv = document.getElementById("textQuestions");
+      textDiv.innerHTML = "";
+      const byQuestion = {};
+      data.forEach(d => {
+        if (!byQuestion[d.question]) byQuestion[d.question] = [];
+        byQuestion[d.question].push(d.value);
+      });
+
+      Object.entries(byQuestion).forEach(([q, answers]) => {
+        const box = document.createElement("div");
+        box.className = "text-question";
+        const title = document.createElement("div");
+        title.className = "text-question-title";
+        title.textContent = q;
+        const ul = document.createElement("ul");
+        answers.forEach(txt => {
+          const li = document.createElement("li");
+          li.textContent = txt;
+          ul.appendChild(li);
+        });
+        box.appendChild(title);
+        box.appendChild(ul);
+        textDiv.appendChild(box);
       });
     }
   </script>

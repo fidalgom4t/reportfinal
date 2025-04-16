@@ -25,7 +25,7 @@
       color: #007c91;
       margin-left: 15px;
     }
-    select, .multi-select {
+    select {
       margin: 10px;
       padding: 5px;
     }
@@ -33,6 +33,17 @@
       width: 100%;
       height: 400px;
       margin-bottom: 40px;
+    }
+    .section {
+      margin-top: 50px;
+      padding: 20px;
+      border-top: 2px solid #007c91;
+    }
+    .summary-box {
+      border: 1px solid #007c91;
+      background: #f4f9fa;
+      padding: 20px;
+      margin-bottom: 20px;
     }
     .text-question {
       border: 1px solid #007c91;
@@ -47,17 +58,6 @@
       font-size: 16px;
       color: #007c91;
     }
-    .section-toggle button {
-      margin: 5px;
-      padding: 8px 16px;
-      border: none;
-      background-color: #007c91;
-      color: #fff;
-      cursor: pointer;
-    }
-    .section-toggle button.active {
-      background-color: #005c6b;
-    }
   </style>
 </head>
 <body>
@@ -70,23 +70,11 @@
 
   <label>Cliente:</label>
   <select id="clientSelect"></select>
-  <label>Turmas:</label>
-  <select id="turmaSelect" multiple></select>
-  <label>Perguntas Abertas:</label>
-  <select id="textQuestionSelect" multiple></select>
 
-  <div class="section-toggle">
-    <button onclick="setSection('assessment')" id="btn-assessment" class="active">Assessment</button>
-    <button onclick="setSection('evaluation')" id="btn-evaluation">Avaliação</button>
-  </div>
-
-  <div class="chart-container" id="overallChart"></div>
-  <div id="turmaCharts"></div>
-  <div id="textQuestions"></div>
+  <div id="content"></div>
 
   <script>
     let rawData = [];
-    let currentSection = 'assessment';
 
     fetch('data.json')
       .then(res => res.json())
@@ -106,164 +94,111 @@
         select.appendChild(opt);
       });
       select.onchange = () => {
-        populateTurmas();
-        applyFilters();
+        renderClientPrograms(select.value);
       };
     }
 
-    function populateTurmas() {
-      const client = document.getElementById("clientSelect").value;
-      const turmas = [...new Set(rawData.filter(d => d.client === client).map(d => d.turma))].sort();
-      const turmaSelect = document.getElementById("turmaSelect");
-      turmaSelect.innerHTML = '';
-      turmas.forEach(t => {
-        const opt = document.createElement("option");
-        opt.value = t;
-        opt.textContent = t;
-        turmaSelect.appendChild(opt);
-      });
+    function renderClientPrograms(client) {
+      const content = document.getElementById("content");
+      content.innerHTML = '';
+      const clientData = rawData.filter(d => d.client === client);
+      const programs = [...new Set(clientData.map(d => d.program))];
 
-      const questions = [...new Set(rawData.filter(d => d.client === client && typeof d.value !== 'number').map(d => d.question))].sort();
-      const textSelect = document.getElementById("textQuestionSelect");
-      textSelect.innerHTML = '';
-      questions.forEach(q => {
-        const opt = document.createElement("option");
-        opt.value = q;
-        opt.textContent = q.slice(0, 60);
-        textSelect.appendChild(opt);
-      });
-    }
+      programs.forEach(program => {
+        const section = document.createElement('div');
+        section.className = 'section';
 
-    function setSection(section) {
-      currentSection = section;
-      document.getElementById("btn-assessment").classList.toggle("active", section === 'assessment');
-      document.getElementById("btn-evaluation").classList.toggle("active", section === 'evaluation');
-      applyFilters();
-    }
+        const progData = clientData.filter(d => d.program === program);
+        const assessmentData = progData.filter(d => d.section === 'assessment');
+        const evaluationData = progData.filter(d => d.section === 'evaluation');
 
-    function getSelected(id) {
-      return Array.from(document.getElementById(id).selectedOptions).map(o => o.value);
-    }
+        // Datas de submissão
+        const parseDate = str => new Date(str);
+        const formatDate = date => date.toLocaleDateString('pt-PT', { month: 'long', year: 'numeric' });
+        const start = formatDate(new Date(Math.min(...assessmentData.map(d => parseDate(d.submitted_at)))));
+        const end = formatDate(new Date(Math.min(...evaluationData.map(d => parseDate(d.submitted_at)))));
 
-    function applyFilters() {
-      const client = document.getElementById("clientSelect").value;
-      const turmas = getSelected("turmaSelect");
-      const textQuestions = getSelected("textQuestionSelect");
+        // Formador
+        const trainers = [...new Set(progData.map(d => d.trainer).filter(Boolean))];
 
-      const filtered = rawData.filter(d =>
-        d.client === client &&
-        d.section === currentSection &&
-        (!turmas.length || turmas.includes(d.turma))
-      );
+        section.innerHTML = `
+          <h2>${program}</h2>
+          <div class="summary-box">
+            <p><strong>Scope temporal:</strong> ${start} - ${end}</p>
+            <p><strong>Respostas Assessment:</strong> ${new Set(assessmentData.map(d => d.id)).size}</p>
+            <p><strong>Respostas Avaliação:</strong> ${new Set(evaluationData.map(d => d.id)).size}</p>
+            <p><strong>Formador:</strong>
+              <select>
+                ${trainers.map(t => `<option>${t}</option>`).join('')}
+              </select>
+            </p>
+          </div>
+        `;
 
-      drawCharts(filtered);
+        const chartA = document.createElement('div');
+        chartA.className = 'chart-container';
+        section.appendChild(chartA);
+        renderChart(chartA, assessmentData);
 
-      const texts = filtered.filter(d => typeof d.value !== 'number' && textQuestions.includes(d.question));
-      drawTextQuestions(texts);
-    }
+        const chartE = document.createElement('div');
+        chartE.className = 'chart-container';
+        section.appendChild(chartE);
+        renderChart(chartE, evaluationData);
 
-    function drawCharts(data) {
-      const byTurma = {};
-      const overall = {};
+        const textContainer = document.createElement('div');
+        section.appendChild(textContainer);
+        renderTextQuestions(textContainer, [...assessmentData, ...evaluationData]);
 
-      data.forEach(({ turma, question, value }) => {
-        if (typeof value !== 'number') return;
-        if (!byTurma[turma]) byTurma[turma] = {};
-        if (!byTurma[turma][question]) byTurma[turma][question] = [];
-        byTurma[turma][question].push(value);
-
-        if (!overall[question]) overall[question] = [];
-        overall[question].push(value);
-      });
-
-      const container = document.getElementById("turmaCharts");
-      container.innerHTML = "";
-
-      if (Object.keys(byTurma).length > 1) {
-        const overallData = Object.entries(overall).map(([q, vals]) => ({
-          question: q,
-          average: vals.reduce((a, b) => a + b, 0) / vals.length
-        }));
-        drawBarChart("overallChart", overallData);
-      } else {
-        document.getElementById("overallChart").innerHTML = "";
-      }
-
-      Object.entries(byTurma).forEach(([turma, questions], i) => {
-        const chartId = `turmaChart${i}`;
-        const chartData = Object.entries(questions).map(([q, vals]) => ({
-          question: q,
-          average: vals.reduce((a, b) => a + b, 0) / vals.length
-        }));
-
-        const title = document.createElement("div");
-        title.className = "text-question-title";
-        title.textContent = `Turma: ${turma}`;
-        container.appendChild(title);
-
-        const div = document.createElement("div");
-        div.className = "chart-container";
-        div.id = chartId;
-        container.appendChild(div);
-
-        drawBarChart(chartId, chartData);
+        content.appendChild(section);
       });
     }
 
-    function drawBarChart(containerId, data) {
-      const chart = echarts.init(document.getElementById(containerId));
-      const questions = data.map(d => d.question);
-      const values = data.map(d => d.average);
-
+    function renderChart(container, data) {
+      const grouped = {};
+      data.forEach(d => {
+        if (typeof d.value === 'number') {
+          if (!grouped[d.question]) grouped[d.question] = [];
+          grouped[d.question].push(d.value);
+        }
+      });
+      const dataset = Object.entries(grouped).map(([q, vals]) => ({
+        question: q,
+        average: vals.reduce((a, b) => a + b, 0) / vals.length
+      }));
+      const chart = echarts.init(container);
       chart.setOption({
         tooltip: {},
-        xAxis: {
-          type: "category",
-          data: questions,
-          axisLabel: { rotate: 30, color: "#333" }
-        },
-        yAxis: {
-          type: "value",
-          min: 0,
-          max: 5,
-          axisLabel: { show: false },
-          splitLine: { show: false }
-        },
+        xAxis: { type: 'category', data: dataset.map(d => d.question), axisLabel: { rotate: 30 } },
+        yAxis: { type: 'value', min: 0, max: 5 },
         series: [{
-          type: "bar",
-          data: values,
+          type: 'bar',
+          data: dataset.map(d => d.average),
           itemStyle: {
             color: val => val.value < 3 ? '#d94e5d' : val.value < 4 ? '#f2c037' : '#61c277'
           },
-          label: {
-            show: true,
-            position: "top",
-            formatter: '{c}',
-            color: "#333"
-          }
+          label: { show: true, position: 'top', formatter: '{c}' }
         }]
       });
     }
 
-    function drawTextQuestions(data) {
-      const container = document.getElementById("textQuestions");
-      container.innerHTML = "";
+    function renderTextQuestions(container, data) {
+      const textQs = data.filter(d => typeof d.value !== 'number');
       const grouped = {};
-      data.forEach(d => {
+      textQs.forEach(d => {
         if (!grouped[d.question]) grouped[d.question] = [];
         grouped[d.question].push(d.value);
       });
 
-      Object.entries(grouped).forEach(([q, answers]) => {
-        const box = document.createElement("div");
-        box.className = "text-question";
-        const title = document.createElement("div");
-        title.className = "text-question-title";
+      Object.entries(grouped).forEach(([q, vals]) => {
+        const box = document.createElement('div');
+        box.className = 'text-question';
+        const title = document.createElement('div');
+        title.className = 'text-question-title';
         title.textContent = q;
-        const ul = document.createElement("ul");
-        answers.forEach(txt => {
-          const li = document.createElement("li");
-          li.textContent = txt;
+        const ul = document.createElement('ul');
+        vals.forEach(v => {
+          const li = document.createElement('li');
+          li.textContent = v;
           ul.appendChild(li);
         });
         box.appendChild(title);

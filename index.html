@@ -267,7 +267,7 @@
       const selectedQuestions = getChecked("textQuestionSelect");
       const trainer = document.getElementById("trainerInput").value || 'N/A';
 
-      const titleMeta = metaConfig.titles.find(t => t.programId === program);
+      const titleMeta = metaConfig.titles.find(t => t.program_id === program);
       if (titleMeta) {
         document.getElementById("hero-title").textContent = titleMeta.title;
         document.getElementById("hero-subtitle").textContent = titleMeta.subtitle;
@@ -340,7 +340,7 @@
     function drawBarChart(containerId, data, program) {
       const chart = echarts.init(document.getElementById(containerId));
       const labelMap = {}, orderMap = {};
-      metaConfig.labels.filter(l => l.programId === program).forEach(({ questionId, label, sortOrder }) => {
+      metaConfig.labels.filter(l => l.program_id === program).forEach(({ questionId, label, sortOrder }) => {
         labelMap[questionId] = label;
         orderMap[questionId] = +sortOrder;
       });

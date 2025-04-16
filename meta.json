@@ -1,1 +1,276 @@
-
+{
+  "labels": [
+    {
+      "QUESTION ID": "01. No meu contexto de trabalho, consigo produzir de forma focalizada e sem grandes interrup??es",
+      "LABEL": "FOCO",
+      "sort order": 1
+    },
+    {
+      "QUESTION ID": "02. \"O n?mero de assuntos diferentes que tenho de gerir em paralelo ? adequado, n?o excessivo.\"",
+      "LABEL": "DIVERSIDADE",
+      "sort order": 2
+    },
+    {
+      "QUESTION ID": "03. \"Organizo o meu trabalho de forma met?dica e eficiente, e sinto ter tudo sob controlo.\"",
+      "LABEL": "CONTROLO",
+      "sort order": 3
+    },
+    {
+      "QUESTION ID": "04. Raramente procrastino. Respeito sempre as prioridades que defini na minha lista de tarefas.",
+      "LABEL": "PRIORIDADES",
+      "sort order": 4
+    },
+    {
+      "QUESTION ID": "08. A defini??o das minhas fun??es ? muito clara. Sei precisamente quais as minhas responsabilidades.\"",
+      "LABEL": "RESPONSABILIDADES",
+      "sort order": 5
+    },
+    {
+      "QUESTION ID": "09. A estrat?gia atual da empresa, e a forma como deve ser implementada na minha equipa/unidade/departamento, est?o para mim muito claras.\"",
+      "LABEL": "ESTRAT?GIA",
+      "sort order": 6
+    },
+    {
+      "QUESTION ID": "10. Conhe?o perfeitamente quais os meus objetivos atuais, e n?o tenho qualquer d?vida sobre as prioridades que devo respeitar.\"",
+      "LABEL": "OBJETIVOS",
+      "sort order": 7
+    },
+    {
+      "QUESTION ID": "11. \"Quanto aos crit?rios de sucesso que definem o meu bom desempenho, a minha vis?o e a vis?o de quem me avalia e/ou lidera s?o inteiramente coincidentes.\"",
+      "LABEL": "CRIT?RIOS SUCESSO",
+      "sort order": 8
+    },
+    {
+      "QUESTION ID": "12. ...a utiliza??o de emails ? eficiente.\"",
+      "LABEL": "EMAILS",
+      "sort order": 9
+    },
+    {
+      "QUESTION ID": "13. ...as reuni?es s?o eficazes.\"",
+      "LABEL": "REUNI?ES",
+      "sort order": 10
+    },
+    {
+      "QUESTION ID": "14 ...h? boa agilidade: as decis?es tendem a ser c?leres e os assuntos resolvem-se com rapidez.\"",
+      "LABEL": "AGILIDADE",
+      "sort order": 11
+    },
+    {
+      "QUESTION ID": "15. ...os processos internos s?o simples e eficientes.\"",
+      "LABEL": "PROCESSOS",
+      "sort order": 12
+    },
+    {
+      "QUESTION ID": "16. ... h? claramente um clima de confian?a entre os colaboradores.\"",
+      "LABEL": "CONFIAN?A",
+      "sort order": 13
+    },
+    {
+      "QUESTION ID": "17. .. h? poucas d?vidas sobre quem ficou de fazer o qu?. Eventuais ?reas cinzentas que surjam na divis?o de responsabilidades s?o rapidamente discutidas e clarificadas.\"",
+      "LABEL": "?REAS CINZENTAS",
+      "sort order": 14
+    },
+    {
+      "QUESTION ID": "Q1: How would you globally classify the collaborative efficiency:",
+      "LABEL": "EFFICIENCY WITHIN TEAM",
+      "sort order": 1
+    },
+    {
+      "QUESTION ID": "Q1: Inter-teams (teams you articulate most with)",
+      "LABEL": "INTER-TEAM EFFICIENCY",
+      "sort order": 2
+    },
+    {
+      "QUESTION ID": "Q1: In your organisation as a whole",
+      "LABEL": "EFFICIENCY WITHIN ORGANISATION",
+      "sort order": 3
+    },
+    {
+      "QUESTION ID": "Q4: ... I always know exactly what to do about each matter.",
+      "LABEL": "RESPONSIBILITY",
+      "sort order": 4
+    },
+    {
+      "QUESTION ID": "Q5: ... in lengthier projects (> 3 months), it is very clear where we want to get and what it means to say \"Done!\".",
+      "LABEL": "FINISH LINE",
+      "sort order": 5
+    },
+    {
+      "QUESTION ID": "Q6: ... I always know the purpose of what I'm doing and that helps me to keep motivated.",
+      "LABEL": "PURPOSE",
+      "sort order": 6
+    },
+    {
+      "QUESTION ID": "Q7: ... there is good agility: decisions tend to be made quickly and issues are resolved swiftly.",
+      "LABEL": "AGILITY",
+      "sort order": 7
+    },
+    {
+      "QUESTION ID": "Q10: ... there is little doubt about who is responsible for what. Potential grey areas that come up when splitting responsibilities are quickly discussed and clarified.",
+      "LABEL": "OWNERSHIP",
+      "sort order": 8
+    },
+    {
+      "QUESTION ID": "Q11: ... people are open to renegotiate deadlines. Each time something will likely get delayed, I am always told ahead of time.",
+      "LABEL": "COMMITMENT ADJUSTMENT",
+      "sort order": 9
+    },
+    {
+      "QUESTION ID": "Q12: ... I rarely get \"blocked\". I know exactly who to speak to in order to get matters back on track.",
+      "LABEL": "ROAD BLOCKS",
+      "sort order": 10
+    },
+    {
+      "QUESTION ID": "Q13: ... internal processes are simple and efficient.",
+      "LABEL": "PROCESSES",
+      "sort order": 11
+    },
+    {
+      "QUESTION ID": "Q15: ... the use of emails is efficient.",
+      "LABEL": "EMAILS",
+      "sort order": 12
+    },
+    {
+      "QUESTION ID": "Q16: ... meetings are effective.",
+      "LABEL": "MEETINGS",
+      "sort order": 13
+    },
+    {
+      "QUESTION ID": "Q17: ... is it easy and agile to report / know the status of each matter.",
+      "LABEL": "REPORTING",
+      "sort order": 14
+    },
+    {
+      "QUESTION ID": "Q6: \"Tenho sido capaz de motivar a minha equipa. Trabalham com sentido de miss?o, d?o o seu melhor e acreditam na import?ncia do que fazem.\"",
+      "LABEL": "MOTIVA??O",
+      "sort order": 1
+    },
+    {
+      "QUESTION ID": "Q7: \"Tenho sido capaz de orientar a minha equipa. Comigo sabem sempre onde fica a meta.\"",
+      "LABEL": "ORIENTA??O",
+      "sort order": 2
+    },
+    {
+      "QUESTION ID": "Q8: \"Tenho conseguido coordenar a equipa com efici?ncia. ? raro haver confus?o sobre quem faz o qu?.\"",
+      "LABEL": "DELEGA??O",
+      "sort order": 3
+    },
+    {
+      "QUESTION ID": "Q10: \"Tenho sido capaz de fazer crescer a minha equipa. Sinto que cada vez s?o mais aut?nomos e proativos.\"",
+      "LABEL": "AUTONOMIA",
+      "sort order": 4
+    },
+    {
+      "QUESTION ID": "Q11: \"Tenho conseguido criar um bom esp?rito de equipa, com um ADN forte em alinhamento e valores.\"",
+      "LABEL": "ALINHAMENTO",
+      "sort order": 5
+    },
+    {
+      "QUESTION ID": "Q12: \"Tenho conseguido servir a equipa e ser um elemento catalizador do seu bom desempenho.\"",
+      "LABEL": "CATALIZADOR",
+      "sort order": 6
+    },
+    {
+      "QUESTION ID": "Q4: \"In my work environment I am able to produce in a focused manner and with no major distractions.\"",
+      "LABEL": "FOCUS",
+      "sort order": 1
+    },
+    {
+      "QUESTION ID": "Q5: \"In my case, it's rare having to manage lots of different issues simultaneously. The number of different subjects that I have to manage simultaneously is suitable, not excessive.\"",
+      "LABEL": "DIVERSITY",
+      "sort order": 2
+    },
+    {
+      "QUESTION ID": "Q6: \"I organize my work methodically and efficiently, and I feel everything is under control.\"",
+      "LABEL": "CONTROL",
+      "sort order": 3
+    },
+    {
+      "QUESTION ID": "Q7: \"I rarely procrastinate. I always respect the priorities that I've defined on my to-do list.\"",
+      "LABEL": "PRIORITIES",
+      "sort order": 4
+    },
+    {
+      "QUESTION ID": "Q10: \"My duties are defined very clearly. I know exactly what my responsibilities are.\"",
+      "LABEL": "RESPONSABILITIES",
+      "sort order": 5
+    },
+    {
+      "QUESTION ID": "Q11: \"The current corporate strategy and how it should be implemented in my team/unit/department are very clear to me.\"",
+      "LABEL": "STRATEGY",
+      "sort order": 6
+    },
+    {
+      "QUESTION ID": "Q12: \"I am perfectly aware of my current goals, and have no doubt about which priorities to respect.\"",
+      "LABEL": "GOALS",
+      "sort order": 7
+    },
+    {
+      "QUESTION ID": "Q13: \"Regarding success criteria defining my performance, my vision and that of my appraiser/leader match entirely.\"",
+      "LABEL": "SUCCESS CRITERIA",
+      "sort order": 8
+    },
+    {
+      "QUESTION ID": "Q15: ...email use is efficient.\"",
+      "LABEL": "EMAILS",
+      "sort order": 9
+    },
+    {
+      "QUESTION ID": "Q16: ...meetings are effective.\"",
+      "LABEL": "MEETINGS",
+      "sort order": 10
+    },
+    {
+      "QUESTION ID": "Q17: ...there is good agility: decisions tend to be fast and issues are resolved quickly.\"",
+      "LABEL": "AGILITY",
+      "sort order": 11
+    },
+    {
+      "QUESTION ID": "Q18: ...internal processes are simple and efficient.\"",
+      "LABEL": "PROCESSES",
+      "sort order": 12
+    },
+    {
+      "QUESTION ID": "Q19: ...there is a high trust environment among co-workers.\"",
+      "LABEL": "TRUST",
+      "sort order": 13
+    },
+    {
+      "QUESTION ID": "Q20: ...there is little or no doubt about every task ownership. When grey areas emerge about division of responsibilities, it is quite simple to discuss and clarify them.",
+      "LABEL": "GREY AREAS",
+      "sort order": 14
+    }
+  ],
+  "titles": [
+    {
+      "program_id": "COLAB 365",
+      "T?TULO": "COLAB 365",
+      "SUBT?TULO": "A arte da Efici?ncia Colaborativa"
+    },
+    {
+      "program_id": "P365",
+      "T?TULO": "PRODUCTIVITY 365",
+      "SUBT?TULO": "PRODUTIVIDADE PESSOAL E ALTA PERFORMANCE"
+    },
+    {
+      "program_id": "EIO",
+      "T?TULO": "EMOTIONS INSIDE OUT",
+      "SUBT?TULO": "DA GEST?O EMOCIONAL AOS RESULTADOS"
+    },
+    {
+      "program_id": "CIO",
+      "T?TULO": "COMMUNICATIONS INSIDE OUT",
+      "SUBT?TULO": "GEST?O EMOCIONAL E EFIC?CIA INTERPESSOAL"
+    },
+    {
+      "program_id": "EL",
+      "T?TULO": "EFFECTIVE LEADERSHIP",
+      "SUBT?TULO": "LIDERAN?A E GEST?O DE EQUIPAS"
+    },
+    {
+      "program_id": "XMAN",
+      "T?TULO": "X-MAN",
+      "SUBT?TULO": "EXPECTATIONS MANAGEMENT TRAINING"
+    }
+  ]
+}

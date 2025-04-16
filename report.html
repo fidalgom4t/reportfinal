@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Relatório de Formação</title>
+  <script src="https://cdn.jsdelivr.net/npm/echarts@5"></script>
+  <style>
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      padding: 30px;
+      background-color: #fff;
+      color: #333;
+    }
+    header {
+      display: flex;
+      align-items: center;
+      border-bottom: 2px solid #007c91;
+      padding-bottom: 10px;
+      margin-bottom: 30px;
+    }
+    .logo-text {
+      font-size: 20px;
+      font-weight: bold;
+      color: #007c91;
+      margin-left: 15px;
+    }
+    .program-button {
+      margin: 5px;
+      padding: 10px 20px;
+      border: none;
+      background-color: #007c91;
+      color: white;
+      cursor: pointer;
+    }
+    .program-button.active {
+      background-color: #005c6b;
+    }
+    .section {
+      display: none;
+      margin-top: 40px;
+    }
+    .section.active {
+      display: block;
+    }
+    .summary-box {
+      border: 2px solid #007c91;
+      padding: 20px;
+      margin-bottom: 30px;
+    }
+    .summary-title {
+      font-weight: bold;
+      margin-bottom: 10px;
+      font-size: 18px;
+    }
+    .chart-container {
+      width: 100%;
+      height: 400px;
+      margin: 30px 0;
+    }
+    .text-question {
+      border: 1px solid #007c91;
+      border-left: 6px solid #007c91;
+      padding: 16px;
+      margin-bottom: 30px;
+      background: #f9f9f9;
+    }
+    .text-question-title {
+      font-weight: bold;
+      margin-bottom: 8px;
+      font-size: 16px;
+      color: #007c91;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <img src="logo.png" alt="Logo" height="50">
+    <div class="logo-text">MIND4TIME<br><span style="font-weight: normal; font-size: 14px;">Productivity Consulting</span></div>
+  </header>
+
+  <h1>Relatório de Formação</h1>
+  <div id="programButtons"></div>
+  <div id="reportContainer"></div>
+
+  <script>
+    const urlParams = new URLSearchParams(window.location.search);
+    const selectedClients = urlParams.get("clients")?.split(',') || [];
+    const selectedPrograms = urlParams.get("programs")?.split(',') || [];
+    const selectedTurmas = urlParams.get("turmas")?.split(',') || [];
+    const selectedTrainer = urlParams.get("formador") || "";
+    const monthStart = urlParams.get("mes_inicio") || "";
+    const monthEnd = urlParams.get("mes_fim") || "";
+
+    let rawData = [];
+
+    fetch("data.json")
+      .then(res => res.json())
+      .then(data => {
+        rawData = data;
+        generateProgramSections();
+      });
+
+    function generateProgramSections() {
+      const container = document.getElementById("reportContainer");
+      const buttonBar = document.getElementById("programButtons");
+      selectedPrograms.forEach((program, idx) => {
+        const btn = document.createElement("button");
+        btn.className = "program-button" + (idx === 0 ? " active" : "");
+        btn.textContent = program;
+        btn.onclick = () => {
+          document.querySelectorAll('.program-button').forEach(b => b.classList.remove('active'));
+          document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+          btn.classList.add('active');
+          document.getElementById("section-" + program).classList.add("active");
+        };
+        buttonBar.appendChild(btn);
+
+        const section = document.createElement("div");
+        section.className = "section" + (idx === 0 ? " active" : "");
+        section.id = "section-" + program;
+
+        // Executive summary
+        const summary = document.createElement("div");
+        summary.className = "summary-box";
+        summary.innerHTML = `
+          <div class="summary-title">${program}</div>
+          <div><strong>Scope Temporal:</strong> ${monthStart} - ${monthEnd}</div>
+          <div><strong>Formador:</strong> ${selectedTrainer}</div>
+        `;
+        section.appendChild(summary);
+
+        // Gráfico
+        const chartDiv = document.createElement("div");
+        chartDiv.className = "chart-container";
+        chartDiv.id = `chart-${program}`;
+        section.appendChild(chartDiv);
+
+        // Perguntas abertas (placeholder)
+        const openQuestion = document.createElement("div");
+        openQuestion.className = "text-question";
+        openQuestion.innerHTML = `
+          <div class="text-question-title">Respostas Abertas</div>
+          <ul><li>(serão carregadas aqui)</li></ul>
+        `;
+        section.appendChild(openQuestion);
+
+        container.appendChild(section);
+
+        renderChart(`chart-${program}`, program);
+      });
+    }
+
+    function renderChart(containerId, program) {
+      const chart = echarts.init(document.getElementById(containerId));
+      const filtered = rawData.filter(d =>
+        selectedClients.includes(d.client) &&
+        selectedPrograms.includes(d.program) &&
+        selectedTurmas.includes(d.turma) &&
+        typeof d.value === 'number' &&
+        d.program === program
+      );
+      const grouped = {};
+      filtered.forEach(({ question, value }) => {
+        if (!grouped[question]) grouped[question] = [];
+        grouped[question].push(value);
+      });
+      const questions = Object.keys(grouped);
+      const values = questions.map(q => grouped[q].reduce((a, b) => a + b, 0) / grouped[q].length);
+
+      chart.setOption({
+        tooltip: {},
+        xAxis: {
+          type: "category",
+          data: questions,
+          axisLabel: { rotate: 30, color: "#333" }
+        },
+        yAxis: {
+          type: "value",
+          min: 0,
+          max: 5,
+          axisLabel: { show: false },
+          splitLine: { show: false }
+        },
+        series: [{
+          type: "bar",
+          data: values,
+          itemStyle: {
+            color: val => val.value < 3 ? '#d94e5d' : val.value < 4 ? '#f2c037' : '#61c277'
+          },
+          label: {
+            show: true,
+            position: "top",
+            formatter: '{c}',
+            color: "#333"
+          }
+        }]
+      });
+    }
+  </script>
+</body>
+</html>

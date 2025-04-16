@@ -3,8 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Relatório de Formação</title>
-  <script src="https://cdn.jsdelivr.net/npm/echarts@5"></script>
+  <title>Controlo de Relatórios</title>
   <style>
     body {
       font-family: 'Segoe UI', sans-serif;
@@ -25,34 +24,21 @@
       color: #007c91;
       margin-left: 15px;
     }
-    .chart-container {
-      width: 100%;
-      height: 400px;
-      margin-bottom: 40px;
-    }
     .section {
-      margin-top: 50px;
-      padding: 20px;
-      border-top: 2px solid #007c91;
-    }
-    .summary-box {
       border: 1px solid #007c91;
-      background: #f4f9fa;
       padding: 20px;
-      margin-bottom: 20px;
-    }
-    .text-question {
-      border: 1px solid #007c91;
-      border-left: 6px solid #007c91;
-      padding: 16px;
       margin-bottom: 30px;
-      background: #f9f9f9;
     }
-    .text-question-title {
-      font-weight: bold;
-      margin-bottom: 8px;
-      font-size: 16px;
-      color: #007c91;
+    select, input[type="text"] {
+      margin: 5px;
+      padding: 5px;
+    }
+    button {
+      padding: 10px 20px;
+      background-color: #007c91;
+      color: white;
+      border: none;
+      cursor: pointer;
     }
   </style>
 </head>
@@ -62,125 +48,90 @@
     <div class="logo-text">MIND4TIME<br><span style="font-weight: normal; font-size: 14px;">Productivity Consulting</span></div>
   </header>
 
-  <h1>Relatório de Formação</h1>
-  <div id="content"></div>
+  <h1>Painel de Controlo</h1>
+
+  <div class="section">
+    <label>Clientes:</label><br>
+    <select id="clientSelect" multiple size="5"></select><br>
+
+    <label>Programas:</label><br>
+    <select id="programSelect" multiple size="5"></select><br>
+
+    <label>Turmas:</label><br>
+    <select id="turmaSelect" multiple size="5"></select><br>
+
+    <label>Formador (por programa):</label><br>
+    <input type="text" id="trainerInput" placeholder="Nome do formador">
+    
+    <br><br>
+    <button onclick="generateReport()">Gerar Relatório</button>
+  </div>
 
   <script>
     let rawData = [];
-    let filters = JSON.parse(localStorage.getItem("reportFilters") || '{}');
 
     fetch('data.json')
       .then(res => res.json())
       .then(data => {
         rawData = data;
-        renderReport();
+        populateFilters();
       });
 
-    function renderReport() {
-      if (!filters.clients?.length) return;
-      const content = document.getElementById("content");
-      content.innerHTML = '';
-      const filteredData = rawData.filter(d =>
-        filters.clients.includes(d.client) &&
-        filters.programs.includes(d.program) &&
-        filters.turmas.includes(d.turma)
-      );
+    function populateFilters() {
+      const clients = [...new Set(rawData.map(d => d.client))].sort();
+      fillSelect('clientSelect', clients);
+      fillSelect('programSelect', []);
+      fillSelect('turmaSelect', []);
 
-      const programs = [...new Set(filteredData.map(d => d.program))];
+      document.getElementById('clientSelect').addEventListener('change', updatePrograms);
+      document.getElementById('programSelect').addEventListener('change', updateTurmas);
+    }
 
-      programs.forEach(program => {
-        const section = document.createElement('div');
-        section.className = 'section';
-
-        const progData = filteredData.filter(d => d.program === program);
-        const assessmentData = progData.filter(d => d.section === 'assessment');
-        const evaluationData = progData.filter(d => d.section === 'evaluation');
-
-        const parseDate = str => new Date(str);
-        const formatDate = date => date.toLocaleDateString('pt-PT', { month: 'long', year: 'numeric' });
-        const start = formatDate(new Date(filters.start + '-01'));
-        const end = formatDate(new Date(filters.end + '-01'));
-
-        section.innerHTML = `
-          <h2>${program}</h2>
-          <div class="summary-box">
-            <p><strong>Scope temporal:</strong> ${start} - ${end}</p>
-            <p><strong>Respostas Assessment:</strong> ${new Set(assessmentData.map(d => d.id)).size}</p>
-            <p><strong>Respostas Avaliação:</strong> ${new Set(evaluationData.map(d => d.id)).size}</p>
-            <p><strong>Formador:</strong> ${filters.trainer || '(não definido)'}</p>
-          </div>
-        `;
-
-        const chartA = document.createElement('div');
-        chartA.className = 'chart-container';
-        section.appendChild(chartA);
-        renderChart(chartA, assessmentData);
-
-        const chartE = document.createElement('div');
-        chartE.className = 'chart-container';
-        section.appendChild(chartE);
-        renderChart(chartE, evaluationData);
-
-        const textContainer = document.createElement('div');
-        section.appendChild(textContainer);
-        renderTextQuestions(textContainer, [...assessmentData, ...evaluationData]);
-
-        content.appendChild(section);
+    function fillSelect(id, values) {
+      const select = document.getElementById(id);
+      select.innerHTML = '';
+      values.forEach(val => {
+        const opt = document.createElement('option');
+        opt.value = val;
+        opt.textContent = val;
+        select.appendChild(opt);
       });
     }
 
-    function renderChart(container, data) {
-      const grouped = {};
-      data.forEach(d => {
-        if (typeof d.value === 'number') {
-          if (!grouped[d.question]) grouped[d.question] = [];
-          grouped[d.question].push(d.value);
-        }
-      });
-      const dataset = Object.entries(grouped).map(([q, vals]) => ({
-        question: q,
-        average: vals.reduce((a, b) => a + b, 0) / vals.length
-      }));
-      const chart = echarts.init(container);
-      chart.setOption({
-        tooltip: {},
-        xAxis: { type: 'category', data: dataset.map(d => d.question), axisLabel: { rotate: 30 } },
-        yAxis: { type: 'value', min: 0, max: 5 },
-        series: [{
-          type: 'bar',
-          data: dataset.map(d => d.average),
-          itemStyle: {
-            color: val => val.value < 3 ? '#d94e5d' : val.value < 4 ? '#f2c037' : '#61c277'
-          },
-          label: { show: true, position: 'top', formatter: '{c}' }
-        }]
-      });
+    function getSelectedValues(id) {
+      return Array.from(document.getElementById(id).selectedOptions).map(o => o.value);
     }
 
-    function renderTextQuestions(container, data) {
-      const textQs = data.filter(d => typeof d.value !== 'number');
-      const grouped = {};
-      textQs.forEach(d => {
-        if (!grouped[d.question]) grouped[d.question] = [];
-        grouped[d.question].push(d.value);
+    function updatePrograms() {
+      const selectedClients = getSelectedValues('clientSelect');
+      const filtered = rawData.filter(d => selectedClients.includes(d.client));
+      const programs = [...new Set(filtered.map(d => d.program))].sort();
+      fillSelect('programSelect', programs);
+      updateTurmas();
+    }
+
+    function updateTurmas() {
+      const selectedClients = getSelectedValues('clientSelect');
+      const selectedPrograms = getSelectedValues('programSelect');
+      const filtered = rawData.filter(d => selectedClients.includes(d.client) && selectedPrograms.includes(d.program));
+      const turmas = [...new Set(filtered.map(d => d.turma))].sort();
+      fillSelect('turmaSelect', turmas);
+    }
+
+    function generateReport() {
+      const clients = getSelectedValues('clientSelect');
+      const programs = getSelectedValues('programSelect');
+      const turmas = getSelectedValues('turmaSelect');
+      const trainer = document.getElementById('trainerInput').value;
+
+      const query = new URLSearchParams({
+        client: clients.join(','),
+        program: programs.join(','),
+        turma: turmas.join(','),
+        trainer
       });
 
-      Object.entries(grouped).forEach(([q, vals]) => {
-        const box = document.createElement('div');
-        box.className = 'text-question';
-        const title = document.createElement('div');
-        title.className = 'text-question-title';
-        title.textContent = q;
-        const ul = document.createElement('ul');
-        vals.forEach(v => {
-          const li = document.createElement('li');
-          li.textContent = v;
-          ul.appendChild(li);
-        });
-        box.appendChild(title);
-        box.appendChild(ul);
-        container.appendChild(box);
-      });
+      window.location.href = `index.html?${query.toString()}`;
     }
   </script>
 </body>

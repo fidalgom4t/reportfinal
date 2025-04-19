@@ -2,154 +2,216 @@
 <html lang="pt">
 <head>
   <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Relatório Gerado</title>
   <script src="https://cdn.jsdelivr.net/npm/echarts@5"></script>
   <style>
-    body { font-family: 'Segoe UI', sans-serif; margin: 0; padding: 30px; }
-    .exec-page {
-      background-color: white;
-      padding: 60px;
-      page-break-after: always;
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      margin: 0;
+      padding: 30px;
+      background-color: #fff;
+      color: #333;
     }
-    .exec-branding {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
+
+    .hero-banner {
+      background-color: #e6f2f3;
+      padding: 40px;
+      margin-bottom: 40px;
     }
-    .logo-png { height: 45px; }
-    .brand-line { flex: 1; height: 2px; background: #007c91; margin-left: 20px; }
-    .exec-content { display: flex; align-items: center; margin-top: 30px; }
-    .left-img img { width: 280px; }
-    .right-text { flex: 1; padding-left: 40px; }
-    .exec-subtitle { font-style: italic; color: #007c91; font-size: 22px; margin-bottom: 12px; }
-    .exec-title { font-size: 60px; color: #007c91; font-weight: 500; }
-    .exec-tagline { font-size: 22px; color: #007c91; margin: 16px 0 30px; }
-    .exec-meta { font-size: 20px; color: #444; }
-    .exec-meta div { margin: 5px 0; }
-    .exec-footer {
-      display: flex;
-      justify-content: space-between;
-      margin-top: 60px;
+
+    .hero-title {
+      font-size: 48px;
       color: #007c91;
-      font-weight: bold;
+      font-weight: 600;
     }
-    .chart-container { width: 100%; height: 400px; margin-bottom: 40px; }
-    .turma-title { font-weight: bold; color: #007c91; margin-top: 20px; margin-bottom: 10px; }
+
+    .hero-subtitle {
+      font-size: 24px;
+      color: #007c91;
+      font-style: italic;
+      margin-bottom: 20px;
+    }
+
+    .hero-meta {
+      font-size: 18px;
+      margin-top: 20px;
+    }
+
+    .chart-container {
+      height: 400px;
+      margin-bottom: 60px;
+    }
+
+    .turma-title {
+      font-size: 22px;
+      font-weight: bold;
+      margin: 20px 0 10px;
+      color: #007c91;
+    }
+
     .text-question {
       border: 1px solid #007c91;
       border-left: 6px solid #007c91;
       padding: 16px;
-      margin-bottom: 20px;
+      margin-bottom: 30px;
       background: #f9f9f9;
     }
-    .text-question-title { font-weight: bold; margin-bottom: 8px; font-size: 16px; color: #007c91; }
-    .warning {
-      color: red;
+
+    .text-question-title {
       font-weight: bold;
-      margin-top: 50px;
+      margin-bottom: 8px;
+      font-size: 16px;
+      color: #007c91;
+    }
+
+    ul {
+      padding-left: 20px;
     }
   </style>
 </head>
 <body>
-  <h2>Relatório Gerado</h2>
-  <div id="reportContainer"></div>
+  <div id="reportContent"></div>
 
   <script>
-    let rawData = [], metaData = {};
+    async function loadReport() {
+      const filters = JSON.parse(localStorage.getItem('reportFilters')) || {};
+      console.log("Filtros carregados:", filters);
 
-    // Parse filters safely
-    let filters = {};
-    try {
-      filters = JSON.parse(localStorage.getItem('filters') || '{}');
-    } catch (e) {
-      console.warn("Erro ao ler filtros:", e);
-    }
+      const [data, meta] = await Promise.all([
+        fetch('https://fidalgom4t.github.io/reportfinal/data.json').then(res => res.json()),
+        fetch('https://fidalgom4t.github.io/reportfinal/meta.json').then(res => res.json())
+      ]);
 
-    console.log("Filtros carregados:", filters);
-
-    Promise.all([
-      fetch('data.json').then(r => r.json()),
-      fetch('meta.json').then(r => r.json())
-    ]).then(([data, meta]) => {
-      rawData = data;
-      meta.programs.forEach(p => metaData[p.id] = { title: p.title, subtitle: p.subtitle });
-      generateReport();
-    });
-
-    function generateReport() {
-      const container = document.getElementById("reportContainer");
-      container.innerHTML = '';
-      const { client, program, turmas = [], trainer = 'N/A', textQuestions = [] } = filters;
-
-      const filtered = rawData.filter(d =>
-        d.client === client &&
-        d.program === program &&
-        (!turmas.length || turmas.includes(d.turma))
+      const section = 'assessment'; // you can make this dynamic if needed
+      const filtered = data.filter(d =>
+        d.client === filters.client &&
+        d.program === filters.program &&
+        filters.turmas.includes(d.turma) &&
+        d.section === section
       );
 
-      console.log("Dados filtrados:", filtered);
+      const container = document.getElementById('reportContent');
+      container.innerHTML = '';
 
-      if (!filtered.length) {
-        container.innerHTML = `<div class="warning">⚠️ Nenhum dado encontrado para os filtros selecionados.</div>`;
-        return;
-      }
+      const programMeta = meta.titles.find(t => t["program_id"] === filters.program) || {};
+      const startDate = getEarliestDate(filtered, 'assessment');
+      const endDate = getEarliestDate(filtered, 'evaluation');
 
-      const dates = filtered.map(d => new Date(d.date)).filter(d => !isNaN(d));
-      const months = [...new Set(dates.map(d => d.toLocaleDateString('pt-PT', { month: 'long', year: 'numeric' })))];
-      const dateRange = months.join(' – ') || 'N/A';
-      const meta = metaData[program] || { title: program, subtitle: '' };
-
-      // EXECUTIVE PAGE
-      const execDiv = document.createElement("div");
-      execDiv.className = "exec-page";
-      execDiv.innerHTML = `
-        <div class="exec-branding">
-          <img src="logo.png" class="logo-png"/>
-          <div class="brand-line"></div>
-        </div>
-        <div class="exec-content">
-          <div class="left-img"><img src="cube.png" /></div>
-          <div class="right-text">
-            <div class="exec-subtitle">corporate training</div>
-            <div class="exec-title">${meta.title}</div>
-            <div class="exec-tagline">${meta.subtitle}</div>
-            <div class="exec-meta">
-              <div><span class="italic">scope</span> temporal</div>
-              <div>${dateRange}</div>
-              <div>formadora</div>
-              <div>${trainer}</div>
-            </div>
-          </div>
-        </div>
-        <div class="exec-footer">
-          <span>www.MIND4TIME.com</span>
-          <span>© MIND4TIME 2024</span>
+      container.innerHTML += `
+        <div class="hero-banner">
+          <div class="hero-subtitle">${programMeta["SUBTÍTULO"] || ''}</div>
+          <div class="hero-title">${programMeta["TÍTULO"] || filters.program}</div>
+          <div class="hero-meta"><strong>Formador:</strong> ${filters.trainer || 'N/A'}</div>
+          <div class="hero-meta"><strong>Período de implementação:</strong> ${startDate} - ${endDate}</div>
         </div>
       `;
-      container.appendChild(execDiv);
 
-      // Rest of rendering (charts, text, etc.) follows...
+      // Render chart
+      const numericData = filtered.filter(d => typeof d.value === 'number');
+      const groupedByTurma = groupBy(numericData, 'turma');
+      const labelMap = createLabelMap(meta.labels);
+
+      // Optional global chart
+      if (filters.turmas.length > 1) {
+        const globalAverages = computeAverages(numericData, labelMap);
+        createBarChart('Global', globalAverages, container);
+      }
+
+      Object.entries(groupedByTurma).forEach(([turma, values]) => {
+        const turmaTitle = document.createElement("div");
+        turmaTitle.className = "turma-title";
+        turmaTitle.textContent = `Turma: ${turma}`;
+        container.appendChild(turmaTitle);
+
+        const turmaAverages = computeAverages(values, labelMap);
+        createBarChart(turma, turmaAverages, container);
+      });
+
+      // Render open-ended responses
+      const textData = filtered.filter(d => typeof d.value !== 'number' && (filters.textQuestions || []).includes(d.question));
+      renderTextQuestions(textData, container);
     }
 
-    function drawChart(container, data, section) {
-      const chart = echarts.init(container);
-      data.sort((a, b) => a.question.localeCompare(b.question));
+    function getEarliestDate(data, section) {
+      const dates = data.filter(d => d.section === section && d.date).map(d => new Date(d.date));
+      if (!dates.length) return "N/A";
+      const earliest = new Date(Math.min(...dates));
+      return earliest.toLocaleDateString('pt-PT', { year: 'numeric', month: 'long' });
+    }
+
+    function groupBy(arr, key) {
+      return arr.reduce((acc, item) => {
+        (acc[item[key]] ||= []).push(item);
+        return acc;
+      }, {});
+    }
+
+    function computeAverages(data, labelMap) {
+      const grouped = {};
+      data.forEach(({ question, value }) => {
+        if (!grouped[question]) grouped[question] = [];
+        grouped[question].push(value);
+      });
+
+      return Object.entries(grouped).map(([question, values]) => ({
+        label: labelMap[question] || question,
+        avg: values.reduce((a, b) => a + b, 0) / values.length
+      })).sort((a, b) => a.label.localeCompare(b.label));
+    }
+
+    function createLabelMap(labels) {
+      const map = {};
+      labels.forEach(l => map[l["QUESTION ID"]] = l["LABEL"]);
+      return map;
+    }
+
+    function createBarChart(title, data, container) {
+      const chartDiv = document.createElement('div');
+      chartDiv.className = "chart-container";
+      container.appendChild(chartDiv);
+
+      const chart = echarts.init(chartDiv);
       chart.setOption({
+        title: { text: title, left: 'center', textStyle: { fontSize: 18 } },
         tooltip: {},
-        xAxis: { type: 'category', data: data.map(d => d.question), axisLabel: { rotate: 30 } },
+        xAxis: { type: 'category', data: data.map(d => d.label), axisLabel: { rotate: 30 } },
         yAxis: { type: 'value', min: 0, max: 5 },
         series: [{
           type: 'bar',
-          data: data.map(d => d.average),
+          data: data.map(d => d.avg),
+          label: { show: true, position: 'top' },
           itemStyle: {
-            color: section === 'assessment'
-              ? val => val.value < 3 ? '#d94e5d' : val.value < 4 ? '#f2c037' : '#61c277'
-              : '#61c277'
-          },
-          label: { show: true, position: 'top', formatter: '{c}' }
+            color: val => val.value < 3 ? '#d94e5d' : val.value < 4 ? '#f2c037' : '#61c277'
+          }
         }]
       });
     }
+
+    function renderTextQuestions(data, container) {
+      const grouped = groupBy(data, 'question');
+      Object.entries(grouped).forEach(([question, responses]) => {
+        const box = document.createElement("div");
+        box.className = "text-question";
+
+        const title = document.createElement("div");
+        title.className = "text-question-title";
+        title.textContent = question;
+
+        const ul = document.createElement("ul");
+        responses.forEach(r => {
+          const li = document.createElement("li");
+          li.textContent = r.value;
+          ul.appendChild(li);
+        });
+
+        box.appendChild(title);
+        box.appendChild(ul);
+        container.appendChild(box);
+      });
+    }
+
+    loadReport();
   </script>
 </body>
 </html>

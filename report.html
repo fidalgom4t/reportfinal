@@ -1,199 +1,204 @@
 <!DOCTYPE html>
 <html lang="pt">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Relatório de Formação</title>
+  <meta charset="UTF-8" />
+  <title>Relatório Gerado</title>
   <script src="https://cdn.jsdelivr.net/npm/echarts@5"></script>
   <style>
-    body {
-      font-family: 'Segoe UI', sans-serif;
-      padding: 30px;
-      background-color: #fff;
-      color: #333;
+    body { font-family: 'Segoe UI', sans-serif; margin: 0; padding: 30px; }
+    .exec-page {
+      background-color: white;
+      padding: 60px;
+      page-break-after: always;
     }
-    header {
+    .exec-branding {
       display: flex;
+      justify-content: space-between;
       align-items: center;
-      border-bottom: 2px solid #007c91;
-      padding-bottom: 10px;
-      margin-bottom: 30px;
     }
-    .logo-text {
-      font-size: 20px;
-      font-weight: bold;
+    .logo-png { height: 45px; }
+    .brand-line { flex: 1; height: 2px; background: #007c91; margin-left: 20px; }
+    .exec-content { display: flex; align-items: center; margin-top: 30px; }
+    .left-img img { width: 280px; }
+    .right-text { flex: 1; padding-left: 40px; }
+    .exec-subtitle { font-style: italic; color: #007c91; font-size: 22px; margin-bottom: 12px; }
+    .exec-title { font-size: 60px; color: #007c91; font-weight: 500; }
+    .exec-tagline { font-size: 22px; color: #007c91; margin: 16px 0 30px; }
+    .exec-meta { font-size: 20px; color: #444; }
+    .exec-meta div { margin: 5px 0; }
+    .exec-footer {
+      display: flex;
+      justify-content: space-between;
+      margin-top: 60px;
       color: #007c91;
-      margin-left: 15px;
-    }
-    .program-button {
-      margin: 5px;
-      padding: 10px 20px;
-      border: none;
-      background-color: #007c91;
-      color: white;
-      cursor: pointer;
-    }
-    .program-button.active {
-      background-color: #005c6b;
-    }
-    .section {
-      display: none;
-      margin-top: 40px;
-    }
-    .section.active {
-      display: block;
-    }
-    .summary-box {
-      border: 2px solid #007c91;
-      padding: 20px;
-      margin-bottom: 30px;
-    }
-    .summary-title {
       font-weight: bold;
-      margin-bottom: 10px;
-      font-size: 18px;
     }
-    .chart-container {
-      width: 100%;
-      height: 400px;
-      margin: 30px 0;
-    }
+    .chart-container { width: 100%; height: 400px; margin-bottom: 40px; }
+    .turma-title { font-weight: bold; color: #007c91; margin-top: 20px; margin-bottom: 10px; }
     .text-question {
       border: 1px solid #007c91;
       border-left: 6px solid #007c91;
       padding: 16px;
-      margin-bottom: 30px;
+      margin-bottom: 20px;
       background: #f9f9f9;
     }
-    .text-question-title {
-      font-weight: bold;
-      margin-bottom: 8px;
-      font-size: 16px;
-      color: #007c91;
-    }
+    .text-question-title { font-weight: bold; margin-bottom: 8px; font-size: 16px; color: #007c91; }
   </style>
 </head>
 <body>
-  <header>
-    <img src="logo.png" alt="Logo" height="50">
-    <div class="logo-text">MIND4TIME<br><span style="font-weight: normal; font-size: 14px;">Productivity Consulting</span></div>
-  </header>
-
-  <h1>Relatório de Formação</h1>
-  <div id="programButtons"></div>
+  <h2>Relatório Gerado</h2>
   <div id="reportContainer"></div>
 
   <script>
-    const urlParams = new URLSearchParams(window.location.search);
-    const selectedClients = urlParams.get("clients")?.split(',') || [];
-    const selectedPrograms = urlParams.get("programs")?.split(',') || [];
-    const selectedTurmas = urlParams.get("turmas")?.split(',') || [];
-    const selectedTrainer = urlParams.get("formador") || "";
-    const monthStart = urlParams.get("mes_inicio") || "";
-    const monthEnd = urlParams.get("mes_fim") || "";
+    let rawData = [], metaData = {};
+    const filters = JSON.parse(localStorage.getItem('filters') || '{}');
 
-    let rawData = [];
+    Promise.all([
+      fetch('data.json').then(r => r.json()),
+      fetch('meta.json').then(r => r.json())
+    ]).then(([data, meta]) => {
+      rawData = data;
+      meta.programs.forEach(p => metaData[p.id] = { title: p.title, subtitle: p.subtitle });
+      generateReport();
+    });
 
-    fetch("data.json")
-      .then(res => res.json())
-      .then(data => {
-        rawData = data;
-        generateProgramSections();
-      });
-
-    function generateProgramSections() {
+    function generateReport() {
       const container = document.getElementById("reportContainer");
-      const buttonBar = document.getElementById("programButtons");
-      selectedPrograms.forEach((program, idx) => {
-        const btn = document.createElement("button");
-        btn.className = "program-button" + (idx === 0 ? " active" : "");
-        btn.textContent = program;
-        btn.onclick = () => {
-          document.querySelectorAll('.program-button').forEach(b => b.classList.remove('active'));
-          document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
-          btn.classList.add('active');
-          document.getElementById("section-" + program).classList.add("active");
-        };
-        buttonBar.appendChild(btn);
+      container.innerHTML = '';
+      const { client, program, turmas = [], trainer = 'N/A', textQuestions = [] } = filters;
+      const filtered = rawData.filter(d =>
+        d.client === client &&
+        d.program === program &&
+        (!turmas.length || turmas.includes(d.turma))
+      );
 
-        const section = document.createElement("div");
-        section.className = "section" + (idx === 0 ? " active" : "");
-        section.id = "section-" + program;
+      const dates = filtered.map(d => new Date(d.date)).filter(d => !isNaN(d));
+      const months = [...new Set(dates.map(d => d.toLocaleDateString('pt-PT', { month: 'long', year: 'numeric' })))];
+      const dateRange = months.join(' – ') || 'N/A';
+      const meta = metaData[program] || { title: program, subtitle: '' };
 
-        // Executive summary
-        const summary = document.createElement("div");
-        summary.className = "summary-box";
-        summary.innerHTML = `
-          <div class="summary-title">${program}</div>
-          <div><strong>Scope Temporal:</strong> ${monthStart} - ${monthEnd}</div>
-          <div><strong>Formador:</strong> ${selectedTrainer}</div>
-        `;
-        section.appendChild(summary);
+      // EXECUTIVE PAGE
+      const execDiv = document.createElement("div");
+      execDiv.className = "exec-page";
+      execDiv.innerHTML = `
+        <div class="exec-branding">
+          <img src="logo.png" class="logo-png"/>
+          <div class="brand-line"></div>
+        </div>
+        <div class="exec-content">
+          <div class="left-img"><img src="cube.png" /></div>
+          <div class="right-text">
+            <div class="exec-subtitle">corporate training</div>
+            <div class="exec-title">${meta.title}</div>
+            <div class="exec-tagline">${meta.subtitle}</div>
+            <div class="exec-meta">
+              <div><span class="italic">scope</span> temporal</div>
+              <div>${dateRange}</div>
+              <div>formadora</div>
+              <div>${trainer}</div>
+            </div>
+          </div>
+        </div>
+        <div class="exec-footer">
+          <span>www.MIND4TIME.com</span>
+          <span>© MIND4TIME 2024</span>
+        </div>
+      `;
+      container.appendChild(execDiv);
 
-        // Gráfico
-        const chartDiv = document.createElement("div");
-        chartDiv.className = "chart-container";
-        chartDiv.id = `chart-${program}`;
-        section.appendChild(chartDiv);
+      ['assessment', 'evaluation'].forEach(section => {
+        const sectionData = filtered.filter(d => d.section === section);
+        if (!sectionData.length) return;
 
-        // Perguntas abertas (placeholder)
-        const openQuestion = document.createElement("div");
-        openQuestion.className = "text-question";
-        openQuestion.innerHTML = `
-          <div class="text-question-title">Respostas Abertas</div>
-          <ul><li>(serão carregadas aqui)</li></ul>
-        `;
-        section.appendChild(openQuestion);
+        const numeric = sectionData.filter(d => typeof d.value === 'number');
+        const text = sectionData.filter(d => typeof d.value !== 'number' && textQuestions.includes(d.question));
+        const turmasSet = [...new Set(sectionData.map(d => d.turma))];
 
-        container.appendChild(section);
+        const heading = document.createElement('h3');
+        heading.textContent = section === 'assessment' ? 'Avaliação Inicial' : 'Avaliação Final';
+        container.appendChild(heading);
 
-        renderChart(`chart-${program}`, program);
+        if (turmasSet.length > 1) {
+          const chartDiv = document.createElement('div');
+          chartDiv.className = 'chart-container';
+          container.appendChild(chartDiv);
+          const global = {};
+          numeric.forEach(({ question, value }) => {
+            if (!global[question]) global[question] = [];
+            global[question].push(value);
+          });
+          const avgData = Object.entries(global).map(([q, vals]) => ({
+            question: q,
+            average: vals.reduce((a, b) => a + b, 0) / vals.length
+          }));
+          setTimeout(() => drawChart(chartDiv, avgData, section), 50);
+        }
+
+        turmasSet.forEach(turma => {
+          const title = document.createElement("div");
+          title.className = "turma-title";
+          title.textContent = `Turma: ${turma}`;
+          container.appendChild(title);
+
+          const chartDiv = document.createElement('div');
+          chartDiv.className = 'chart-container';
+          container.appendChild(chartDiv);
+
+          const turmaData = numeric.filter(d => d.turma === turma);
+          const perQ = {};
+          turmaData.forEach(({ question, value }) => {
+            if (!perQ[question]) perQ[question] = [];
+            perQ[question].push(value);
+          });
+
+          const chartData = Object.entries(perQ).map(([q, vals]) => ({
+            question: q,
+            average: vals.reduce((a, b) => a + b, 0) / vals.length
+          }));
+
+          setTimeout(() => drawChart(chartDiv, chartData, section), 50);
+        });
+
+        const questionGroups = {};
+        text.forEach(({ question, value }) => {
+          if (!questionGroups[question]) questionGroups[question] = [];
+          questionGroups[question].push(value);
+        });
+        Object.entries(questionGroups).forEach(([q, answers]) => {
+          const box = document.createElement("div");
+          box.className = "text-question";
+          const title = document.createElement("div");
+          title.className = "text-question-title";
+          title.textContent = q;
+          const ul = document.createElement("ul");
+          answers.forEach(a => {
+            const li = document.createElement("li");
+            li.textContent = a;
+            ul.appendChild(li);
+          });
+          box.appendChild(title);
+          box.appendChild(ul);
+          container.appendChild(box);
+        });
       });
     }
 
-    function renderChart(containerId, program) {
-      const chart = echarts.init(document.getElementById(containerId));
-      const filtered = rawData.filter(d =>
-        selectedClients.includes(d.client) &&
-        selectedPrograms.includes(d.program) &&
-        selectedTurmas.includes(d.turma) &&
-        typeof d.value === 'number' &&
-        d.program === program
-      );
-      const grouped = {};
-      filtered.forEach(({ question, value }) => {
-        if (!grouped[question]) grouped[question] = [];
-        grouped[question].push(value);
-      });
-      const questions = Object.keys(grouped);
-      const values = questions.map(q => grouped[q].reduce((a, b) => a + b, 0) / grouped[q].length);
-
+    function drawChart(container, data, section) {
+      const chart = echarts.init(container);
+      data.sort((a, b) => a.question.localeCompare(b.question));
       chart.setOption({
         tooltip: {},
-        xAxis: {
-          type: "category",
-          data: questions,
-          axisLabel: { rotate: 30, color: "#333" }
-        },
-        yAxis: {
-          type: "value",
-          min: 0,
-          max: 5,
-          axisLabel: { show: false },
-          splitLine: { show: false }
-        },
+        xAxis: { type: 'category', data: data.map(d => d.question), axisLabel: { rotate: 30 } },
+        yAxis: { type: 'value', min: 0, max: 5 },
         series: [{
-          type: "bar",
-          data: values,
+          type: 'bar',
+          data: data.map(d => d.average),
           itemStyle: {
-            color: val => val.value < 3 ? '#d94e5d' : val.value < 4 ? '#f2c037' : '#61c277'
+            color: section === 'assessment'
+              ? val => val.value < 3 ? '#d94e5d' : val.value < 4 ? '#f2c037' : '#61c277'
+              : '#61c277'
           },
-          label: {
-            show: true,
-            position: "top",
-            formatter: '{c}',
-            color: "#333"
-          }
+          label: { show: true, position: 'top', formatter: '{c}' }
         }]
       });
     }

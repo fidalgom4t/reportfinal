@@ -6,17 +6,17 @@
   <title>Relatório Gerado</title>
   <script src="https://cdn.jsdelivr.net/npm/echarts@5"></script>
   <style>
-    body { font-family: 'Segoe UI', sans-serif; margin:0; padding:30px; background:#fff; color:#333 }
-    .hero-banner { background:#e6f2f3; padding:40px; margin-bottom:40px }
-    .hero-title { font-size:48px; color:#007c91; font-weight:600 }
-    .hero-subtitle { font-size:24px; color:#007c91; font-style:italic; margin-bottom:20px }
-    .hero-meta { font-size:18px; margin-top:20px }
-    .section-title { font-size:32px; color:#337d88; margin:60px 0 20px; border-bottom:2px solid #ccc; padding-bottom:10px }
-    .chart-container { height:400px; margin-bottom:60px }
-    .turma-title { font-size:22px; font-weight:bold; margin:20px 0 10px; color:#007c91 }
-    .text-question { border:1px solid #007c91; border-left:6px solid #007c91; padding:16px; margin-bottom:30px; background:#f9f9f9 }
-    .text-question-title { font-weight:bold; margin-bottom:8px; font-size:16px; color:#007c91 }
-    ul { padding-left:20px }
+    body { font-family: 'Segoe UI', sans-serif; margin:0; padding:30px; background:#fff; color:#333; }
+    .hero-banner { background:#e6f2f3; padding:40px; margin-bottom:40px; }
+    .hero-title { font-size:48px; color:#007c91; font-weight:600; }
+    .hero-subtitle { font-size:24px; color:#007c91; font-style:italic; margin-bottom:20px; }
+    .hero-meta { font-size:18px; margin-top:20px; }
+    .section-title { font-size:32px; color:#337d88; margin:60px 0 20px; border-bottom:2px solid #ccc; padding-bottom:10px; }
+    .chart-container { height:400px; margin-bottom:60px; }
+    .turma-title { font-size:22px; font-weight:bold; margin:20px 0 10px; color:#007c91; }
+    .text-question { border:1px solid #007c91; border-left:6px solid #007c91; padding:16px; margin-bottom:30px; background:#f9f9f9; }
+    .text-question-title { font-weight:bold; margin-bottom:8px; font-size:16px; color:#007c91; }
+    ul { padding-left:20px; }
   </style>
 </head>
 <body>
@@ -30,83 +30,97 @@
         || '{}'
       );
       const [data, meta] = await Promise.all([
-        fetch('https://fidalgom4t.github.io/reportfinal/data.json').then(r=>r.json()),
-        fetch('https://fidalgom4t.github.io/reportfinal/meta.json').then(r=>r.json())
+        fetch('https://fidalgom4t.github.io/reportfinal/data.json').then(r => r.json()),
+        fetch('https://fidalgom4t.github.io/reportfinal/meta.json').then(r => r.json())
       ]);
 
       const container = document.getElementById('reportContent');
       container.innerHTML = '';
 
-      // Hero
-      const progM = meta.titles.find(t=>t.program_id===filters.program) || {};
-      const all = data.filter(d=>
-        d.client===filters.client &&
-        d.program===filters.program &&
-        (filters.turmas||[]).includes(d.turma)
+      // --- Hero Banner with Scope temporal ---
+      const progM = meta.titles.find(t => t.program_id === filters.program) || {};
+      const all = data.filter(d =>
+        d.client === filters.client &&
+        d.program === filters.program &&
+        (filters.turmas || []).includes(d.turma)
       );
+      const start = formatMonthYear(getExtremeDate(all, 'assessment', 'submitted_at', 'min'));
+      const end   = formatMonthYear(getExtremeDate(all, 'evaluation',  'submitted_at', 'max'));
+
       container.innerHTML += `
         <div class="hero-banner">
-          <div class="hero-subtitle">${progM["SUBTÍTULO"]||''}</div>
-          <div class="hero-title">${progM["TÍTULO"]||filters.program}</div>
-          <div class="hero-meta"><strong>Formador:</strong> ${filters.trainer||'N/A'}</div>
-          <div class="hero-meta"><strong>Período:</strong> ${getEarliestDate(all,'assessment')} - ${getEarliestDate(all,'evaluation')}</div>
+          <div class="hero-subtitle">${progM["SUBTÍTULO"]  || ''}</div>
+          <div class="hero-title">${progM["TÍTULO"]         || filters.program}</div>
+          <div class="hero-meta"><strong>Formador:</strong> ${filters.trainer || 'N/A'}</div>
+          <div class="hero-meta"><strong>Scope temporal:</strong> ${start} – ${end}</div>
         </div>
       `;
 
-      // build maps once
+      // Build maps
       const labelMap = createLabelMap(meta.labels);
       const sortMap  = createSortMap(meta.labels);
 
-      for (const section of ['assessment','evaluation']) {
-        // Portuguese title for section
-        const title = section==='assessment' ? 'Assessment' : 'Avaliação do Programa';
+      // Loop through assessment & evaluation
+      for (const section of ['assessment', 'evaluation']) {
+        const title = section === 'assessment'
+          ? 'Assessment'
+          : 'Avaliação do Programa';
         container.innerHTML += `<div class="section-title">${title}</div>`;
 
-        // case‑insensitive match on section
-        const secData = data.filter(d=>
-          d.client===filters.client &&
-          d.program===filters.program &&
-          (filters.turmas||[]).includes(d.turma) &&
-          String(d.section).toLowerCase()===section
+        // filter using .includes()
+        const secData = data.filter(d =>
+          d.client === filters.client &&
+          d.program === filters.program &&
+          (filters.turmas || []).includes(d.turma) &&
+          String(d.section).toLowerCase().includes(section)
         );
 
-        // numeric
-        const numeric = secData.filter(d=>typeof d.value==='number');
-        const byTurma = groupBy(numeric,'turma');
+        // Numeric charts
+        const numeric = secData.filter(d => typeof d.value === 'number');
+        const byTurma = groupBy(numeric, 'turma');
 
-        // global
-        if ((filters.turmas||[]).length>1 && numeric.length) {
-          const avgAll = computeAverages(numeric,labelMap,sortMap);
+        // Global chart if multiple turmas
+        if ((filters.turmas || []).length > 1 && numeric.length) {
+          const avgAll = computeAverages(numeric, labelMap, sortMap);
           createBarChart(`Global (${title})`, avgAll, container);
         }
 
-        // per turma
-        Object.entries(byTurma).forEach(([turma, vals])=>{
+        // Per-turma charts
+        Object.entries(byTurma).forEach(([turma, vals]) => {
           container.appendChild(createTurmaTitle(`Turma: ${turma}`));
-          const avgs = computeAverages(vals,labelMap,sortMap);
+          const avgs = computeAverages(vals, labelMap, sortMap);
           createBarChart(turma, avgs, container);
         });
 
-        // open‑ended
-        const textRes = secData.filter(d=>
-          typeof d.value!=='number' &&
-          (filters.textQuestions||[]).includes(d.question)
+        // Open-ended responses
+        const textRes = secData.filter(d =>
+          typeof d.value !== 'number' &&
+          (filters.textQuestions || []).includes(d.question)
         );
         renderTextQuestions(textRes, container);
       }
     }
 
-    function getEarliestDate(data, section) {
-      const dates = data.filter(d=>d.section && String(d.section).toLowerCase()===section && d.date)
-                        .map(d=>new Date(d.date));
-      if (!dates.length) return 'N/A';
-      const e = new Date(Math.min(...dates));
-      return e.toLocaleDateString('pt-PT',{year:'numeric',month:'long'});
+    // Helpers
+
+    function getExtremeDate(data, section, field, mode) {
+      const dates = data
+        .filter(d => d[field] && String(d.section).toLowerCase().includes(section))
+        .map(d => new Date(d[field]));
+      if (!dates.length) return null;
+      return mode === 'min'
+        ? new Date(Math.min(...dates))
+        : new Date(Math.max(...dates));
+    }
+
+    function formatMonthYear(date) {
+      if (!date) return 'N/A';
+      return date.toLocaleDateString('pt-PT', { year: 'numeric', month: 'long' });
     }
 
     function createLabelMap(labels) {
       const m = {};
-      labels.forEach(l=>{
+      labels.forEach(l => {
         const q = l.questionId || l["QUESTION ID"];
         m[q] = l.label || l["LABEL"];
       });
@@ -115,64 +129,84 @@
 
     function createSortMap(labels) {
       const m = {};
-      labels.forEach(l=>{
+      labels.forEach(l => {
         const q = l.questionId || l["QUESTION ID"];
-        const s = l.sortOrder || l["SORT ORDER"] || l.sort_order;
+        const s = l.sortOrder   || l["SORT ORDER"] || l.sort_order;
         m[q] = +s;
       });
       return m;
     }
 
-    function groupBy(arr,key) {
-      return arr.reduce((a,i)=>{ (a[i[key]]||(a[i[key]]=[])).push(i); return a },{});
+    function groupBy(arr, key) {
+      return arr.reduce((acc, item) => {
+        (acc[item[key]] ||= []).push(item);
+        return acc;
+      }, {});
     }
 
-    function computeAverages(data,labelMap,orderMap) {
-      const g = {};
-      data.forEach(({question,value})=>{ (g[question]||(g[question]=[])).push(value) });
-      const arr = Object.entries(g).map(([q,vals])=>({
+    function computeAverages(data, labelMap, orderMap) {
+      const groups = {};
+      data.forEach(({ question, value }) => {
+        (groups[question] ||= []).push(value);
+      });
+      const arr = Object.entries(groups).map(([q, vals]) => ({
         question: q,
-        label:    labelMap[q]||q,
-        avg:      vals.reduce((a,b)=>a+b,0)/vals.length
+        label:    labelMap[q] || q,
+        avg:      vals.reduce((a, b) => a + b, 0) / vals.length
       }));
-      arr.sort((a,b)=>(orderMap[a.question]||0)-(orderMap[b.question]||0));
+      arr.sort((a, b) => (orderMap[a.question] || 0) - (orderMap[b.question] || 0));
       return arr;
     }
 
-    function createTurmaTitle(txt) {
+    function createTurmaTitle(text) {
       const d = document.createElement('div');
       d.className = 'turma-title';
-      d.textContent = txt;
+      d.textContent = text;
       return d;
     }
 
-    function createBarChart(title,data,container) {
+    function createBarChart(title, data, container) {
       const d = document.createElement('div');
       d.className = 'chart-container';
       container.appendChild(d);
       const chart = echarts.init(d);
       chart.setOption({
-        title:{text:title,left:'center',textStyle:{fontSize:18}},
-        tooltip:{},
-        xAxis:{type:'category',data:data.map(i=>i.label),axisLabel:{rotate:30}},
-        yAxis:{type:'value',min:0,max:5},
-        series:[{
-          type:'bar',
-          data:data.map(i=>i.avg),
-          itemStyle:{color(p){ const v=p.value; if(v<3)return'#d94e5d'; if(v<4)return'#f2c037'; return'#61c277' }},
-          label:{show:true,position:'top'}
+        title:    { text: title, left: 'center', textStyle: { fontSize: 18 } },
+        tooltip:  {},
+        xAxis:    { type: 'category', data: data.map(i => i.label), axisLabel: { rotate: 30 } },
+        yAxis:    { type: 'value', min: 0, max: 5 },
+        series: [{
+          type:      'bar',
+          data:      data.map(i => i.avg),
+          itemStyle: {
+            color(params) {
+              const v = params.value;
+              if (v < 3)   return '#d94e5d';
+              if (v < 4)   return '#f2c037';
+                            return '#61c277';
+            }
+          },
+          label:     { show: true, position: 'top' }
         }]
       });
     }
 
-    function renderTextQuestions(data,container) {
-      const byQ = groupBy(data,'question');
-      Object.entries(byQ).forEach(([q,ans])=>{
-        const box = document.createElement('div'); box.className='text-question';
-        const t = document.createElement('div'); t.className='text-question-title'; t.textContent=q;
-        const ul= document.createElement('ul');
-        ans.forEach(a=>{ const li=document.createElement('li'); li.textContent=a.value; ul.appendChild(li) });
-        box.appendChild(t); box.appendChild(ul);
+    function renderTextQuestions(data, container) {
+      const byQ = groupBy(data, 'question');
+      Object.entries(byQ).forEach(([q, answers]) => {
+        const box = document.createElement('div');
+        box.className = 'text-question';
+        const title = document.createElement('div');
+        title.className = 'text-question-title';
+        title.textContent = q;
+        const ul = document.createElement('ul');
+        answers.forEach(r => {
+          const li = document.createElement('li');
+          li.textContent = r.value;
+          ul.appendChild(li);
+        });
+        box.appendChild(title);
+        box.appendChild(ul);
         container.appendChild(box);
       });
     }

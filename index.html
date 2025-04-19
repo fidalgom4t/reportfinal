@@ -44,6 +44,31 @@
       font-size: 16px;
       color: #007c91;
     }
+    .dropdown-multiselect {
+      position: relative;
+      display: inline-block;
+      width: 300px;
+      margin: 10px 0;
+    }
+    .dropdown-multiselect .select-box {
+      border: 1px solid #ccc;
+      padding: 5px;
+      cursor: pointer;
+      background: #fff;
+    }
+    .dropdown-multiselect .checkboxes {
+      display: none;
+      border: 1px solid #ccc;
+      position: absolute;
+      background-color: white;
+      z-index: 1;
+      max-height: 200px;
+      overflow-y: auto;
+      width: 100%;
+    }
+    .dropdown-multiselect.open .checkboxes {
+      display: block;
+    }
   </style>
 </head>
 <body>
@@ -54,6 +79,12 @@
 
   <label style="margin-left:20px;">Formador:</label>
   <input type="text" id="trainerInput" placeholder="Nome do formador" />
+
+  <label style="margin-left:20px;">Perguntas Abertas:</label>
+  <div class="dropdown-multiselect" id="textWrapper">
+    <div class="select-box" onclick="toggleDropdown('textWrapper')">Selecionar perguntas</div>
+    <div class="checkboxes" id="textQuestionSelect"></div>
+  </div>
 
   <div id="reportContainer"></div>
 
@@ -74,6 +105,30 @@
       clientSelect.onchange = generateReports;
     }
 
+    function toggleDropdown(wrapperId) {
+      document.getElementById(wrapperId).classList.toggle('open');
+    }
+
+    function fillCheckboxes(id, values) {
+      const container = document.getElementById(id);
+      container.innerHTML = '';
+      values.forEach(val => {
+        const label = document.createElement('label');
+        const checkbox = document.createElement('input');
+        checkbox.type = 'checkbox';
+        checkbox.value = val;
+        checkbox.checked = true;
+        label.appendChild(checkbox);
+        label.appendChild(document.createTextNode(' ' + val));
+        container.appendChild(label);
+        container.appendChild(document.createElement('br'));
+      });
+    }
+
+    function getChecked(id) {
+      return Array.from(document.querySelectorAll(`#${id} input:checked`)).map(c => c.value);
+    }
+
     function generateReports() {
       const client = document.getElementById("clientSelect").value;
       const trainer = document.getElementById("trainerInput").value || "N/A";
@@ -82,6 +137,9 @@
 
       const clientData = rawData.filter(d => d.client === client);
       const programs = [...new Set(clientData.map(d => d.program))];
+      const textQs = [...new Set(clientData.filter(d => typeof d.value !== 'number').map(d => d.question))];
+      fillCheckboxes("textQuestionSelect", textQs);
+      const selectedTextQs = getChecked("textQuestionSelect");
 
       programs.forEach((program, idx) => {
         const programData = clientData.filter(d => d.program === program);
@@ -115,7 +173,6 @@
           heading.textContent = type === 'assessment' ? 'Avaliação Inicial' : 'Avaliação Final';
           section.appendChild(heading);
 
-          // Global chart if >1 turma
           if (turmas.length > 1) {
             const globalChartDiv = document.createElement('div');
             globalChartDiv.className = 'chart-container';
@@ -132,10 +189,9 @@
               average: vals.reduce((a, b) => a + b, 0) / vals.length
             }));
 
-            drawChart(globalChartDiv, avgData, type);
+            setTimeout(() => drawChart(globalChartDiv, avgData, type), 50);
           }
 
-          // Charts per turma
           turmas.forEach(turma => {
             const turmaTitle = document.createElement('div');
             turmaTitle.className = 'turma-title';
@@ -158,14 +214,15 @@
               average: vals.reduce((a, b) => a + b, 0) / vals.length
             }));
 
-            drawChart(turmaChartDiv, chartData, type);
+            setTimeout(() => drawChart(turmaChartDiv, chartData, type), 50);
           });
 
-          // Text responses
           const questions = {};
           text.forEach(({ question, value }) => {
-            if (!questions[question]) questions[question] = [];
-            questions[question].push(value);
+            if (selectedTextQs.includes(question)) {
+              if (!questions[question]) questions[question] = [];
+              questions[question].push(value);
+            }
           });
 
           Object.entries(questions).forEach(([q, answers]) => {
@@ -192,6 +249,7 @@
     }
 
     function drawChart(container, data, type) {
+      if (!container) return;
       const chart = echarts.init(container);
       data.sort((a, b) => a.question.localeCompare(b.question));
       const questions = data.map(d => d.question);

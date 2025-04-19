@@ -1,17 +1,17 @@
 {
   "labels": [
     {
-      "QUESTION ID": "01. No meu contexto de trabalho, consigo produzir de forma focalizada e sem grandes interrup??es",
+      "QUESTION ID": "01. No meu contexto de trabalho, consigo produzir de forma focalizada e sem grandes interrupções",
       "LABEL": "FOCO",
       "sort order": 1
     },
     {
-      "QUESTION ID": "02. \"O n?mero de assuntos diferentes que tenho de gerir em paralelo ? adequado, n?o excessivo.\"",
+      "QUESTION ID": "02. \"O número de assuntos diferentes que tenho de gerir em paralelo é adequado, não excessivo.\"",
       "LABEL": "DIVERSIDADE",
       "sort order": 2
     },
     {
-      "QUESTION ID": "03. \"Organizo o meu trabalho de forma met?dica e eficiente, e sinto ter tudo sob controlo.\"",
+      "QUESTION ID": "03. \"Organizo o meu trabalho de forma metódica e eficiente, e sinto ter tudo sob controlo.\"",
       "LABEL": "CONTROLO",
       "sort order": 3
     },
@@ -21,53 +21,53 @@
       "sort order": 4
     },
     {
-      "QUESTION ID": "08. A defini??o das minhas fun??es ? muito clara. Sei precisamente quais as minhas responsabilidades.\"",
+      "QUESTION ID": "08. A definição das minhas funções é muito clara. Sei precisamente quais as minhas responsabilidades.\"",
       "LABEL": "RESPONSABILIDADES",
       "sort order": 5
     },
     {
-      "QUESTION ID": "09. A estrat?gia atual da empresa, e a forma como deve ser implementada na minha equipa/unidade/departamento, est?o para mim muito claras.\"",
-      "LABEL": "ESTRAT?GIA",
+      "QUESTION ID": "09. A estratégia atual da empresa, e a forma como deve ser implementada na minha equipa/unidade/departamento, estão para mim muito claras.\"",
+      "LABEL": "ESTRATÉGIA",
       "sort order": 6
     },
     {
-      "QUESTION ID": "10. Conhe?o perfeitamente quais os meus objetivos atuais, e n?o tenho qualquer d?vida sobre as prioridades que devo respeitar.\"",
+      "QUESTION ID": "10. Conheço perfeitamente quais os meus objetivos atuais, e não tenho qualquer dúvida sobre as prioridades que devo respeitar.\"",
       "LABEL": "OBJETIVOS",
       "sort order": 7
     },
     {
-      "QUESTION ID": "11. \"Quanto aos crit?rios de sucesso que definem o meu bom desempenho, a minha vis?o e a vis?o de quem me avalia e/ou lidera s?o inteiramente coincidentes.\"",
-      "LABEL": "CRIT?RIOS SUCESSO",
+      "QUESTION ID": "11. \"Quanto aos critérios de sucesso que definem o meu bom desempenho, a minha visão e a visão de quem me avalia e/ou lidera são inteiramente coincidentes.\"",
+      "LABEL": "CRITÉRIOS SUCESSO",
       "sort order": 8
     },
     {
-      "QUESTION ID": "12. ...a utiliza??o de emails ? eficiente.\"",
+      "QUESTION ID": "12. ...a utilização de emails é eficiente.\"",
       "LABEL": "EMAILS",
       "sort order": 9
     },
     {
-      "QUESTION ID": "13. ...as reuni?es s?o eficazes.\"",
-      "LABEL": "REUNI?ES",
+      "QUESTION ID": "13. ...as reuniões são eficazes.\"",
+      "LABEL": "REUNIÕES",
       "sort order": 10
     },
     {
-      "QUESTION ID": "14 ...h? boa agilidade: as decis?es tendem a ser c?leres e os assuntos resolvem-se com rapidez.\"",
+      "QUESTION ID": "14 ...há boa agilidade: as decisões tendem a ser céleres e os assuntos resolvem-se com rapidez.\"",
       "LABEL": "AGILIDADE",
       "sort order": 11
     },
     {
-      "QUESTION ID": "15. ...os processos internos s?o simples e eficientes.\"",
+      "QUESTION ID": "15. ...os processos internos são simples e eficientes.\"",
       "LABEL": "PROCESSOS",
       "sort order": 12
     },
     {
-      "QUESTION ID": "16. ... h? claramente um clima de confian?a entre os colaboradores.\"",
-      "LABEL": "CONFIAN?A",
+      "QUESTION ID": "16. ... há claramente um clima de confiança entre os colaboradores.\"",
+      "LABEL": "CONFIANÇA",
       "sort order": 13
     },
     {
-      "QUESTION ID": "17. .. h? poucas d?vidas sobre quem ficou de fazer o qu?. Eventuais ?reas cinzentas que surjam na divis?o de responsabilidades s?o rapidamente discutidas e clarificadas.\"",
-      "LABEL": "?REAS CINZENTAS",
+      "QUESTION ID": "17. .. há poucas dúvidas sobre quem ficou de fazer o quê. Eventuais áreas cinzentas que surjam na divisão de responsabilidades são rapidamente discutidas e clarificadas.\"",
+      "LABEL": "ÁREAS CINZENTAS",
       "sort order": 14
     },
     {
@@ -141,27 +141,27 @@
       "sort order": 14
     },
     {
-      "QUESTION ID": "Q6: \"Tenho sido capaz de motivar a minha equipa. Trabalham com sentido de miss?o, d?o o seu melhor e acreditam na import?ncia do que fazem.\"",
-      "LABEL": "MOTIVA??O",
+      "QUESTION ID": "Q6: \"Tenho sido capaz de motivar a minha equipa. Trabalham com sentido de missão, dão o seu melhor e acreditam na importância do que fazem.\"",
+      "LABEL": "MOTIVAÇÃO",
       "sort order": 1
     },
     {
       "QUESTION ID": "Q7: \"Tenho sido capaz de orientar a minha equipa. Comigo sabem sempre onde fica a meta.\"",
-      "LABEL": "ORIENTA??O",
+      "LABEL": "ORIENTAÇÃO",
       "sort order": 2
     },
     {
-      "QUESTION ID": "Q8: \"Tenho conseguido coordenar a equipa com efici?ncia. ? raro haver confus?o sobre quem faz o qu?.\"",
-      "LABEL": "DELEGA??O",
+      "QUESTION ID": "Q8: \"Tenho conseguido coordenar a equipa com eficiência. É raro haver confusão sobre quem faz o quê.\"",
+      "LABEL": "DELEGAÇÃO",
       "sort order": 3
     },
     {
-      "QUESTION ID": "Q10: \"Tenho sido capaz de fazer crescer a minha equipa. Sinto que cada vez s?o mais aut?nomos e proativos.\"",
+      "QUESTION ID": "Q10: \"Tenho sido capaz de fazer crescer a minha equipa. Sinto que cada vez são mais autónomos e proativos.\"",
       "LABEL": "AUTONOMIA",
       "sort order": 4
     },
     {
-      "QUESTION ID": "Q11: \"Tenho conseguido criar um bom esp?rito de equipa, com um ADN forte em alinhamento e valores.\"",
+      "QUESTION ID": "Q11: \"Tenho conseguido criar um bom espírito de equipa, com um ADN forte em alinhamento e valores.\"",
       "LABEL": "ALINHAMENTO",
       "sort order": 5
     },
@@ -244,33 +244,33 @@
   "titles": [
     {
       "program_id": "COLAB 365",
-      "T?TULO": "COLAB 365",
-      "SUBT?TULO": "A arte da Efici?ncia Colaborativa"
+      "TÍTULO": "COLAB 365",
+      "SUBTÍTULO": "A arte da Eficiência Colaborativa"
     },
     {
       "program_id": "P365",
-      "T?TULO": "PRODUCTIVITY 365",
-      "SUBT?TULO": "PRODUTIVIDADE PESSOAL E ALTA PERFORMANCE"
+      "TÍTULO": "PRODUCTIVITY 365",
+      "SUBTÍTULO": "PRODUTIVIDADE PESSOAL E ALTA PERFORMANCE"
     },
     {
       "program_id": "EIO",
-      "T?TULO": "EMOTIONS INSIDE OUT",
-      "SUBT?TULO": "DA GEST?O EMOCIONAL AOS RESULTADOS"
+      "TÍTULO": "EMOTIONS INSIDE OUT",
+      "SUBTÍTULO": "DA GESTÃO EMOCIONAL AOS RESULTADOS"
     },
     {
       "program_id": "CIO",
-      "T?TULO": "COMMUNICATIONS INSIDE OUT",
-      "SUBT?TULO": "GEST?O EMOCIONAL E EFIC?CIA INTERPESSOAL"
+      "TÍTULO": "COMMUNICATIONS INSIDE OUT",
+      "SUBTÍTULO": "GESTÃO EMOCIONAL E EFICÁCIA INTERPESSOAL"
     },
     {
       "program_id": "EL",
-      "T?TULO": "EFFECTIVE LEADERSHIP",
-      "SUBT?TULO": "LIDERAN?A E GEST?O DE EQUIPAS"
+      "TÍTULO": "EFFECTIVE LEADERSHIP",
+      "SUBTÍTULO": "LIDERANÇA E GESTÃO DE EQUIPAS"
     },
     {
       "program_id": "XMAN",
-      "T?TULO": "X-MAN",
-      "SUBT?TULO": "EXPECTATIONS MANAGEMENT TRAINING"
+      "TÍTULO": "X-MAN",
+      "SUBTÍTULO": "EXPECTATIONS MANAGEMENT TRAINING"
     }
   ]
 }

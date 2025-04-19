@@ -54,6 +54,7 @@
       width: 100%;
       height: 400px;
       margin-bottom: 40px;
+      transition: all 0.3s ease;
     }
     .turma-title {
       font-size: 18px;
@@ -134,28 +135,27 @@
     <div class="logo-text">MIND4TIME<br><span style="font-weight: normal; font-size: 14px;">Productivity Consulting</span></div>
   </header>
 
-<div id="executiveSummary" class="hero-banner">
-  <div class="hero-left">
-    <img src="cube.png" alt="Formação" class="hero-img" />
+  <div id="executiveSummary" class="hero-banner">
+    <div class="hero-left">
+      <img src="cube.png" alt="Formação" class="hero-img" />
+    </div>
+    <div class="hero-right">
+      <div class="hero-subtitle" id="hero-subtitle"></div>
+      <div class="hero-title" id="hero-title"></div>
+      <div class="hero-tagline" id="hero-tagline"></div>
+      <br><br>
+      <table>
+        <tr>
+          <td><span class="italic">scope</span> temporal</td>
+          <td id="hero-date">N/A</td>
+        </tr>
+        <tr>
+          <td>formador</td>
+          <td id="hero-trainer">N/A</td>
+        </tr>
+      </table>
+    </div>
   </div>
-  <div class="hero-right">
-    <div class="hero-subtitle" id="hero-subtitle"></div>
-    <div class="hero-title" id="hero-title"></div>
-    <div class="hero-tagline" id="hero-tagline"></div>
-    <br><br>
-    <table>
-      <tr>
-        <td><span class="italic">scope</span> temporal</td>
-        <td id="hero-date">N/A</td>
-      </tr>
-      <tr>
-        <td>formador</td>
-        <td id="hero-trainer">N/A</td>
-      </tr>
-    </table>
-  </div>
-</div>
-
 
   <label>Cliente:</label>
   <select id="clientSelect"></select>
@@ -309,14 +309,18 @@
 
       const container = document.getElementById("turmaCharts");
       container.innerHTML = "";
+
+      const overallChartEl = document.getElementById("overallChart");
       if (turmas.length > 1) {
+        overallChartEl.style.display = "block";
         const overallData = Object.entries(overall).map(([q, vals]) => ({
           question: q,
           average: vals.reduce((a, b) => a + b, 0) / vals.length
         }));
         drawBarChart("overallChart", overallData, program);
       } else {
-        document.getElementById("overallChart").innerHTML = "";
+        overallChartEl.innerHTML = "";
+        overallChartEl.style.display = "none";
       }
 
       Object.entries(byTurma).forEach(([turma, questions], idx) => {

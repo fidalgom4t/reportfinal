@@ -4,7 +4,10 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Relatório de Formação</title>
+  <!-- ECharts library -->
   <script src="https://cdn.jsdelivr.net/npm/echarts@5"></script>
+  <!-- html2pdf library -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
   <style>
     body {
       font-family: 'Segoe UI', sans-serif;
@@ -127,6 +130,15 @@
     .italic {
       font-style: italic;
     }
+    /* PDF Print Styles */
+    @media print {
+      .dropdown-multiselect, .toggle-btns, input, select, button.export-btn {
+        display: none !important;
+      }
+      body {
+        zoom: 90%;
+      }
+    }
   </style>
 </head>
 <body>
@@ -135,6 +147,7 @@
     <div class="logo-text">MIND4TIME<br><span style="font-weight: normal; font-size: 14px;">Productivity Consulting</span></div>
   </header>
 
+  <!-- Executive Summary Hero Banner -->
   <div id="executiveSummary" class="hero-banner">
     <div class="hero-left">
       <img src="cube.png" alt="Formação" class="hero-img" />
@@ -157,6 +170,7 @@
     </div>
   </div>
 
+  <!-- Controls -->
   <label>Cliente:</label>
   <select id="clientSelect"></select>
 
@@ -178,6 +192,9 @@
   <label>Formador:</label>
   <input type="text" id="trainerInput" placeholder="Nome do formador" style="margin-bottom: 20px; padding: 5px; width: 250px;">
 
+  <!-- Export Button for PDF -->
+  <button class="export-btn" onclick="exportToPDF()" style="margin:20px 0; padding:10px 20px;">Exportar PDF</button>
+
   <div class="toggle-btns">
     <button onclick="setSection('assessment')" id="btn-assessment" class="active">Assessment</button>
     <button onclick="setSection('evaluation')" id="btn-evaluation">Avaliação</button>
@@ -192,6 +209,7 @@
     let metaConfig = { labels: [], titles: [] };
     let currentSection = 'assessment';
 
+    // Load data.json and meta.json, then initialize filters and apply them.
     Promise.all([
       fetch('data.json').then(res => res.json()),
       fetch('meta.json').then(res => res.json())
@@ -267,21 +285,22 @@
       const selectedQuestions = getChecked("textQuestionSelect");
       const trainer = document.getElementById("trainerInput").value || 'N/A';
 
+      // Update executive summary using meta information for titles,
+      // while "formador" is manually input and time scope is calculated from data.json dates.
       const titleMeta = metaConfig.titles.find(t => t.program_id === program);
       if (titleMeta) {
         document.getElementById("hero-title").textContent = titleMeta.title;
         document.getElementById("hero-subtitle").textContent = titleMeta.subtitle;
         document.getElementById("hero-tagline").textContent = titleMeta.tagline;
       }
-
       document.getElementById("hero-trainer").textContent = trainer;
 
+      // Calculate time scope from first submitted dates in data.json for each section
       const filtered = rawData.filter(d =>
         (!client || d.client === client) &&
         (!program || d.program === program) &&
         (!turmas.length || turmas.includes(d.turma))
       );
-
       const evalDates = filtered.filter(d => d.section === 'evaluation' && d.date).map(d => new Date(d.date));
       const assessDates = filtered.filter(d => d.section === 'assessment' && d.date).map(d => new Date(d.date));
       const firstEval = evalDates.length ? new Intl.DateTimeFormat('pt-PT', { month: 'long', year: 'numeric' }).format(Math.min(...evalDates)) : 'N/A';
@@ -394,6 +413,19 @@
         box.appendChild(ul);
         textDiv.appendChild(box);
       });
+    }
+
+    // PDF export function using html2pdf.js
+    function exportToPDF() {
+      const element = document.body;
+      const opt = {
+        margin:       0.5,
+        filename:     'relatorio_formacao.pdf',
+        image:        { type: 'jpeg', quality: 0.98 },
+        html2canvas:  { scale: 2 },
+        jsPDF:        { unit: 'in', format: 'a4', orientation: 'portrait' }
+      };
+      html2pdf().set(opt).from(element).save();
     }
   </script>
 </body>

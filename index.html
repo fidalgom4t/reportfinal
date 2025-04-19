@@ -1,38 +1,17 @@
-<!-- index.html (updated from index (5).html) -->
 <!DOCTYPE html>
 <html lang="pt">
 <head>
   <meta charset="UTF-8" />
   <title>Selecionar Filtros</title>
   <style>
-    body {
-      font-family: 'Segoe UI', sans-serif;
-      padding: 40px;
-      background: #f5f5f5;
-    }
-    label {
-      font-weight: bold;
-      margin-top: 20px;
-      display: block;
-    }
-    select, input {
-      padding: 5px;
-      margin-top: 5px;
-      width: 300px;
-    }
-    .dropdown-multiselect {
-      margin-top: 15px;
-    }
+    body { font-family: 'Segoe UI', sans-serif; padding:40px; background:#f5f5f5 }
+    label { font-weight:bold; margin-top:20px; display:block }
+    select,input { padding:5px; margin-top:5px; width:300px }
+    .dropdown-multiselect { margin-top:15px }
     .link-button {
-      display: inline-block;
-      margin-top: 30px;
-      padding: 10px 20px;
-      background-color: #007c91;
-      color: white;
-      text-decoration: none;
-      font-weight: bold;
-      border-radius: 5px;
-      cursor: pointer;
+      display:inline-block; margin:30px 0; padding:10px 20px;
+      background:#007c91; color:#fff; text-decoration:none;
+      font-weight:bold; border-radius:5px; cursor:pointer;
     }
   </style>
 </head>
@@ -58,6 +37,13 @@
     <div class="checkboxes" id="textQuestionSelect"></div>
   </div>
 
+  <!-- NEW: Scope temporal inputs -->
+  <label>Scope temporal - Início:</label>
+  <input type="month" id="startMonthInput" />
+
+  <label>Scope temporal - Fim:</label>
+  <input type="month" id="endMonthInput" />
+
   <a class="link-button" onclick="goToReport()">Ver Relatório</a>
 
   <script>
@@ -68,6 +54,7 @@
       .then(data => {
         rawData = data;
         populateFilters();
+        syncScopeInputs();
       });
 
     function toggleDropdown() {
@@ -79,9 +66,9 @@
       const clientSelect = document.getElementById("clientSelect");
       clientSelect.innerHTML = clients.map(c => `<option value="${c}">${c}</option>`).join('');
       clientSelect.onchange = updatePrograms;
-      clientSelect.value = getStored('client');
+      clientSelect.value = getStored('client') || clients[0];
       updatePrograms();
-      syncInputs();
+      syncOtherInputs();
     }
 
     function updatePrograms() {
@@ -91,7 +78,7 @@
       const programSelect = document.getElementById("programSelect");
       programSelect.innerHTML = programs.map(p => `<option value="${p}">${p}</option>`).join('');
       programSelect.onchange = updateTurmas;
-      programSelect.value = getStored('program');
+      programSelect.value = getStored('program') || programs[0];
       updateTurmas();
       store('client', client);
     }
@@ -106,7 +93,7 @@
       turmaSelect.onchange = storeSelections;
       store('program', program);
 
-      const textQs = [...new Set(filtered.filter(d => typeof d.value !== 'number').map(d => d.question))];
+      const textQs = [...new Set(filtered.filter(d => isNaN(+d.value)).map(d => d.question))];
       fillCheckboxes("textQuestionSelect", textQs);
     }
 
@@ -128,14 +115,29 @@
       });
     }
 
-    function syncInputs() {
+    function syncOtherInputs() {
       document.getElementById("trainerInput").value = getStored('trainer') || '';
-      document.getElementById("trainerInput").oninput = () => store('trainer', document.getElementById("trainerInput").value);
+      document.getElementById("trainerInput").oninput = () =>
+        store('trainer', document.getElementById("trainerInput").value);
+    }
+
+    function syncScopeInputs() {
+      const stored = JSON.parse(localStorage.getItem('filters') || '{}');
+      if (stored.start) {
+        document.getElementById('startMonthInput').value = stored.start;
+      }
+      if (stored.end) {
+        document.getElementById('endMonthInput').value = stored.end;
+      }
+      document.getElementById('startMonthInput').onchange = e =>
+        store('start', e.target.value);
+      document.getElementById('endMonthInput').onchange = e =>
+        store('end', e.target.value);
     }
 
     function storeSelections() {
       const turmas = Array.from(document.getElementById("turmaSelect").selectedOptions).map(o => o.value);
-      const textQs = Array.from(document.querySelectorAll(`#textQuestionSelect input:checked`)).map(c => c.value);
+      const textQs = Array.from(document.querySelectorAll("#textQuestionSelect input:checked")).map(c => c.value);
       store('turmas', turmas);
       store('textQuestions', textQs);
     }
@@ -152,9 +154,8 @@
     }
 
     function goToReport() {
-      // Copy over your selected filters
+      // Copy all filters (including user‐picked start/end) to reportFilters
       localStorage.setItem('reportFilters', localStorage.getItem('filters'));
-      // Navigate
       window.location.href = 'report.html';
     }
   </script>

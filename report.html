@@ -2,6 +2,11 @@
 <html lang="pt">
 <head>
   <meta charset="UTF-8" />
+  <!-- Prevent caching -->
+  <meta http-equiv="Cache-Control" content="no-store, no-cache, must-revalidate" />
+  <meta http-equiv="Pragma" content="no-cache" />
+  <meta http-equiv="Expires" content="0" />
+
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Relatório Gerado</title>
   <script src="https://cdn.jsdelivr.net/npm/echarts@5"></script>
@@ -24,7 +29,6 @@
 
   <script>
     async function loadReport() {
-      // Load filters, data and meta
       const filters = JSON.parse(
         localStorage.getItem('reportFilters') ||
         localStorage.getItem('filters') ||
@@ -36,9 +40,9 @@
       ]);
 
       const container = document.getElementById('reportContent');
-      container.innerHTML = '';  // clear any existing content
+      container.innerHTML = '';
 
-      // --- Build Hero Banner via DOM ---
+      // Hero banner
       const progMeta = meta.titles.find(t => t.program_id === filters.program) || {};
       const allRecords = data.filter(d =>
         d.client === filters.client &&
@@ -50,84 +54,62 @@
 
       const hero = document.createElement('div');
       hero.className = 'hero-banner';
-
-      const subtitle = document.createElement('div');
-      subtitle.className = 'hero-subtitle';
-      subtitle.textContent = progMeta["SUBTÍTULO"] || '';
-      hero.appendChild(subtitle);
-
-      const title = document.createElement('div');
-      title.className = 'hero-title';
-      title.textContent = progMeta["TÍTULO"] || filters.program;
-      hero.appendChild(title);
-
-      const metaTrainer = document.createElement('div');
-      metaTrainer.className = 'hero-meta';
-      metaTrainer.innerHTML = `<strong>Formador:</strong> ${filters.trainer || 'N/A'}`;
-      hero.appendChild(metaTrainer);
-
-      const metaScope = document.createElement('div');
-      metaScope.className = 'hero-meta';
-      metaScope.innerHTML = `<strong>Scope temporal:</strong> ${startDate} – ${endDate}`;
-      hero.appendChild(metaScope);
-
+      hero.innerHTML = `
+        <div class="hero-subtitle">${progMeta["SUBTÍTULO"]||''}</div>
+        <div class="hero-title">${progMeta["TÍTULO"]||filters.program}</div>
+        <div class="hero-meta"><strong>Formador:</strong> ${filters.trainer||'N/A'}</div>
+        <div class="hero-meta"><strong>Scope temporal:</strong> ${startDate} – ${endDate}</div>
+      `;
       container.appendChild(hero);
 
-      // Build lookup maps
+      // Maps
       const labelMap = createLabelMap(meta.labels);
       const sortMap  = createSortMap(meta.labels);
 
-      // Loop through both sections
-      for (const sectionKey of ['assessment', 'evaluation']) {
-        const sectionTitleText = sectionKey === 'assessment'
+      // Sections
+      for (const key of ['assessment','evaluation']) {
+        const sectionTitle = key === 'assessment'
           ? 'Assessment'
           : 'Avaliação do Programa';
 
-        // Section heading
-        const sectionHeading = document.createElement('div');
-        sectionHeading.className = 'section-title';
-        sectionHeading.textContent = sectionTitleText;
-        container.appendChild(sectionHeading);
+        const hdr = document.createElement('div');
+        hdr.className = 'section-title';
+        hdr.textContent = sectionTitle;
+        container.appendChild(hdr);
 
-        // Filter rows for this section
+        // Filter and pick only numeric values
         const secData = data.filter(d =>
           d.client === filters.client &&
           d.program === filters.program &&
           (filters.turmas || []).includes(d.turma) &&
-          String(d.section || '').trim().toLowerCase().includes(sectionKey)
+          String(d.section || '').toLowerCase().includes(key) &&
+          !isNaN(+d.value)
         );
 
-        // Numeric values (accepts numbers and numeric strings)
-        const numeric = secData.filter(d => !isNaN(+d.value));
-        const byTurma = groupBy(numeric, 'turma');
+        // Group by turma
+        const byTurma = groupBy(secData, 'turma');
 
-        // Global chart if multiple turmas
-        if ((filters.turmas || []).length > 1 && numeric.length) {
-          const globalAverages = computeAverages(numeric, labelMap, sortMap);
-          createBarChart(`Global (${sectionTitleText})`, globalAverages, container);
+        // Global chart if >1 turma
+        if ((filters.turmas || []).length > 1 && secData.length) {
+          const globalAvg = computeAverages(secData, labelMap, sortMap);
+          createBarChart(`Global (${sectionTitle})`, globalAvg, container);
         }
 
         // Per‑turma charts
-        Object.entries(byTurma).forEach(([turma, records]) => {
-          const turmaTitle = document.createElement('div');
-          turmaTitle.className = 'turma-title';
-          turmaTitle.textContent = `Turma: ${turma}`;
-          container.appendChild(turmaTitle);
+        Object.entries(byTurma).forEach(([turma, vals]) => {
+          const tt = document.createElement('div');
+          tt.className = 'turma-title';
+          tt.textContent = `Turma: ${turma}`;
+          container.appendChild(tt);
 
-          const avgs = computeAverages(records, labelMap, sortMap);
+          const avgs = computeAverages(vals, labelMap, sortMap);
           createBarChart(turma, avgs, container);
         });
-
-        // Open‑ended responses
-        const textResponses = secData.filter(d =>
-          isNaN(+d.value) &&
-          (filters.textQuestions || []).includes(d.question)
-        );
-        renderTextQuestions(textResponses, container);
       }
     }
 
-    // Utility: find min/max date for a given field
+    // Helpers
+
     function getExtremeDate(data, sectionKey, field, mode) {
       const dates = data
         .filter(d => d[field] && String(d.section || '').toLowerCase().includes(sectionKey))
@@ -138,34 +120,30 @@
         : new Date(Math.max(...dates));
     }
 
-    // Format a JS Date as "Month Year" in pt-PT
     function formatMonthYear(date) {
       if (!date) return 'N/A';
-      return date.toLocaleDateString('pt-PT', { year:'numeric', month:'long' });
+      return date.toLocaleDateString('pt-PT',{ year:'numeric', month:'long' });
     }
 
-    // Build question→label map
     function createLabelMap(labels) {
-      const map = {};
+      const m = {};
       labels.forEach(l => {
         const q = l.questionId || l["QUESTION ID"];
-        map[q] = l.label || l["LABEL"];
+        m[q] = l.label || l["LABEL"];
       });
-      return map;
+      return m;
     }
 
-    // Build question→sortOrder map
     function createSortMap(labels) {
-      const map = {};
+      const m = {};
       labels.forEach(l => {
         const q = l.questionId || l["QUESTION ID"];
         const s = l.sortOrder || l["SORT ORDER"] || l.sort_order;
-        map[q] = +s;
+        m[q] = +s;
       });
-      return map;
+      return m;
     }
 
-    // Group array of objects by key
     function groupBy(arr, key) {
       return arr.reduce((acc, item) => {
         (acc[item[key]] ||= []).push(item);
@@ -173,37 +151,38 @@
       }, {});
     }
 
-    // Compute per-question averages and sort by sortMap
     function computeAverages(data, labelMap, orderMap) {
       const groups = {};
-      data.forEach(({ question, value }) => {
+      data.forEach(({question, value}) => {
         const num = +value;
         (groups[question] ||= []).push(num);
       });
-      const arr = Object.entries(groups).map(([q, vals]) => ({
-        question: q,
-        label:    labelMap[q] || q,
-        avg:      vals.reduce((a,b) => a + b, 0) / vals.length
-      }));
-      arr.sort((a,b) => (orderMap[a.question] || 0) - (orderMap[b.question] || 0));
+      const arr = Object.entries(groups).map(([q, vals]) => {
+        const avgRaw = vals.reduce((a, b) => a + b, 0) / vals.length;
+        return {
+          question: q,
+          label:    labelMap[q] || q,
+          avg:      Number(avgRaw.toFixed(1))  // round to one decimal
+        };
+      });
+      arr.sort((a, b) => (orderMap[a.question] || 0) - (orderMap[b.question] || 0));
       return arr;
     }
 
-    // Create and append an ECharts bar chart
     function createBarChart(title, data, container) {
-      const chartDiv = document.createElement('div');
-      chartDiv.className = 'chart-container';
-      container.appendChild(chartDiv);
-
-      const chart = echarts.init(chartDiv);
+      const div = document.createElement('div');
+      div.className = 'chart-container';
+      container.appendChild(div);
+      const chart = echarts.init(div);
       chart.setOption({
-        title:   { text: title, left:'center', textStyle:{ fontSize:18 } },
+        title:   { text: title, left: 'center', textStyle: { fontSize: 18 } },
         tooltip: {},
-        xAxis:   { type:'category', data:data.map(d=>d.label), axisLabel:{ rotate:30 } },
-        yAxis:   { type:'value', min:0, max:5 },
+        xAxis:   { type: 'category', data: data.map(d => d.label), axisLabel: { rotate: 30 } },
+        yAxis:   { type: 'value', min: 0, max: 5 },
         series: [{
           type: 'bar',
-          data: data.map(d=>d.avg),
+          data: data.map(d => d.avg),
+          label: { show: true, position: 'top', formatter: '{c}' },
           itemStyle: {
             color(params) {
               const v = params.value;
@@ -211,37 +190,12 @@
               if (v < 4)   return '#f2c037';
                             return '#61c277';
             }
-          },
-          label: { show:true, position:'top' }
+          }
         }]
       });
     }
 
-    // Render open‑ended question blocks
-    function renderTextQuestions(data, container) {
-      const byQuestion = groupBy(data, 'question');
-      Object.entries(byQuestion).forEach(([q, answers]) => {
-        const box = document.createElement('div');
-        box.className = 'text-question';
-
-        const title = document.createElement('div');
-        title.className = 'text-question-title';
-        title.textContent = q;
-        box.appendChild(title);
-
-        const ul = document.createElement('ul');
-        answers.forEach(a => {
-          const li = document.createElement('li');
-          li.textContent = a.value;
-          ul.appendChild(li);
-        });
-        box.appendChild(ul);
-
-        container.appendChild(box);
-      });
-    }
-
-    // Kick off
+    // Start
     loadReport();
   </script>
 </body>

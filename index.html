@@ -22,11 +22,11 @@
   <label>Cliente:</label>
   <select id="clientSelect"></select>
 
-  <label>Programa:</label>
-  <select id="programSelect"></select>
+  <label>Programas:</label>
+  <select id="programSelect" multiple size="4"></select>
 
   <label>Turmas:</label>
-  <select id="turmaSelect" multiple size="5" style="height:auto;"></select>
+  <select id="turmaSelect" multiple size="5"></select>
 
   <label>Formador:</label>
   <input type="text" id="trainerInput" placeholder="Nome do formador" />
@@ -37,7 +37,6 @@
     <div class="checkboxes" id="textQuestionSelect"></div>
   </div>
 
-  <!-- NEW: Scope temporal inputs -->
   <label>Scope temporal - Início:</label>
   <input type="month" id="startMonthInput" />
 
@@ -53,7 +52,7 @@
       .then(res => res.json())
       .then(data => {
         rawData = data;
-        populateFilters();
+        populateClients();
         syncScopeInputs();
       });
 
@@ -61,100 +60,102 @@
       document.getElementById("textWrapper").classList.toggle("open");
     }
 
-    function populateFilters() {
+    function populateClients() {
       const clients = [...new Set(rawData.map(d => d.client))];
       const clientSelect = document.getElementById("clientSelect");
       clientSelect.innerHTML = clients.map(c => `<option value="${c}">${c}</option>`).join('');
-      clientSelect.onchange = updatePrograms;
+      clientSelect.onchange = populatePrograms;
       clientSelect.value = getStored('client') || clients[0];
-      updatePrograms();
-      syncOtherInputs();
+      populatePrograms();
     }
 
-    function updatePrograms() {
+    function populatePrograms() {
       const client = document.getElementById("clientSelect").value;
+      store('client', client);
       const filtered = rawData.filter(d => d.client === client);
       const programs = [...new Set(filtered.map(d => d.program))];
       const programSelect = document.getElementById("programSelect");
-      programSelect.innerHTML = programs.map(p => `<option value="${p}">${p}</option>`).join('');
-      programSelect.onchange = updateTurmas;
-      programSelect.value = getStored('program') || programs[0];
-      updateTurmas();
-      store('client', client);
+      programSelect.innerHTML = programs
+        .map(p => `<option value="${p}">${p}</option>`)
+        .join('');
+      // restore
+      const stored = getStored('programs') || [programs[0]];
+      Array.from(programSelect.options).forEach(opt =>
+        opt.selected = stored.includes(opt.value)
+      );
+      programSelect.onchange = () => {
+        const sel = Array.from(programSelect.selectedOptions).map(o => o.value);
+        store('programs', sel);
+        populateTurmas();
+      };
+      store('programs', stored);
+      populateTurmas();
     }
 
-    function updateTurmas() {
-      const client = document.getElementById("clientSelect").value;
-      const program = document.getElementById("programSelect").value;
-      const filtered = rawData.filter(d => d.client === client && d.program === program);
+    function populateTurmas() {
+      const client = getStored('client');
+      const programs = getStored('programs') || [];
+      const filtered = rawData.filter(d =>
+        d.client === client && programs.includes(d.program)
+      );
       const turmas = [...new Set(filtered.map(d => d.turma))];
       const turmaSelect = document.getElementById("turmaSelect");
-      turmaSelect.innerHTML = turmas.map(t => `<option value="${t}">${t}</option>`).join('');
-      turmaSelect.onchange = storeSelections;
-      store('program', program);
-
-      const textQs = [...new Set(filtered.filter(d => isNaN(+d.value)).map(d => d.question))];
-      fillCheckboxes("textQuestionSelect", textQs);
+      turmaSelect.innerHTML = turmas
+        .map(t => `<option value="${t}">${t}</option>`)
+        .join('');
+      // restore
+      const stored = getStored('turmas') || [];
+      Array.from(turmaSelect.options).forEach(opt =>
+        opt.selected = stored.includes(opt.value)
+      );
+      turmaSelect.onchange = () => {
+        const sel = Array.from(turmaSelect.selectedOptions).map(o => o.value);
+        store('turmas', sel);
+      };
+      store('turmas', stored);
+      populateTextQs(filtered);
     }
 
-    function fillCheckboxes(id, values) {
-      const container = document.getElementById(id);
+    function populateTextQs(filtered) {
+      const textQs = [...new Set(filtered.filter(d => isNaN(+d.value)).map(d => d.question))];
+      const container = document.getElementById("textQuestionSelect");
       container.innerHTML = '';
       const stored = getStored('textQuestions') || [];
-      values.forEach(val => {
-        const label = document.createElement('label');
-        const checkbox = document.createElement('input');
-        checkbox.type = 'checkbox';
-        checkbox.value = val;
-        checkbox.checked = stored.includes(val);
-        checkbox.onchange = storeSelections;
-        label.appendChild(checkbox);
-        label.appendChild(document.createTextNode(' ' + val));
-        container.appendChild(label);
+      textQs.forEach(q => {
+        const lbl = document.createElement('label');
+        const cb = document.createElement('input');
+        cb.type = 'checkbox';
+        cb.value = q;
+        cb.checked = stored.includes(q);
+        cb.onchange = () => {
+          const sel = Array.from(container.querySelectorAll('input:checked')).map(i=>i.value);
+          store('textQuestions', sel);
+        };
+        lbl.appendChild(cb);
+        lbl.appendChild(document.createTextNode(' ' + q));
+        container.appendChild(lbl);
         container.appendChild(document.createElement('br'));
       });
     }
 
-    function syncOtherInputs() {
-      document.getElementById("trainerInput").value = getStored('trainer') || '';
-      document.getElementById("trainerInput").oninput = () =>
-        store('trainer', document.getElementById("trainerInput").value);
-    }
-
     function syncScopeInputs() {
-      const stored = JSON.parse(localStorage.getItem('filters') || '{}');
-      if (stored.start) {
-        document.getElementById('startMonthInput').value = stored.start;
-      }
-      if (stored.end) {
-        document.getElementById('endMonthInput').value = stored.end;
-      }
-      document.getElementById('startMonthInput').onchange = e =>
-        store('start', e.target.value);
-      document.getElementById('endMonthInput').onchange = e =>
-        store('end', e.target.value);
-    }
-
-    function storeSelections() {
-      const turmas = Array.from(document.getElementById("turmaSelect").selectedOptions).map(o => o.value);
-      const textQs = Array.from(document.querySelectorAll("#textQuestionSelect input:checked")).map(c => c.value);
-      store('turmas', turmas);
-      store('textQuestions', textQs);
+      const stored = JSON.parse(localStorage.getItem('filters')||'{}');
+      if (stored.start) document.getElementById('startMonthInput').value = stored.start;
+      if (stored.end)   document.getElementById('endMonthInput').value   = stored.end;
+      document.getElementById('startMonthInput').onchange = e => store('start', e.target.value);
+      document.getElementById('endMonthInput').onchange   = e => store('end',   e.target.value);
     }
 
     function store(key, value) {
-      const state = JSON.parse(localStorage.getItem('filters') || '{}');
-      state[key] = value;
-      localStorage.setItem('filters', JSON.stringify(state));
+      const s = JSON.parse(localStorage.getItem('filters')||'{}');
+      s[key] = value;
+      localStorage.setItem('filters', JSON.stringify(s));
     }
-
     function getStored(key) {
-      const state = JSON.parse(localStorage.getItem('filters') || '{}');
-      return state[key];
+      return JSON.parse(localStorage.getItem('filters')||'{}')[key];
     }
 
     function goToReport() {
-      // Copy all filters (including user‐picked start/end) to reportFilters
       localStorage.setItem('reportFilters', localStorage.getItem('filters'));
       window.location.href = 'report.html';
     }

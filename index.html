@@ -1,3 +1,4 @@
+<!-- index.html (updated from index (5).html) -->
 <!DOCTYPE html>
 <html lang="pt">
 <head>
@@ -31,6 +32,7 @@
       text-decoration: none;
       font-weight: bold;
       border-radius: 5px;
+      cursor: pointer;
     }
   </style>
 </head>
@@ -56,7 +58,7 @@
     <div class="checkboxes" id="textQuestionSelect"></div>
   </div>
 
-  <a href="report.html" class="link-button">Ver Relatório</a>
+  <a class="link-button" onclick="goToReport()">Ver Relatório</a>
 
   <script>
     let rawData = [];
@@ -147,6 +149,13 @@
     function getStored(key) {
       const state = JSON.parse(localStorage.getItem('filters') || '{}');
       return state[key];
+    }
+
+    function goToReport() {
+      // Copy over your selected filters
+      localStorage.setItem('reportFilters', localStorage.getItem('filters'));
+      // Navigate
+      window.location.href = 'report.html';
     }
   </script>
 </body>

@@ -28,175 +28,191 @@
   <div id="reportContent"></div>
 
   <script>
-    async function loadReport() {
-      const filters = JSON.parse(
-        localStorage.getItem('reportFilters') ||
-        localStorage.getItem('filters') ||
-        '{}'
+  async function loadReport() {
+    // Load filters, data, meta
+    const filters = JSON.parse(localStorage.getItem('reportFilters') || localStorage.getItem('filters') || '{}');
+    const [data, meta] = await Promise.all([
+      fetch('https://fidalgom4t.github.io/reportfinal/data.json').then(r => r.json()),
+      fetch('https://fidalgom4t.github.io/reportfinal/meta.json').then(r => r.json())
+    ]);
+
+    const container = document.getElementById('reportContent');
+    container.innerHTML = '';
+
+    // Hero banner
+    const progMeta = meta.titles.find(t => t.program_id === filters.program) || {};
+    const all = data.filter(d =>
+      d.client === filters.client &&
+      d.program === filters.program &&
+      (filters.turmas||[]).includes(d.turma)
+    );
+    const startDate = formatMonthYear(getExtremeDate(all, 'assessment', 'min'));
+    const endDate   = formatMonthYear(getExtremeDate(all, 'evaluation',  'max'));
+
+    const hero = document.createElement('div');
+    hero.className = 'hero-banner';
+    hero.innerHTML = `
+      <div class="hero-subtitle">${progMeta["SUBTÍTULO"]||''}</div>
+      <div class="hero-title">${progMeta["TÍTULO"]||filters.program}</div>
+      <div class="hero-meta"><strong>Formador:</strong> ${filters.trainer||'N/A'}</div>
+      <div class="hero-meta"><strong>Scope temporal:</strong> ${startDate} – ${endDate}</div>
+    `;
+    container.appendChild(hero);
+
+    // Build maps
+    const labelMap = createLabelMap(meta.labels);
+    const sortMap  = createSortMap(meta.labels);
+
+    // Loop both sections
+    ['assessment','evaluation'].forEach(key => {
+      const sectionTitle = key==='assessment' ? 'Assessment' : 'Avaliação do Programa';
+
+      // Section header
+      const hdr = document.createElement('div');
+      hdr.className = 'section-title';
+      hdr.textContent = sectionTitle;
+      container.appendChild(hdr);
+
+      // Numeric-only rows
+      const sectionRows = all.filter(d =>
+        String(d.section||'').toLowerCase().includes(key) &&
+        !isNaN(+d.value)
       );
-      const [data, meta] = await Promise.all([
-        fetch('https://fidalgom4t.github.io/reportfinal/data.json').then(r => r.json()),
-        fetch('https://fidalgom4t.github.io/reportfinal/meta.json').then(r => r.json())
-      ]);
 
-      const container = document.getElementById('reportContent');
-      container.innerHTML = '';
+      // Group by turma
+      const byTurma = groupBy(sectionRows, 'turma');
 
-      // Hero banner
-      const progMeta = meta.titles.find(t => t.program_id === filters.program) || {};
-      const allRecords = data.filter(d =>
-        d.client === filters.client &&
-        d.program === filters.program &&
-        (filters.turmas || []).includes(d.turma)
-      );
-      const startDate = formatMonthYear(getExtremeDate(allRecords, 'assessment', 'date', 'min'));
-      const endDate   = formatMonthYear(getExtremeDate(allRecords, 'evaluation',  'date', 'max'));
-
-      const hero = document.createElement('div');
-      hero.className = 'hero-banner';
-      hero.innerHTML = `
-        <div class="hero-subtitle">${progMeta["SUBTÍTULO"]||''}</div>
-        <div class="hero-title">${progMeta["TÍTULO"]||filters.program}</div>
-        <div class="hero-meta"><strong>Formador:</strong> ${filters.trainer||'N/A'}</div>
-        <div class="hero-meta"><strong>Scope temporal:</strong> ${startDate} – ${endDate}</div>
-      `;
-      container.appendChild(hero);
-
-      // Maps
-      const labelMap = createLabelMap(meta.labels);
-      const sortMap  = createSortMap(meta.labels);
-
-      // Sections
-      for (const key of ['assessment','evaluation']) {
-        const sectionTitle = key === 'assessment'
-          ? 'Assessment'
-          : 'Avaliação do Programa';
-
-        const hdr = document.createElement('div');
-        hdr.className = 'section-title';
-        hdr.textContent = sectionTitle;
-        container.appendChild(hdr);
-
-        // Filter and pick only numeric values
-        const secData = data.filter(d =>
-          d.client === filters.client &&
-          d.program === filters.program &&
-          (filters.turmas || []).includes(d.turma) &&
-          String(d.section || '').toLowerCase().includes(key) &&
-          !isNaN(+d.value)
-        );
-
-        // Group by turma
-        const byTurma = groupBy(secData, 'turma');
-
-        // Global chart if >1 turma
-        if ((filters.turmas || []).length > 1 && secData.length) {
-          const globalAvg = computeAverages(secData, labelMap, sortMap);
-          createBarChart(`Global (${sectionTitle})`, globalAvg, container);
-        }
-
-        // Per‑turma charts
-        Object.entries(byTurma).forEach(([turma, vals]) => {
-          const tt = document.createElement('div');
-          tt.className = 'turma-title';
-          tt.textContent = `Turma: ${turma}`;
-          container.appendChild(tt);
-
-          const avgs = computeAverages(vals, labelMap, sortMap);
-          createBarChart(turma, avgs, container);
-        });
+      // Global chart if multiple turmas
+      if ((filters.turmas||[]).length > 1 && sectionRows.length) {
+        const globalAvg = computeAverages(sectionRows, labelMap, sortMap);
+        createBarChart(`Global (${sectionTitle})`, globalAvg, container);
       }
-    }
 
-    // Helpers
+      // Per‑turma charts
+      Object.entries(byTurma).forEach(([turma, vals]) => {
+        const tdiv = document.createElement('div');
+        tdiv.className = 'turma-title';
+        tdiv.textContent = `Turma: ${turma}`;
+        container.appendChild(tdiv);
 
-    function getExtremeDate(data, sectionKey, field, mode) {
-      const dates = data
-        .filter(d => d[field] && String(d.section || '').toLowerCase().includes(sectionKey))
-        .map(d => new Date(d[field]));
-      if (!dates.length) return null;
-      return mode === 'min'
-        ? new Date(Math.min(...dates))
-        : new Date(Math.max(...dates));
-    }
-
-    function formatMonthYear(date) {
-      if (!date) return 'N/A';
-      return date.toLocaleDateString('pt-PT',{ year:'numeric', month:'long' });
-    }
-
-    function createLabelMap(labels) {
-      const m = {};
-      labels.forEach(l => {
-        const q = l.questionId || l["QUESTION ID"];
-        m[q] = l.label || l["LABEL"];
+        const avgs = computeAverages(vals, labelMap, sortMap);
+        createBarChart(turma, avgs, container);
       });
-      return m;
-    }
 
-    function createSortMap(labels) {
-      const m = {};
-      labels.forEach(l => {
-        const q = l.questionId || l["QUESTION ID"];
-        const s = l.sortOrder || l["SORT ORDER"] || l.sort_order;
-        m[q] = +s;
+      // Open‑ended responses (only selected questions)
+      const textRows = all.filter(d =>
+        String(d.section||'').toLowerCase().includes(key) &&
+        isNaN(+d.value) &&
+        (filters.textQuestions||[]).includes(d.question)
+      );
+      renderTextQuestions(textRows, container);
+    });
+  }
+
+  // Helpers
+
+  function getExtremeDate(rows, sectionKey, mode) {
+    const dates = [];
+    rows.forEach(d => {
+      if (String(d.section||'').toLowerCase().includes(sectionKey)) {
+        const raw = d.date || d.submitted_at;
+        if (raw) dates.push(new Date(raw));
+      }
+    });
+    if (!dates.length) return null;
+    return mode==='min'
+      ? new Date(Math.min(...dates))
+      : new Date(Math.max(...dates));
+  }
+
+  function formatMonthYear(dt) {
+    if (!dt) return 'N/A';
+    return dt.toLocaleDateString('pt-PT',{ month:'long', year:'numeric' });
+  }
+
+  function createLabelMap(labels) {
+    const m={};
+    labels.forEach(l=>{
+      const q = l.questionId||l["QUESTION ID"];
+      m[q] = l.label||l["LABEL"];
+    });
+    return m;
+  }
+
+  function createSortMap(labels) {
+    const m={};
+    labels.forEach(l=>{
+      const q = l.questionId||l["QUESTION ID"];
+      m[q] = + (l.sortOrder||l["SORT ORDER"]||l.sort_order);
+    });
+    return m;
+  }
+
+  function groupBy(arr, key) {
+    return arr.reduce((acc,i)=>{
+      (acc[i[key]] ||= []).push(i);
+      return acc;
+    },{});
+  }
+
+  function computeAverages(rows, labelMap, orderMap) {
+    const groups={};
+    rows.forEach(({question,value})=>{
+      const num = +value;
+      (groups[question] ||= []).push(num);
+    });
+    const out = Object.entries(groups).map(([q, vals])=>{
+      const avgRaw = vals.reduce((a,b)=>a+b,0)/vals.length;
+      return {
+        question: q,
+        label:    labelMap[q]||q,
+        avg:      +avgRaw.toFixed(1)
+      };
+    });
+    out.sort((a,b)=>(orderMap[a.question]||0)-(orderMap[b.question]||0));
+    return out;
+  }
+
+  function createBarChart(title, data, container) {
+    const div = document.createElement('div');
+    div.className = 'chart-container';
+    container.appendChild(div);
+    echarts.init(div).setOption({
+      title:{ text:title, left:'center', textStyle:{ fontSize:18 } },
+      tooltip:{},
+      xAxis:{ type:'category', data:data.map(d=>d.label), axisLabel:{ rotate:30 } },
+      yAxis:{ type:'value', min:0, max:5 },
+      series:[{
+        type:'bar',
+        data:data.map(d=>d.avg),
+        label:{ show:true, position:'top', formatter:'{c}' },
+        itemStyle:{ color(p){ const v=p.value; if(v<3)return'#d94e5d'; if(v<4)return'#f2c037'; return'#61c277'; } }
+      }]
+    });
+  }
+
+  function renderTextQuestions(rows, container) {
+    const byQ = groupBy(rows,'question');
+    Object.entries(byQ).forEach(([q, answers]) => {
+      const box = document.createElement('div');
+      box.className = 'text-question';
+      const title = document.createElement('div');
+      title.className = 'text-question-title';
+      title.textContent = q;
+      box.appendChild(title);
+      const ul = document.createElement('ul');
+      answers.forEach(a=>{
+        const li = document.createElement('li');
+        li.textContent = a.value;
+        ul.appendChild(li);
       });
-      return m;
-    }
+      box.appendChild(ul);
+      container.appendChild(box);
+    });
+  }
 
-    function groupBy(arr, key) {
-      return arr.reduce((acc, item) => {
-        (acc[item[key]] ||= []).push(item);
-        return acc;
-      }, {});
-    }
-
-    function computeAverages(data, labelMap, orderMap) {
-      const groups = {};
-      data.forEach(({question, value}) => {
-        const num = +value;
-        (groups[question] ||= []).push(num);
-      });
-      const arr = Object.entries(groups).map(([q, vals]) => {
-        const avgRaw = vals.reduce((a, b) => a + b, 0) / vals.length;
-        return {
-          question: q,
-          label:    labelMap[q] || q,
-          avg:      Number(avgRaw.toFixed(1))  // round to one decimal
-        };
-      });
-      arr.sort((a, b) => (orderMap[a.question] || 0) - (orderMap[b.question] || 0));
-      return arr;
-    }
-
-    function createBarChart(title, data, container) {
-      const div = document.createElement('div');
-      div.className = 'chart-container';
-      container.appendChild(div);
-      const chart = echarts.init(div);
-      chart.setOption({
-        title:   { text: title, left: 'center', textStyle: { fontSize: 18 } },
-        tooltip: {},
-        xAxis:   { type: 'category', data: data.map(d => d.label), axisLabel: { rotate: 30 } },
-        yAxis:   { type: 'value', min: 0, max: 5 },
-        series: [{
-          type: 'bar',
-          data: data.map(d => d.avg),
-          label: { show: true, position: 'top', formatter: '{c}' },
-          itemStyle: {
-            color(params) {
-              const v = params.value;
-              if (v < 3)   return '#d94e5d';
-              if (v < 4)   return '#f2c037';
-                            return '#61c277';
-            }
-          }
-        }]
-      });
-    }
-
-    // Start
-    loadReport();
+  // Start
+  loadReport();
   </script>
 </body>
 </html>

@@ -1,76 +1,41 @@
 <!DOCTYPE html>
 <html lang="pt">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Relatório de Formação</title>
-  <!-- ECharts library -->
+  <meta charset="UTF-8">
+  <title>Relatório Multi-Programa</title>
   <script src="https://cdn.jsdelivr.net/npm/echarts@5"></script>
-  <!-- html2pdf library -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
   <style>
     body {
       font-family: 'Segoe UI', sans-serif;
       padding: 30px;
-      background-color: #fff;
       color: #333;
     }
-    header {
-      display: flex;
-      align-items: center;
-      border-bottom: 2px solid #007c91;
-      padding-bottom: 10px;
-      margin-bottom: 30px;
+    .program-section {
+      page-break-after: always;
+      border-bottom: 2px solid #ccc;
+      margin-bottom: 60px;
     }
-    .logo-text {
-      font-size: 20px;
-      font-weight: bold;
-      color: #007c91;
-      margin-left: 15px;
-    }
-    .dropdown-multiselect {
-      position: relative;
-      display: inline-block;
-      width: 250px;
-      margin: 10px;
-    }
-    .dropdown-multiselect .select-box {
-      border: 1px solid #ccc;
-      padding: 5px;
-      cursor: pointer;
-      background: #fff;
-    }
-    .dropdown-multiselect .checkboxes {
-      display: none;
-      border: 1px solid #ccc;
-      position: absolute;
-      background-color: white;
-      z-index: 1;
-      max-height: 200px;
-      overflow-y: auto;
-      width: 100%;
-    }
-    .dropdown-multiselect.open .checkboxes {
-      display: block;
+    .executive-summary {
+      margin-bottom: 20px;
+      padding-bottom: 15px;
+      border-bottom: 1px solid #aaa;
     }
     .chart-container {
       width: 100%;
       height: 400px;
       margin-bottom: 40px;
-      transition: all 0.3s ease;
     }
     .turma-title {
-      font-size: 18px;
       font-weight: bold;
-      margin-top: 40px;
-      margin-bottom: 10px;
       color: #007c91;
+      margin-top: 20px;
+      margin-bottom: 10px;
     }
     .text-question {
       border: 1px solid #007c91;
       border-left: 6px solid #007c91;
       padding: 16px;
-      margin-bottom: 30px;
+      margin-bottom: 20px;
       background: #f9f9f9;
     }
     .text-question-title {
@@ -79,353 +44,186 @@
       font-size: 16px;
       color: #007c91;
     }
-    .toggle-btns button {
-      margin: 5px;
-      padding: 8px 16px;
-      border: none;
-      background-color: #007c91;
-      color: #fff;
-      cursor: pointer;
-    }
-    .toggle-btns button.active {
-      background-color: #005c6b;
-    }
-    .hero-banner {
-      display: flex;
-      align-items: center;
-      margin: 40px 0;
-      border-bottom: 1px solid #ccc;
-      padding-bottom: 30px;
-    }
-    .hero-left {
-      flex: 0 0 300px;
-    }
-    .hero-img {
-      max-width: 100%;
-    }
-    .hero-right {
-      flex: 1;
-      padding-left: 40px;
-    }
-    .hero-subtitle {
-      font-style: italic;
-      color: #337d88;
-      font-size: 18px;
-      margin-bottom: 10px;
-    }
-    .hero-title {
-      font-size: 50px;
-      color: #337d88;
-      font-weight: 500;
-    }
-    .hero-tagline {
-      color: #337d88;
-      font-size: 20px;
-      margin-bottom: 30px;
-    }
-    .hero-meta {
-      font-size: 18px;
-      color: #444;
-    }
-    .italic {
-      font-style: italic;
-    }
-    /* PDF Print Styles */
-    @media print {
-      .dropdown-multiselect, .toggle-btns, input, select, button.export-btn {
-        display: none !important;
-      }
-      body {
-        zoom: 90%;
-      }
-    }
   </style>
 </head>
 <body>
-  <header>
-    <img src="logo.png" alt="Logo" height="50">
-    <div class="logo-text">MIND4TIME<br><span style="font-weight: normal; font-size: 14px;">Productivity Consulting</span></div>
-  </header>
+  <h1>Relatório Completo de Formação</h1>
 
-  <!-- Executive Summary Hero Banner -->
-  <div id="executiveSummary" class="hero-banner">
-    <div class="hero-left">
-      <img src="cube.png" alt="Formação" class="hero-img" />
-    </div>
-    <div class="hero-right">
-      <div class="hero-subtitle" id="hero-subtitle"></div>
-      <div class="hero-title" id="hero-title"></div>
-      <div class="hero-tagline" id="hero-tagline"></div>
-      <br><br>
-      <table>
-        <tr>
-          <td><span class="italic">scope</span> temporal</td>
-          <td id="hero-date">N/A</td>
-        </tr>
-        <tr>
-          <td>formador</td>
-          <td id="hero-trainer">N/A</td>
-        </tr>
-      </table>
-    </div>
-  </div>
-
-  <!-- Controls -->
   <label>Cliente:</label>
   <select id="clientSelect"></select>
 
-  <label>Programa:</label>
-  <select id="programSelect"></select>
+  <label style="margin-left:20px;">Formador:</label>
+  <input type="text" id="trainerInput" placeholder="Nome do formador" />
 
-  <label>Turmas:</label>
-  <div class="dropdown-multiselect" id="turmaWrapper">
-    <div class="select-box" onclick="toggleDropdown('turmaWrapper')">Selecionar turmas</div>
-    <div class="checkboxes" id="turmaSelect"></div>
-  </div>
-
-  <label>Perguntas Abertas:</label>
-  <div class="dropdown-multiselect" id="textWrapper">
-    <div class="select-box" onclick="toggleDropdown('textWrapper')">Selecionar perguntas</div>
-    <div class="checkboxes" id="textQuestionSelect"></div>
-  </div>
-
-  <label>Formador:</label>
-  <input type="text" id="trainerInput" placeholder="Nome do formador" style="margin-bottom: 20px; padding: 5px; width: 250px;">
-
-  <!-- Export Button for PDF -->
-  <button class="export-btn" onclick="exportToPDF()" style="margin:20px 0; padding:10px 20px;">Exportar PDF</button>
-
-  <div class="toggle-btns">
-    <button onclick="setSection('assessment')" id="btn-assessment" class="active">Assessment</button>
-    <button onclick="setSection('evaluation')" id="btn-evaluation">Avaliação</button>
-  </div>
-
-  <div id="overallChart" class="chart-container"></div>
-  <div id="turmaCharts"></div>
-  <div id="textQuestions"></div>
+  <div id="reportContainer"></div>
 
   <script>
     let rawData = [];
-    let metaConfig = { labels: [], titles: [] };
-    let currentSection = 'assessment';
 
-    // Load data.json and meta.json, then initialize filters and apply them.
-    Promise.all([
-      fetch('data.json').then(res => res.json()),
-      fetch('meta.json').then(res => res.json())
-    ]).then(([data, meta]) => {
-      rawData = data;
-      metaConfig = meta;
-      populateClientFilter();
-      applyFilters();
-    });
-
-    function toggleDropdown(wrapperId) {
-      document.getElementById(wrapperId).classList.toggle('open');
-    }
-
-    function fillCheckboxes(id, values) {
-      const container = document.getElementById(id);
-      container.innerHTML = '';
-      values.forEach(val => {
-        const label = document.createElement('label');
-        const checkbox = document.createElement('input');
-        checkbox.type = 'checkbox';
-        checkbox.value = val;
-        checkbox.checked = true;
-        checkbox.onchange = applyFilters;
-        label.appendChild(checkbox);
-        label.appendChild(document.createTextNode(' ' + val));
-        container.appendChild(label);
-        container.appendChild(document.createElement('br'));
+    fetch('data.json')
+      .then(res => res.json())
+      .then(data => {
+        rawData = data;
+        populateClientFilter();
       });
-    }
-
-    function getChecked(id) {
-      return Array.from(document.querySelectorAll(`#${id} input:checked`)).map(c => c.value);
-    }
 
     function populateClientFilter() {
-      const clients = [...new Set(rawData.map(d => d.client))].sort();
+      const clients = [...new Set(rawData.map(d => d.client))];
       const clientSelect = document.getElementById("clientSelect");
       clientSelect.innerHTML = clients.map(c => `<option value="${c}">${c}</option>`).join('');
-      clientSelect.onchange = () => {
-        const selectedClient = clientSelect.value;
-        const filtered = rawData.filter(d => d.client === selectedClient);
-        const programs = [...new Set(filtered.map(d => d.program))].sort();
-        const programSelect = document.getElementById("programSelect");
-        programSelect.innerHTML = programs.map(p => `<option value="${p}">${p}</option>`).join('');
-        programSelect.onchange = populateTurmas;
-        populateTurmas();
-      };
+      clientSelect.onchange = generateReports;
     }
 
-    function populateTurmas() {
+    function generateReports() {
       const client = document.getElementById("clientSelect").value;
-      const program = document.getElementById("programSelect").value;
-      const filtered = rawData.filter(d => d.client === client && d.program === program);
-      const turmas = [...new Set(filtered.map(d => d.turma))].sort();
-      fillCheckboxes("turmaSelect", turmas);
-      const textQs = [...new Set(filtered.filter(d => typeof d.value !== 'number').map(d => d.question))].sort();
-      fillCheckboxes("textQuestionSelect", textQs);
-      applyFilters();
-    }
+      const trainer = document.getElementById("trainerInput").value || "N/A";
+      const container = document.getElementById("reportContainer");
+      container.innerHTML = '';
 
-    function setSection(section) {
-      currentSection = section;
-      document.getElementById("btn-assessment").classList.toggle("active", section === 'assessment');
-      document.getElementById("btn-evaluation").classList.toggle("active", section === 'evaluation');
-      applyFilters();
-    }
+      const clientData = rawData.filter(d => d.client === client);
+      const programs = [...new Set(clientData.map(d => d.program))];
 
-    function applyFilters() {
-      const client = document.getElementById("clientSelect").value;
-      const program = document.getElementById("programSelect").value;
-      const turmas = getChecked("turmaSelect");
-      const selectedQuestions = getChecked("textQuestionSelect");
-      const trainer = document.getElementById("trainerInput").value || 'N/A';
+      programs.forEach((program, idx) => {
+        const programData = clientData.filter(d => d.program === program);
+        const section = document.createElement('div');
+        section.className = 'program-section';
 
-      // Update executive summary using meta information for titles,
-      // while "formador" is manually input and time scope is calculated from data.json dates.
-      const titleMeta = metaConfig.titles.find(t => t.program_id === program);
-      if (titleMeta) {
-        document.getElementById("hero-title").textContent = titleMeta.title;
-        document.getElementById("hero-subtitle").textContent = titleMeta.subtitle;
-        document.getElementById("hero-tagline").textContent = titleMeta.tagline;
-      }
-      document.getElementById("hero-trainer").textContent = trainer;
+        // Executive Summary
+        const dates = programData.map(d => new Date(d.date));
+        const minDate = dates.length ? new Date(Math.min(...dates)) : null;
+        const maxDate = dates.length ? new Date(Math.max(...dates)) : null;
+        const scope = minDate ? `${minDate.toLocaleDateString()} - ${maxDate.toLocaleDateString()}` : 'N/A';
 
-      // Calculate time scope from first submitted dates in data.json for each section
-      const filtered = rawData.filter(d =>
-        (!client || d.client === client) &&
-        (!program || d.program === program) &&
-        (!turmas.length || turmas.includes(d.turma))
-      );
-      const evalDates = filtered.filter(d => d.section === 'evaluation' && d.date).map(d => new Date(d.date));
-      const assessDates = filtered.filter(d => d.section === 'assessment' && d.date).map(d => new Date(d.date));
-      const firstEval = evalDates.length ? new Intl.DateTimeFormat('pt-PT', { month: 'long', year: 'numeric' }).format(Math.min(...evalDates)) : 'N/A';
-      const firstAssess = assessDates.length ? new Intl.DateTimeFormat('pt-PT', { month: 'long', year: 'numeric' }).format(Math.min(...assessDates)) : 'N/A';
-      document.getElementById("hero-date").textContent = `${firstAssess || ''}${firstEval && firstEval !== firstAssess ? ' - ' + firstEval : ''}`;
+        const summary = document.createElement('div');
+        summary.className = 'executive-summary';
+        summary.innerHTML = `
+          <h2>Programa: ${program}</h2>
+          <p><strong>Formador:</strong> ${trainer}</p>
+          <p><strong>Período:</strong> ${scope}</p>
+        `;
+        section.appendChild(summary);
 
-      const filteredForSection = filtered.filter(d => d.section === currentSection);
-      const numeric = filteredForSection.filter(d => typeof d.value === 'number');
-      const text = filteredForSection.filter(d => typeof d.value !== 'number' && selectedQuestions.includes(d.question));
+        ['assessment', 'evaluation'].forEach((type) => {
+          const sectionData = programData.filter(d => d.section === type);
+          if (!sectionData.length) return;
 
-      drawCharts(numeric, turmas, program);
-      drawTextQuestions(text);
-    }
+          const numeric = sectionData.filter(d => typeof d.value === 'number');
+          const text = sectionData.filter(d => typeof d.value !== 'number');
+          const turmas = [...new Set(sectionData.map(d => d.turma))];
 
-    function drawCharts(data, turmas, program) {
-      const byTurma = {};
-      const overall = {};
-      data.forEach(({ turma, question, value }) => {
-        if (!byTurma[turma]) byTurma[turma] = {};
-        if (!byTurma[turma][question]) byTurma[turma][question] = [];
-        byTurma[turma][question].push(value);
-        if (!overall[question]) overall[question] = [];
-        overall[question].push(value);
+          const heading = document.createElement('h3');
+          heading.textContent = type === 'assessment' ? 'Avaliação Inicial' : 'Avaliação Final';
+          section.appendChild(heading);
+
+          // Global chart if >1 turma
+          if (turmas.length > 1) {
+            const globalChartDiv = document.createElement('div');
+            globalChartDiv.className = 'chart-container';
+            section.appendChild(globalChartDiv);
+
+            const globalData = {};
+            numeric.forEach(({ question, value }) => {
+              if (!globalData[question]) globalData[question] = [];
+              globalData[question].push(value);
+            });
+
+            const avgData = Object.entries(globalData).map(([q, vals]) => ({
+              question: q,
+              average: vals.reduce((a, b) => a + b, 0) / vals.length
+            }));
+
+            drawChart(globalChartDiv, avgData, type);
+          }
+
+          // Charts per turma
+          turmas.forEach(turma => {
+            const turmaTitle = document.createElement('div');
+            turmaTitle.className = 'turma-title';
+            turmaTitle.textContent = `Turma: ${turma}`;
+            section.appendChild(turmaTitle);
+
+            const turmaChartDiv = document.createElement('div');
+            turmaChartDiv.className = 'chart-container';
+            section.appendChild(turmaChartDiv);
+
+            const turmaData = numeric.filter(d => d.turma === turma);
+            const perQ = {};
+            turmaData.forEach(({ question, value }) => {
+              if (!perQ[question]) perQ[question] = [];
+              perQ[question].push(value);
+            });
+
+            const chartData = Object.entries(perQ).map(([q, vals]) => ({
+              question: q,
+              average: vals.reduce((a, b) => a + b, 0) / vals.length
+            }));
+
+            drawChart(turmaChartDiv, chartData, type);
+          });
+
+          // Text responses
+          const questions = {};
+          text.forEach(({ question, value }) => {
+            if (!questions[question]) questions[question] = [];
+            questions[question].push(value);
+          });
+
+          Object.entries(questions).forEach(([q, answers]) => {
+            const box = document.createElement('div');
+            box.className = 'text-question';
+            const title = document.createElement('div');
+            title.className = 'text-question-title';
+            title.textContent = q;
+            const ul = document.createElement('ul');
+            answers.forEach(a => {
+              const li = document.createElement('li');
+              li.textContent = a;
+              ul.appendChild(li);
+            });
+            box.appendChild(title);
+            box.appendChild(ul);
+            section.appendChild(box);
+          });
+
+        });
+
+        container.appendChild(section);
       });
-
-      const container = document.getElementById("turmaCharts");
-      container.innerHTML = "";
-
-      const overallChartEl = document.getElementById("overallChart");
-      if (turmas.length > 1) {
-        overallChartEl.style.display = "block";
-        const overallData = Object.entries(overall).map(([q, vals]) => ({
-          question: q,
-          average: vals.reduce((a, b) => a + b, 0) / vals.length
-        }));
-        drawBarChart("overallChart", overallData, program);
-      } else {
-        overallChartEl.innerHTML = "";
-        overallChartEl.style.display = "none";
-      }
-
-      Object.entries(byTurma).forEach(([turma, questions], idx) => {
-        const chartId = `turmaChart${idx}`;
-        const title = document.createElement("div");
-        title.className = "turma-title";
-        title.textContent = `Turma: ${turma}`;
-        const div = document.createElement("div");
-        div.id = chartId;
-        div.className = "chart-container";
-        container.appendChild(title);
-        container.appendChild(div);
-        const data = Object.entries(questions).map(([q, vals]) => ({
-          question: q,
-          average: vals.reduce((a, b) => a + b, 0) / vals.length
-        }));
-        drawBarChart(chartId, data, program);
-      });
     }
 
-    function drawBarChart(containerId, data, program) {
-      const chart = echarts.init(document.getElementById(containerId));
-      const labelMap = {}, orderMap = {};
-      metaConfig.labels.filter(l => l.program_id === program).forEach(({ questionId, label, sortOrder }) => {
-        labelMap[questionId] = label;
-        orderMap[questionId] = +sortOrder;
-      });
-
-      data.sort((a, b) => (orderMap[a.question] || 999) - (orderMap[b.question] || 999));
-      const questions = data.map(d => labelMap[d.question] || d.question);
+    function drawChart(container, data, type) {
+      const chart = echarts.init(container);
+      data.sort((a, b) => a.question.localeCompare(b.question));
+      const questions = data.map(d => d.question);
       const values = data.map(d => d.average);
 
       chart.setOption({
         tooltip: {},
-        xAxis: { type: 'category', data: questions, axisLabel: { rotate: 30 } },
-        yAxis: { type: 'value', min: 0, max: 5 },
+        xAxis: {
+          type: 'category',
+          data: questions,
+          axisLabel: { rotate: 30 }
+        },
+        yAxis: {
+          type: 'value',
+          min: 0,
+          max: 5
+        },
         series: [{
           type: 'bar',
           data: values,
           itemStyle: {
-            color: currentSection === 'assessment'
+            color: type === 'assessment'
               ? val => val.value < 3 ? '#d94e5d' : val.value < 4 ? '#f2c037' : '#61c277'
               : '#61c277'
           },
-          label: { show: true, position: 'top', formatter: '{c}' }
+          label: {
+            show: true,
+            position: 'top',
+            formatter: '{c}'
+          }
         }]
       });
-    }
-
-    function drawTextQuestions(data) {
-      const textDiv = document.getElementById("textQuestions");
-      textDiv.innerHTML = "";
-      const byQuestion = {};
-      data.forEach(d => {
-        if (!byQuestion[d.question]) byQuestion[d.question] = [];
-        byQuestion[d.question].push(d.value);
-      });
-      Object.entries(byQuestion).forEach(([q, answers]) => {
-        const box = document.createElement("div");
-        box.className = "text-question";
-        const title = document.createElement("div");
-        title.className = "text-question-title";
-        title.textContent = q;
-        const ul = document.createElement("ul");
-        answers.forEach(txt => {
-          const li = document.createElement("li");
-          li.textContent = txt;
-          ul.appendChild(li);
-        });
-        box.appendChild(title);
-        box.appendChild(ul);
-        textDiv.appendChild(box);
-      });
-    }
-
-    // PDF export function using html2pdf.js
-    function exportToPDF() {
-      const element = document.body;
-      const opt = {
-        margin:       0.5,
-        filename:     'relatorio_formacao.pdf',
-        image:        { type: 'jpeg', quality: 0.98 },
-        html2canvas:  { scale: 2 },
-        jsPDF:        { unit: 'in', format: 'a4', orientation: 'portrait' }
-      };
-      html2pdf().set(opt).from(element).save();
     }
   </script>
 </body>

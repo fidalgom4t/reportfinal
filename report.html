@@ -29,29 +29,27 @@
 
   <script>
   async function loadReport() {
-    // Load filters, data, meta
-    const filters = JSON.parse(localStorage.getItem('reportFilters') || localStorage.getItem('filters') || '{}');
+    const filters = JSON.parse(localStorage.getItem('reportFilters')||localStorage.getItem('filters')||'{}');
     const [data, meta] = await Promise.all([
-      fetch('https://fidalgom4t.github.io/reportfinal/data.json').then(r => r.json()),
-      fetch('https://fidalgom4t.github.io/reportfinal/meta.json').then(r => r.json())
+      fetch('https://fidalgom4t.github.io/reportfinal/data.json').then(r=>r.json()),
+      fetch('https://fidalgom4t.github.io/reportfinal/meta.json').then(r=>r.json())
     ]);
 
     const container = document.getElementById('reportContent');
     container.innerHTML = '';
 
     // Hero banner
-    const progMeta = meta.titles.find(t => t.program_id === filters.program) || {};
-    const all = data.filter(d =>
-      d.client === filters.client &&
-      d.program === filters.program &&
+    const progMeta = meta.titles.find(t=>t.program_id===filters.program)||{};
+    const all = data.filter(d=>
+      d.client===filters.client &&
+      d.program===filters.program &&
       (filters.turmas||[]).includes(d.turma)
     );
-    const startDate = formatMonthYear(getExtremeDate(all, 'assessment', 'min'));
-    const endDate   = formatMonthYear(getExtremeDate(all, 'evaluation',  'max'));
+    const startDate = formatMonthYear(getExtremeDate(all,'assessment','min'));
+    const endDate   = formatMonthYear(getExtremeDate(all,'evaluation','max'));
 
-    const hero = document.createElement('div');
-    hero.className = 'hero-banner';
-    hero.innerHTML = `
+    const hero = document.createElement('div'); hero.className='hero-banner';
+    hero.innerHTML=`
       <div class="hero-subtitle">${progMeta["SUBTÍTULO"]||''}</div>
       <div class="hero-title">${progMeta["TÍTULO"]||filters.program}</div>
       <div class="hero-meta"><strong>Formador:</strong> ${filters.trainer||'N/A'}</div>
@@ -59,159 +57,117 @@
     `;
     container.appendChild(hero);
 
-    // Build maps
+    // Maps
     const labelMap = createLabelMap(meta.labels);
     const sortMap  = createSortMap(meta.labels);
 
-    // Loop both sections
-    ['assessment','evaluation'].forEach(key => {
+    // Sections
+    ['assessment','evaluation'].forEach(key=>{
       const sectionTitle = key==='assessment' ? 'Assessment' : 'Avaliação do Programa';
-
-      // Section header
       const hdr = document.createElement('div');
-      hdr.className = 'section-title';
-      hdr.textContent = sectionTitle;
+      hdr.className='section-title'; hdr.textContent=sectionTitle;
       container.appendChild(hdr);
 
-      // Numeric-only rows
-      const sectionRows = all.filter(d =>
-        String(d.section||'').toLowerCase().includes(key) &&
-        !isNaN(+d.value)
-      );
-
-      // Group by turma
-      const byTurma = groupBy(sectionRows, 'turma');
-
-      // Global chart if multiple turmas
-      if ((filters.turmas||[]).length > 1 && sectionRows.length) {
-        const globalAvg = computeAverages(sectionRows, labelMap, sortMap);
-        createBarChart(`Global (${sectionTitle})`, globalAvg, container);
-      }
-
-      // Per‑turma charts
-      Object.entries(byTurma).forEach(([turma, vals]) => {
-        const tdiv = document.createElement('div');
-        tdiv.className = 'turma-title';
-        tdiv.textContent = `Turma: ${turma}`;
-        container.appendChild(tdiv);
-
-        const avgs = computeAverages(vals, labelMap, sortMap);
-        createBarChart(turma, avgs, container);
+      // Split out numeric vs open-ended by a strict regex
+      const rows = all.filter(d => String(d.section||'').toLowerCase().includes(key));
+      const numericRows = rows.filter(d=>{
+        const s = String(d.value||'').trim();
+        return /^-?\d+(\.\d+)?$/.test(s);
+      });
+      const textRows    = rows.filter(d=>{
+        const s = String(d.value||'').trim();
+        return !/^(-?\d+(\.\d+)?)$/.test(s) && (filters.textQuestions||[]).includes(d.question);
       });
 
-      // Open‑ended responses (only selected questions)
-      const textRows = all.filter(d =>
-        String(d.section||'').toLowerCase().includes(key) &&
-        isNaN(+d.value) &&
-        (filters.textQuestions||[]).includes(d.question)
-      );
+      // Charts: group numericRows by turma
+      const byTurma = groupBy(numericRows,'turma');
+      if ((filters.turmas||[]).length>1 && numericRows.length) {
+        createBarChart(`Global (${sectionTitle})`, computeAverages(numericRows,labelMap,sortMap), container);
+      }
+      Object.entries(byTurma).forEach(([turma,vals])=>{
+        const tdiv=document.createElement('div');
+        tdiv.className='turma-title'; tdiv.textContent=`Turma: ${turma}`;
+        container.appendChild(tdiv);
+        createBarChart(turma, computeAverages(vals,labelMap,sortMap), container);
+      });
+
+      // Open‑ended responses
       renderTextQuestions(textRows, container);
     });
   }
 
-  // Helpers
-
   function getExtremeDate(rows, sectionKey, mode) {
-    const dates = [];
-    rows.forEach(d => {
-      if (String(d.section||'').toLowerCase().includes(sectionKey)) {
-        const raw = d.date || d.submitted_at;
-        if (raw) dates.push(new Date(raw));
+    const dates=[];
+    rows.forEach(d=>{
+      if(String(d.section||'').toLowerCase().includes(sectionKey)){
+        const r=d.date||d.submitted_at;
+        if(r) dates.push(new Date(r));
       }
     });
-    if (!dates.length) return null;
+    if(!dates.length) return null;
     return mode==='min'
       ? new Date(Math.min(...dates))
       : new Date(Math.max(...dates));
   }
-
-  function formatMonthYear(dt) {
-    if (!dt) return 'N/A';
-    return dt.toLocaleDateString('pt-PT',{ month:'long', year:'numeric' });
+  function formatMonthYear(dt){
+    if(!dt) return 'N/A';
+    return dt.toLocaleDateString('pt-PT',{month:'long',year:'numeric'});
   }
-
-  function createLabelMap(labels) {
-    const m={};
-    labels.forEach(l=>{
-      const q = l.questionId||l["QUESTION ID"];
-      m[q] = l.label||l["LABEL"];
-    });
-    return m;
+  function createLabelMap(labels){
+    const m={}; labels.forEach(l=>{
+      const q=l.questionId||l["QUESTION ID"];
+      m[q]=l.label||l["LABEL"];
+    }); return m;
   }
-
-  function createSortMap(labels) {
-    const m={};
-    labels.forEach(l=>{
-      const q = l.questionId||l["QUESTION ID"];
-      m[q] = + (l.sortOrder||l["SORT ORDER"]||l.sort_order);
-    });
-    return m;
+  function createSortMap(labels){
+    const m={}; labels.forEach(l=>{
+      const q=l.questionId||l["QUESTION ID"];
+      m[q]=+(l.sortOrder||l["SORT ORDER"]||l.sort_order);
+    }); return m;
   }
-
-  function groupBy(arr, key) {
-    return arr.reduce((acc,i)=>{
-      (acc[i[key]] ||= []).push(i);
-      return acc;
-    },{});
+  function groupBy(arr,key){
+    return arr.reduce((a,i)=>(a[i[key]]||(a[i[key]]=[])).push(i)&&a,{});
   }
-
-  function computeAverages(rows, labelMap, orderMap) {
-    const groups={};
+  function computeAverages(rows,labelMap,orderMap){
+    const g={};
     rows.forEach(({question,value})=>{
-      const num = +value;
-      (groups[question] ||= []).push(num);
+      const n=+value;
+      (g[question]||(g[question]=[])).push(n);
     });
-    const out = Object.entries(groups).map(([q, vals])=>{
-      const avgRaw = vals.reduce((a,b)=>a+b,0)/vals.length;
-      return {
-        question: q,
-        label:    labelMap[q]||q,
-        avg:      +avgRaw.toFixed(1)
-      };
+    const out=Object.entries(g).map(([q,vals])=>{
+      const avg=vals.reduce((a,b)=>a+b,0)/vals.length;
+      return { question:q, label:labelMap[q]||q, avg:+avg.toFixed(1) };
     });
     out.sort((a,b)=>(orderMap[a.question]||0)-(orderMap[b.question]||0));
     return out;
   }
-
-  function createBarChart(title, data, container) {
-    const div = document.createElement('div');
-    div.className = 'chart-container';
+  function createBarChart(title,data,container){
+    const div=document.createElement('div'); div.className='chart-container';
     container.appendChild(div);
     echarts.init(div).setOption({
-      title:{ text:title, left:'center', textStyle:{ fontSize:18 } },
+      title:{text:title,left:'center',textStyle:{fontSize:18}},
       tooltip:{},
-      xAxis:{ type:'category', data:data.map(d=>d.label), axisLabel:{ rotate:30 } },
-      yAxis:{ type:'value', min:0, max:5 },
-      series:[{
-        type:'bar',
-        data:data.map(d=>d.avg),
-        label:{ show:true, position:'top', formatter:'{c}' },
-        itemStyle:{ color(p){ const v=p.value; if(v<3)return'#d94e5d'; if(v<4)return'#f2c037'; return'#61c277'; } }
+      xAxis:{type:'category',data:data.map(d=>d.label),axisLabel:{rotate:30}},
+      yAxis:{type:'value',min:0,max:5},
+      series:[{type:'bar',data:data.map(d=>d.avg),
+        label:{show:true,position:'top',formatter:'{c}'},
+        itemStyle:{color(p){const v=p.value;if(v<3)return'#d94e5d';if(v<4)return'#f2c037';return'#61c277'}}
       }]
     });
   }
-
-  function renderTextQuestions(rows, container) {
-    const byQ = groupBy(rows,'question');
-    Object.entries(byQ).forEach(([q, answers]) => {
-      const box = document.createElement('div');
-      box.className = 'text-question';
-      const title = document.createElement('div');
-      title.className = 'text-question-title';
-      title.textContent = q;
-      box.appendChild(title);
-      const ul = document.createElement('ul');
-      answers.forEach(a=>{
-        const li = document.createElement('li');
-        li.textContent = a.value;
-        ul.appendChild(li);
-      });
+  function renderTextQuestions(rows, container){
+    const byQ=groupBy(rows,'question');
+    Object.entries(byQ).forEach(([q,answers])=>{
+      const box=document.createElement('div'); box.className='text-question';
+      const t=document.createElement('div'); t.className='text-question-title'; t.textContent=q;
+      box.appendChild(t);
+      const ul=document.createElement('ul');
+      answers.forEach(a=>{const li=document.createElement('li');li.textContent=a.value;ul.appendChild(li)});
       box.appendChild(ul);
       container.appendChild(box);
     });
   }
 
-  // Start
   loadReport();
   </script>
 </body>

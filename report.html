@@ -6,17 +6,17 @@
   <title>Relatório Gerado</title>
   <script src="https://cdn.jsdelivr.net/npm/echarts@5"></script>
   <style>
-    body { font-family: 'Segoe UI', sans-serif; margin:0; padding:30px; background:#fff; color:#333; }
-    .hero-banner { background:#e6f2f3; padding:40px; margin-bottom:40px; }
-    .hero-title { font-size:48px; color:#007c91; font-weight:600; }
-    .hero-subtitle { font-size:24px; color:#007c91; font-style:italic; margin-bottom:20px; }
-    .hero-meta { font-size:18px; margin-top:20px; }
-    .section-title { font-size:32px; color:#337d88; margin:60px 0 20px; border-bottom:2px solid #ccc; padding-bottom:10px; }
-    .chart-container { height:400px; margin-bottom:60px; }
-    .turma-title { font-size:22px; font-weight:bold; margin:20px 0 10px; color:#007c91; }
-    .text-question { border:1px solid #007c91; border-left:6px solid #007c91; padding:16px; margin-bottom:30px; background:#f9f9f9; }
-    .text-question-title { font-weight:bold; margin-bottom:8px; font-size:16px; color:#007c91; }
-    ul { padding-left:20px; }
+    body { font-family: 'Segoe UI', sans-serif; margin:0; padding:30px; background:#fff; color:#333 }
+    .hero-banner { background:#e6f2f3; padding:40px; margin-bottom:40px }
+    .hero-title { font-size:48px; color:#007c91; font-weight:600 }
+    .hero-subtitle { font-size:24px; color:#007c91; font-style:italic; margin-bottom:20px }
+    .hero-meta { font-size:18px; margin-top:20px }
+    .section-title { font-size:32px; color:#337d88; margin:60px 0 20px; border-bottom:2px solid #ccc; padding-bottom:10px }
+    .chart-container { height:400px; margin-bottom:60px }
+    .turma-title { font-size:22px; font-weight:bold; margin:20px 0 10px; color:#007c91 }
+    .text-question { border:1px solid #007c91; border-left:6px solid #007c91; padding:16px; margin-bottom:30px; background:#f9f9f9 }
+    .text-question-title { font-weight:bold; margin-bottom:8px; font-size:16px; color:#007c91 }
+    ul { padding-left:20px }
   </style>
 </head>
 <body>
@@ -25,9 +25,9 @@
   <script>
     async function loadReport() {
       const filters = JSON.parse(
-        localStorage.getItem('reportFilters')
-        || localStorage.getItem('filters')
-        || '{}'
+        localStorage.getItem('reportFilters') ||
+        localStorage.getItem('filters') ||
+        '{}'
       );
       const [data, meta] = await Promise.all([
         fetch('https://fidalgom4t.github.io/reportfinal/data.json').then(r => r.json()),
@@ -49,25 +49,25 @@
 
       container.innerHTML += `
         <div class="hero-banner">
-          <div class="hero-subtitle">${progM["SUBTÍTULO"]  || ''}</div>
-          <div class="hero-title">${progM["TÍTULO"]         || filters.program}</div>
-          <div class="hero-meta"><strong>Formador:</strong> ${filters.trainer || 'N/A'}</div>
+          <div class="hero-subtitle">${progM["SUBTÍTULO"]||''}</div>
+          <div class="hero-title">${progM["TÍTULO"]||filters.program}</div>
+          <div class="hero-meta"><strong>Formador:</strong> ${filters.trainer||'N/A'}</div>
           <div class="hero-meta"><strong>Scope temporal:</strong> ${start} – ${end}</div>
         </div>
       `;
 
-      // Build maps
+      // Build label & sort maps once
       const labelMap = createLabelMap(meta.labels);
       const sortMap  = createSortMap(meta.labels);
 
-      // Loop through assessment & evaluation
-      for (const section of ['assessment', 'evaluation']) {
+      // Loop through both sections
+      for (const section of ['assessment','evaluation']) {
         const title = section === 'assessment'
           ? 'Assessment'
           : 'Avaliação do Programa';
         container.innerHTML += `<div class="section-title">${title}</div>`;
 
-        // filter using .includes()
+        // filter matching section
         const secData = data.filter(d =>
           d.client === filters.client &&
           d.program === filters.program &&
@@ -75,27 +75,27 @@
           String(d.section).toLowerCase().includes(section)
         );
 
-        // Numeric charts
-        const numeric = secData.filter(d => typeof d.value === 'number');
+        // ----- Numeric data (now accepts numeric strings) -----
+        const numeric = secData.filter(d => !isNaN(parseFloat(d.value)));
         const byTurma = groupBy(numeric, 'turma');
 
-        // Global chart if multiple turmas
-        if ((filters.turmas || []).length > 1 && numeric.length) {
+        // global chart if more than one turma
+        if ((filters.turmas||[]).length > 1 && numeric.length) {
           const avgAll = computeAverages(numeric, labelMap, sortMap);
           createBarChart(`Global (${title})`, avgAll, container);
         }
 
-        // Per-turma charts
+        // per-turma charts
         Object.entries(byTurma).forEach(([turma, vals]) => {
           container.appendChild(createTurmaTitle(`Turma: ${turma}`));
           const avgs = computeAverages(vals, labelMap, sortMap);
           createBarChart(turma, avgs, container);
         });
 
-        // Open-ended responses
+        // ----- Open-ended responses -----
         const textRes = secData.filter(d =>
-          typeof d.value !== 'number' &&
-          (filters.textQuestions || []).includes(d.question)
+          isNaN(parseFloat(d.value)) &&
+          (filters.textQuestions||[]).includes(d.question)
         );
         renderTextQuestions(textRes, container);
       }
@@ -115,7 +115,7 @@
 
     function formatMonthYear(date) {
       if (!date) return 'N/A';
-      return date.toLocaleDateString('pt-PT', { year: 'numeric', month: 'long' });
+      return date.toLocaleDateString('pt-PT',{ year:'numeric', month:'long' });
     }
 
     function createLabelMap(labels) {
@@ -145,16 +145,19 @@
     }
 
     function computeAverages(data, labelMap, orderMap) {
+      // convert all values to numbers
       const groups = {};
-      data.forEach(({ question, value }) => {
-        (groups[question] ||= []).push(value);
+      data.forEach(({question, value}) => {
+        const num = +value;
+        (groups[question] ||= []).push(num);
       });
       const arr = Object.entries(groups).map(([q, vals]) => ({
         question: q,
         label:    labelMap[q] || q,
-        avg:      vals.reduce((a, b) => a + b, 0) / vals.length
+        avg:      vals.reduce((a,b)=>a+b,0) / vals.length
       }));
-      arr.sort((a, b) => (orderMap[a.question] || 0) - (orderMap[b.question] || 0));
+      // sort by your meta.json order
+      arr.sort((a,b)=>(orderMap[a.question]||0) - (orderMap[b.question]||0));
       return arr;
     }
 
@@ -171,41 +174,34 @@
       container.appendChild(d);
       const chart = echarts.init(d);
       chart.setOption({
-        title:    { text: title, left: 'center', textStyle: { fontSize: 18 } },
-        tooltip:  {},
-        xAxis:    { type: 'category', data: data.map(i => i.label), axisLabel: { rotate: 30 } },
-        yAxis:    { type: 'value', min: 0, max: 5 },
-        series: [{
-          type:      'bar',
-          data:      data.map(i => i.avg),
-          itemStyle: {
-            color(params) {
-              const v = params.value;
-              if (v < 3)   return '#d94e5d';
-              if (v < 4)   return '#f2c037';
-                            return '#61c277';
-            }
-          },
-          label:     { show: true, position: 'top' }
+        title:{ text: title, left:'center', textStyle:{fontSize:18} },
+        tooltip:{},
+        xAxis:{ type:'category', data: data.map(i=>i.label), axisLabel:{rotate:30} },
+        yAxis:{ type:'value', min:0, max:5 },
+        series:[{
+          type:'bar',
+          data: data.map(i=>i.avg),
+          itemStyle:{ color(p){ const v=p.value; if(v<3)return'#d94e5d'; if(v<4)return'#f2c037'; return'#61c277'}},
+          label:{show:true, position:'top'}
         }]
       });
     }
 
     function renderTextQuestions(data, container) {
-      const byQ = groupBy(data, 'question');
+      const byQ = groupBy(data,'question');
       Object.entries(byQ).forEach(([q, answers]) => {
         const box = document.createElement('div');
         box.className = 'text-question';
-        const title = document.createElement('div');
-        title.className = 'text-question-title';
-        title.textContent = q;
+        const t = document.createElement('div');
+        t.className = 'text-question-title';
+        t.textContent = q;
         const ul = document.createElement('ul');
-        answers.forEach(r => {
+        answers.forEach(a => {
           const li = document.createElement('li');
-          li.textContent = r.value;
+          li.textContent = a.value;
           ul.appendChild(li);
         });
-        box.appendChild(title);
+        box.appendChild(t);
         box.appendChild(ul);
         container.appendChild(box);
       });

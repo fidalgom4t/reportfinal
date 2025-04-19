@@ -1,3 +1,4 @@
+<!-- report.html (updated) -->
 <!DOCTYPE html>
 <html lang="pt">
 <head>
@@ -13,43 +14,36 @@
       background-color: #fff;
       color: #333;
     }
-
     .hero-banner {
       background-color: #e6f2f3;
       padding: 40px;
       margin-bottom: 40px;
     }
-
     .hero-title {
       font-size: 48px;
       color: #007c91;
       font-weight: 600;
     }
-
     .hero-subtitle {
       font-size: 24px;
       color: #007c91;
       font-style: italic;
       margin-bottom: 20px;
     }
-
     .hero-meta {
       font-size: 18px;
       margin-top: 20px;
     }
-
     .chart-container {
       height: 400px;
       margin-bottom: 60px;
     }
-
     .turma-title {
       font-size: 22px;
       font-weight: bold;
       margin: 20px 0 10px;
       color: #007c91;
     }
-
     .text-question {
       border: 1px solid #007c91;
       border-left: 6px solid #007c91;
@@ -57,14 +51,12 @@
       margin-bottom: 30px;
       background: #f9f9f9;
     }
-
     .text-question-title {
       font-weight: bold;
       margin-bottom: 8px;
       font-size: 16px;
       color: #007c91;
     }
-
     ul {
       padding-left: 20px;
     }
@@ -75,19 +67,23 @@
 
   <script>
     async function loadReport() {
-      const filters = JSON.parse(localStorage.getItem('reportFilters')) || {};
-      console.log("Filtros carregados:", filters);
+      // Try both storage keys
+      const filters = JSON.parse(
+        localStorage.getItem('reportFilters')
+        || localStorage.getItem('filters')
+        || '{}'
+      );
 
       const [data, meta] = await Promise.all([
         fetch('https://fidalgom4t.github.io/reportfinal/data.json').then(res => res.json()),
         fetch('https://fidalgom4t.github.io/reportfinal/meta.json').then(res => res.json())
       ]);
 
-      const section = 'assessment'; // you can make this dynamic if needed
+      const section = 'assessment';
       const filtered = data.filter(d =>
         d.client === filters.client &&
         d.program === filters.program &&
-        filters.turmas.includes(d.turma) &&
+        (filters.turmas || []).includes(d.turma) &&
         d.section === section
       );
 
@@ -103,33 +99,33 @@
           <div class="hero-subtitle">${programMeta["SUBTÍTULO"] || ''}</div>
           <div class="hero-title">${programMeta["TÍTULO"] || filters.program}</div>
           <div class="hero-meta"><strong>Formador:</strong> ${filters.trainer || 'N/A'}</div>
-          <div class="hero-meta"><strong>Período de implementação:</strong> ${startDate} - ${endDate}</div>
+          <div class="hero-meta"><strong>Período:</strong> ${startDate} - ${endDate}</div>
         </div>
       `;
 
-      // Render chart
       const numericData = filtered.filter(d => typeof d.value === 'number');
       const groupedByTurma = groupBy(numericData, 'turma');
       const labelMap = createLabelMap(meta.labels);
 
-      // Optional global chart
-      if (filters.turmas.length > 1) {
+      if ((filters.turmas || []).length > 1) {
         const globalAverages = computeAverages(numericData, labelMap);
         createBarChart('Global', globalAverages, container);
       }
 
       Object.entries(groupedByTurma).forEach(([turma, values]) => {
-        const turmaTitle = document.createElement("div");
-        turmaTitle.className = "turma-title";
-        turmaTitle.textContent = `Turma: ${turma}`;
-        container.appendChild(turmaTitle);
+        const titleEl = document.createElement("div");
+        titleEl.className = "turma-title";
+        titleEl.textContent = `Turma: ${turma}`;
+        container.appendChild(titleEl);
 
         const turmaAverages = computeAverages(values, labelMap);
         createBarChart(turma, turmaAverages, container);
       });
 
-      // Render open-ended responses
-      const textData = filtered.filter(d => typeof d.value !== 'number' && (filters.textQuestions || []).includes(d.question));
+      const textData = filtered.filter(d =>
+        typeof d.value !== 'number' &&
+        (filters.textQuestions || []).includes(d.question)
+      );
       renderTextQuestions(textData, container);
     }
 
@@ -150,13 +146,11 @@
     function computeAverages(data, labelMap) {
       const grouped = {};
       data.forEach(({ question, value }) => {
-        if (!grouped[question]) grouped[question] = [];
-        grouped[question].push(value);
+        (grouped[question] ||= []).push(value);
       });
-
-      return Object.entries(grouped).map(([question, values]) => ({
+      return Object.entries(grouped).map(([question, vals]) => ({
         label: labelMap[question] || question,
-        avg: values.reduce((a, b) => a + b, 0) / values.length
+        avg: vals.reduce((a, b) => a + b, 0) / vals.length
       })).sort((a, b) => a.label.localeCompare(b.label));
     }
 
@@ -180,10 +174,15 @@
         series: [{
           type: 'bar',
           data: data.map(d => d.avg),
-          label: { show: true, position: 'top' },
           itemStyle: {
-            color: val => val.value < 3 ? '#d94e5d' : val.value < 4 ? '#f2c037' : '#61c277'
-          }
+            color: function(params) {
+              const v = params.value;
+              if (v < 3)   return '#d94e5d';
+              if (v < 4)   return '#f2c037';
+                           return '#61c277';
+            }
+          },
+          label: { show: true, position: 'top' }
         }]
       });
     }
@@ -193,18 +192,15 @@
       Object.entries(grouped).forEach(([question, responses]) => {
         const box = document.createElement("div");
         box.className = "text-question";
-
         const title = document.createElement("div");
         title.className = "text-question-title";
         title.textContent = question;
-
         const ul = document.createElement("ul");
         responses.forEach(r => {
           const li = document.createElement("li");
           li.textContent = r.value;
           ul.appendChild(li);
         });
-
         box.appendChild(title);
         box.appendChild(ul);
         container.appendChild(box);

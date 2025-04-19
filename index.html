@@ -10,15 +10,28 @@
       padding: 30px;
       color: #333;
     }
-    .program-section {
-      page-break-after: always;
-      border-bottom: 2px solid #ccc;
+    .exec-page {
+      background-color: #e6f2f3;
+      padding: 60px;
       margin-bottom: 60px;
+      page-break-after: always;
     }
-    .executive-summary {
-      margin-bottom: 20px;
-      padding-bottom: 15px;
-      border-bottom: 1px solid #aaa;
+    .exec-title {
+      font-size: 40px;
+      color: #007c91;
+      margin-bottom: 10px;
+    }
+    .exec-subtitle {
+      font-size: 20px;
+      color: #005c6b;
+      font-style: italic;
+    }
+    .exec-meta {
+      margin-top: 30px;
+      font-size: 18px;
+    }
+    .program-section {
+      margin-bottom: 60px;
     }
     .chart-container {
       width: 100%;
@@ -87,202 +100,205 @@
   </div>
 
   <div id="reportContainer"></div>
+<script>
+  let rawData = [];
 
-  <script>
-    let rawData = [];
+  fetch('data.json')
+    .then(res => res.json())
+    .then(data => {
+      rawData = data;
+      populateClientFilter();
+    });
 
-    fetch('data.json')
-      .then(res => res.json())
-      .then(data => {
-        rawData = data;
-        populateClientFilter();
-      });
+  function toggleDropdown(wrapperId) {
+    document.getElementById(wrapperId).classList.toggle('open');
+  }
 
-    function populateClientFilter() {
-      const clients = [...new Set(rawData.map(d => d.client))];
-      const clientSelect = document.getElementById("clientSelect");
-      clientSelect.innerHTML = clients.map(c => `<option value="${c}">${c}</option>`).join('');
-      clientSelect.onchange = generateReports;
-    }
+  function fillCheckboxes(id, values) {
+    const container = document.getElementById(id);
+    container.innerHTML = '';
+    values.forEach(val => {
+      const label = document.createElement('label');
+      const checkbox = document.createElement('input');
+      checkbox.type = 'checkbox';
+      checkbox.value = val;
+      checkbox.checked = true;
+      checkbox.onchange = generateReports; // 🔁 Live update
+      label.appendChild(checkbox);
+      label.appendChild(document.createTextNode(' ' + val));
+      container.appendChild(label);
+      container.appendChild(document.createElement('br'));
+    });
+  }
 
-    function toggleDropdown(wrapperId) {
-      document.getElementById(wrapperId).classList.toggle('open');
-    }
+  function getChecked(id) {
+    return Array.from(document.querySelectorAll(`#${id} input:checked`)).map(c => c.value);
+  }
 
-    function fillCheckboxes(id, values) {
-      const container = document.getElementById(id);
-      container.innerHTML = '';
-      values.forEach(val => {
-        const label = document.createElement('label');
-        const checkbox = document.createElement('input');
-        checkbox.type = 'checkbox';
-        checkbox.value = val;
-        checkbox.checked = true;
-        label.appendChild(checkbox);
-        label.appendChild(document.createTextNode(' ' + val));
-        container.appendChild(label);
-        container.appendChild(document.createElement('br'));
-      });
-    }
-
-    function getChecked(id) {
-      return Array.from(document.querySelectorAll(`#${id} input:checked`)).map(c => c.value);
-    }
-
-    function generateReports() {
-      const client = document.getElementById("clientSelect").value;
-      const trainer = document.getElementById("trainerInput").value || "N/A";
-      const container = document.getElementById("reportContainer");
-      container.innerHTML = '';
-
-      const clientData = rawData.filter(d => d.client === client);
-      const programs = [...new Set(clientData.map(d => d.program))];
+  function populateClientFilter() {
+    const clients = [...new Set(rawData.map(d => d.client))];
+    const clientSelect = document.getElementById("clientSelect");
+    clientSelect.innerHTML = clients.map(c => `<option value="${c}">${c}</option>`).join('');
+    clientSelect.onchange = () => {
+      const clientData = rawData.filter(d => d.client === clientSelect.value);
       const textQs = [...new Set(clientData.filter(d => typeof d.value !== 'number').map(d => d.question))];
       fillCheckboxes("textQuestionSelect", textQs);
-      const selectedTextQs = getChecked("textQuestionSelect");
+      generateReports();
+    };
+  }
 
-      programs.forEach((program, idx) => {
-        const programData = clientData.filter(d => d.program === program);
-        const section = document.createElement('div');
-        section.className = 'program-section';
+  function generateReports() {
+    const client = document.getElementById("clientSelect").value;
+    const trainer = document.getElementById("trainerInput").value || "N/A";
+    const selectedTextQs = getChecked("textQuestionSelect");
+    const container = document.getElementById("reportContainer");
+    container.innerHTML = '';
 
-        // Executive Summary
-        const dates = programData.map(d => new Date(d.date));
-        const minDate = dates.length ? new Date(Math.min(...dates)) : null;
-        const maxDate = dates.length ? new Date(Math.max(...dates)) : null;
-        const scope = minDate ? `${minDate.toLocaleDateString()} - ${maxDate.toLocaleDateString()}` : 'N/A';
+    const clientData = rawData.filter(d => d.client === client);
+    const programs = [...new Set(clientData.map(d => d.program))];
 
-        const summary = document.createElement('div');
-        summary.className = 'executive-summary';
-        summary.innerHTML = `
-          <h2>Programa: ${program}</h2>
-          <p><strong>Formador:</strong> ${trainer}</p>
-          <p><strong>Período:</strong> ${scope}</p>
-        `;
-        section.appendChild(summary);
+    programs.forEach((program, idx) => {
+      const programData = clientData.filter(d => d.program === program);
+      const section = document.createElement('div');
+      section.className = 'program-section';
 
-        ['assessment', 'evaluation'].forEach((type) => {
-          const sectionData = programData.filter(d => d.section === type);
-          if (!sectionData.length) return;
+      // 🧾 EXECUTIVE SUMMARY PAGE
+      const exec = document.createElement('div');
+      exec.className = 'exec-page';
+      const dates = programData.map(d => new Date(d.date));
+      const minDate = dates.length ? new Date(Math.min(...dates)) : null;
+      const maxDate = dates.length ? new Date(Math.max(...dates)) : null;
+      const scope = minDate ? `${minDate.toLocaleDateString()} - ${maxDate.toLocaleDateString()}` : 'N/A';
 
-          const numeric = sectionData.filter(d => typeof d.value === 'number');
-          const text = sectionData.filter(d => typeof d.value !== 'number');
-          const turmas = [...new Set(sectionData.map(d => d.turma))];
+      exec.innerHTML = `
+        <div class="exec-title">Programa: ${program}</div>
+        <div class="exec-subtitle">Formador: ${trainer}</div>
+        <div class="exec-meta">Período de implementação: ${scope}</div>
+      `;
+      container.appendChild(exec);
 
-          const heading = document.createElement('h3');
-          heading.textContent = type === 'assessment' ? 'Avaliação Inicial' : 'Avaliação Final';
-          section.appendChild(heading);
+      // 📊 SECTIONS: Assessment + Evaluation
+      ['assessment', 'evaluation'].forEach((type) => {
+        const sectionData = programData.filter(d => d.section === type);
+        if (!sectionData.length) return;
 
-          if (turmas.length > 1) {
-            const globalChartDiv = document.createElement('div');
-            globalChartDiv.className = 'chart-container';
-            section.appendChild(globalChartDiv);
+        const numeric = sectionData.filter(d => typeof d.value === 'number');
+        const text = sectionData.filter(d => typeof d.value !== 'number');
+        const turmas = [...new Set(sectionData.map(d => d.turma))];
 
-            const globalData = {};
-            numeric.forEach(({ question, value }) => {
-              if (!globalData[question]) globalData[question] = [];
-              globalData[question].push(value);
-            });
+        const heading = document.createElement('h3');
+        heading.textContent = type === 'assessment' ? 'Avaliação Inicial' : 'Avaliação Final';
+        section.appendChild(heading);
 
-            const avgData = Object.entries(globalData).map(([q, vals]) => ({
-              question: q,
-              average: vals.reduce((a, b) => a + b, 0) / vals.length
-            }));
+        if (turmas.length > 1) {
+          const globalChartDiv = document.createElement('div');
+          globalChartDiv.className = 'chart-container';
+          section.appendChild(globalChartDiv);
 
-            setTimeout(() => drawChart(globalChartDiv, avgData, type), 50);
-          }
-
-          turmas.forEach(turma => {
-            const turmaTitle = document.createElement('div');
-            turmaTitle.className = 'turma-title';
-            turmaTitle.textContent = `Turma: ${turma}`;
-            section.appendChild(turmaTitle);
-
-            const turmaChartDiv = document.createElement('div');
-            turmaChartDiv.className = 'chart-container';
-            section.appendChild(turmaChartDiv);
-
-            const turmaData = numeric.filter(d => d.turma === turma);
-            const perQ = {};
-            turmaData.forEach(({ question, value }) => {
-              if (!perQ[question]) perQ[question] = [];
-              perQ[question].push(value);
-            });
-
-            const chartData = Object.entries(perQ).map(([q, vals]) => ({
-              question: q,
-              average: vals.reduce((a, b) => a + b, 0) / vals.length
-            }));
-
-            setTimeout(() => drawChart(turmaChartDiv, chartData, type), 50);
+          const globalData = {};
+          numeric.forEach(({ question, value }) => {
+            if (!globalData[question]) globalData[question] = [];
+            globalData[question].push(value);
           });
 
-          const questions = {};
-          text.forEach(({ question, value }) => {
-            if (selectedTextQs.includes(question)) {
-              if (!questions[question]) questions[question] = [];
-              questions[question].push(value);
-            }
+          const avgData = Object.entries(globalData).map(([q, vals]) => ({
+            question: q,
+            average: vals.reduce((a, b) => a + b, 0) / vals.length
+          }));
+
+          setTimeout(() => drawChart(globalChartDiv, avgData, type), 50);
+        }
+
+        turmas.forEach(turma => {
+          const turmaTitle = document.createElement('div');
+          turmaTitle.className = 'turma-title';
+          turmaTitle.textContent = `Turma: ${turma}`;
+          section.appendChild(turmaTitle);
+
+          const turmaChartDiv = document.createElement('div');
+          turmaChartDiv.className = 'chart-container';
+          section.appendChild(turmaChartDiv);
+
+          const turmaData = numeric.filter(d => d.turma === turma);
+          const perQ = {};
+          turmaData.forEach(({ question, value }) => {
+            if (!perQ[question]) perQ[question] = [];
+            perQ[question].push(value);
           });
 
-          Object.entries(questions).forEach(([q, answers]) => {
-            const box = document.createElement('div');
-            box.className = 'text-question';
-            const title = document.createElement('div');
-            title.className = 'text-question-title';
-            title.textContent = q;
-            const ul = document.createElement('ul');
-            answers.forEach(a => {
-              const li = document.createElement('li');
-              li.textContent = a;
-              ul.appendChild(li);
-            });
-            box.appendChild(title);
-            box.appendChild(ul);
-            section.appendChild(box);
-          });
+          const chartData = Object.entries(perQ).map(([q, vals]) => ({
+            question: q,
+            average: vals.reduce((a, b) => a + b, 0) / vals.length
+          }));
 
+          setTimeout(() => drawChart(turmaChartDiv, chartData, type), 50);
         });
 
-        container.appendChild(section);
-      });
-    }
-
-    function drawChart(container, data, type) {
-      if (!container) return;
-      const chart = echarts.init(container);
-      data.sort((a, b) => a.question.localeCompare(b.question));
-      const questions = data.map(d => d.question);
-      const values = data.map(d => d.average);
-
-      chart.setOption({
-        tooltip: {},
-        xAxis: {
-          type: 'category',
-          data: questions,
-          axisLabel: { rotate: 30 }
-        },
-        yAxis: {
-          type: 'value',
-          min: 0,
-          max: 5
-        },
-        series: [{
-          type: 'bar',
-          data: values,
-          itemStyle: {
-            color: type === 'assessment'
-              ? val => val.value < 3 ? '#d94e5d' : val.value < 4 ? '#f2c037' : '#61c277'
-              : '#61c277'
-          },
-          label: {
-            show: true,
-            position: 'top',
-            formatter: '{c}'
+        const questions = {};
+        text.forEach(({ question, value }) => {
+          if (selectedTextQs.includes(question)) {
+            if (!questions[question]) questions[question] = [];
+            questions[question].push(value);
           }
-        }]
+        });
+
+        Object.entries(questions).forEach(([q, answers]) => {
+          const box = document.createElement('div');
+          box.className = 'text-question';
+          const title = document.createElement('div');
+          title.className = 'text-question-title';
+          title.textContent = q;
+          const ul = document.createElement('ul');
+          answers.forEach(a => {
+            const li = document.createElement('li');
+            li.textContent = a;
+            ul.appendChild(li);
+          });
+          box.appendChild(title);
+          box.appendChild(ul);
+          section.appendChild(box);
+        });
       });
-    }
-  </script>
+
+      container.appendChild(section);
+    });
+  }
+
+  function drawChart(container, data, type) {
+    if (!container) return;
+    const chart = echarts.init(container);
+    data.sort((a, b) => a.question.localeCompare(b.question));
+    const questions = data.map(d => d.question);
+    const values = data.map(d => d.average);
+
+    chart.setOption({
+      tooltip: {},
+      xAxis: {
+        type: 'category',
+        data: questions,
+        axisLabel: { rotate: 30 }
+      },
+      yAxis: {
+        type: 'value',
+        min: 0,
+        max: 5
+      },
+      series: [{
+        type: 'bar',
+        data: values,
+        itemStyle: {
+          color: type === 'assessment'
+            ? val => val.value < 3 ? '#d94e5d' : val.value < 4 ? '#f2c037' : '#61c277'
+            : '#61c277'
+        },
+        label: {
+          show: true,
+          position: 'top',
+          formatter: '{c}'
+        }
+      }]
+    });
+  }
+</script>
 </body>
 </html>

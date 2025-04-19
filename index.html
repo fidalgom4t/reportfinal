@@ -5,11 +5,15 @@
   <title>Selecionar Filtros</title>
   <style>
     body { font-family: 'Segoe UI', sans-serif; padding:40px; background:#f5f5f5 }
-    label { font-weight:bold; margin-top:20px; display:block }
+    h2 { margin-bottom:20px }
+    .filter-group { margin-bottom:30px }
+    .filter-group label { font-weight:bold; display:block; margin-bottom:5px }
+    .checkbox-list { display:grid; grid-template-columns: repeat(auto-fill,minmax(200px,1fr)); gap:5px }
+    .checkbox-list label { font-weight: normal; }
     select,input { padding:5px; margin-top:5px; width:300px }
     .dropdown-multiselect { margin-top:15px }
     .link-button {
-      display:inline-block; margin:30px 0; padding:10px 20px;
+      display:inline-block; margin-top:20px; padding:10px 20px;
       background:#007c91; color:#fff; text-decoration:none;
       font-weight:bold; border-radius:5px; cursor:pointer;
     }
@@ -19,29 +23,46 @@
 
   <h2>Gerar Relatório Dinâmico</h2>
 
-  <label>Cliente:</label>
-  <select id="clientSelect"></select>
-
-  <label>Programas:</label>
-  <select id="programSelect" multiple size="4"></select>
-
-  <label>Turmas:</label>
-  <select id="turmaSelect" multiple size="5"></select>
-
-  <label>Formador:</label>
-  <input type="text" id="trainerInput" placeholder="Nome do formador" />
-
-  <label>Perguntas Abertas:</label>
-  <div class="dropdown-multiselect" id="textWrapper">
-    <div class="select-box" onclick="toggleDropdown()">Selecionar perguntas</div>
-    <div class="checkboxes" id="textQuestionSelect"></div>
+  <!-- Cliente -->
+  <div class="filter-group">
+    <label>Cliente:</label>
+    <div id="clientWrapper" class="checkbox-list"></div>
   </div>
 
-  <label>Scope temporal - Início:</label>
-  <input type="month" id="startMonthInput" />
+  <!-- Programas -->
+  <div class="filter-group">
+    <label>Programas:</label>
+    <div id="programWrapper" class="checkbox-list"></div>
+  </div>
 
-  <label>Scope temporal - Fim:</label>
-  <input type="month" id="endMonthInput" />
+  <!-- Turmas -->
+  <div class="filter-group">
+    <label>Turmas:</label>
+    <div id="turmaWrapper" class="checkbox-list"></div>
+  </div>
+
+  <!-- Formador -->
+  <div class="filter-group">
+    <label>Formador:</label>
+    <input type="text" id="trainerInput" placeholder="Nome do formador" />
+  </div>
+
+  <!-- Perguntas Abertas -->
+  <div class="filter-group">
+    <label>Perguntas Abertas:</label>
+    <div class="dropdown-multiselect" id="textWrapper">
+      <div class="select-box" onclick="toggleDropdown()">Selecionar perguntas</div>
+      <div class="checkboxes" id="textQuestionSelect"></div>
+    </div>
+  </div>
+
+  <!-- Scope temporal -->
+  <div class="filter-group">
+    <label>Scope temporal - Início:</label>
+    <input type="month" id="startMonthInput" />
+    <label style="margin-top:10px">Scope temporal - Fim:</label>
+    <input type="month" id="endMonthInput" />
+  </div>
 
   <a class="link-button" onclick="goToReport()">Ver Relatório</a>
 
@@ -49,110 +70,119 @@
     let rawData = [];
 
     fetch('data.json')
-      .then(res => res.json())
+      .then(r => r.json())
       .then(data => {
         rawData = data;
-        populateClients();
-        syncScopeInputs();
+        initFilters();
       });
+
+    function initFilters() {
+      populateClients();
+      syncTrainer();
+      syncScope();
+    }
 
     function toggleDropdown() {
       document.getElementById("textWrapper").classList.toggle("open");
     }
 
-    function populateClients() {
-      const clients = [...new Set(rawData.map(d => d.client))];
-      const clientSelect = document.getElementById("clientSelect");
-      clientSelect.innerHTML = clients.map(c => `<option value="${c}">${c}</option>`).join('');
-      clientSelect.onchange = populatePrograms;
-      clientSelect.value = getStored('client') || clients[0];
-      populatePrograms();
-    }
-
-    function populatePrograms() {
-      const client = document.getElementById("clientSelect").value;
-      store('client', client);
-      const filtered = rawData.filter(d => d.client === client);
-      const programs = [...new Set(filtered.map(d => d.program))];
-      const programSelect = document.getElementById("programSelect");
-      programSelect.innerHTML = programs
-        .map(p => `<option value="${p}">${p}</option>`)
-        .join('');
-      // restore
-      const stored = getStored('programs') || [programs[0]];
-      Array.from(programSelect.options).forEach(opt =>
-        opt.selected = stored.includes(opt.value)
-      );
-      programSelect.onchange = () => {
-        const sel = Array.from(programSelect.selectedOptions).map(o => o.value);
-        store('programs', sel);
-        populateTurmas();
-      };
-      store('programs', stored);
-      populateTurmas();
-    }
-
-    function populateTurmas() {
-      const client = getStored('client');
-      const programs = getStored('programs') || [];
-      const filtered = rawData.filter(d =>
-        d.client === client && programs.includes(d.program)
-      );
-      const turmas = [...new Set(filtered.map(d => d.turma))];
-      const turmaSelect = document.getElementById("turmaSelect");
-      turmaSelect.innerHTML = turmas
-        .map(t => `<option value="${t}">${t}</option>`)
-        .join('');
-      // restore
-      const stored = getStored('turmas') || [];
-      Array.from(turmaSelect.options).forEach(opt =>
-        opt.selected = stored.includes(opt.value)
-      );
-      turmaSelect.onchange = () => {
-        const sel = Array.from(turmaSelect.selectedOptions).map(o => o.value);
-        store('turmas', sel);
-      };
-      store('turmas', stored);
-      populateTextQs(filtered);
-    }
-
-    function populateTextQs(filtered) {
-      const textQs = [...new Set(filtered.filter(d => isNaN(+d.value)).map(d => d.question))];
-      const container = document.getElementById("textQuestionSelect");
+    // Utility to fill a set of checkboxes
+    function fillCheckboxes(containerId, items, stored, onChange) {
+      const container = document.getElementById(containerId);
       container.innerHTML = '';
-      const stored = getStored('textQuestions') || [];
-      textQs.forEach(q => {
+      items.forEach(val => {
         const lbl = document.createElement('label');
         const cb = document.createElement('input');
         cb.type = 'checkbox';
-        cb.value = q;
-        cb.checked = stored.includes(q);
-        cb.onchange = () => {
-          const sel = Array.from(container.querySelectorAll('input:checked')).map(i=>i.value);
-          store('textQuestions', sel);
-        };
+        cb.value = val;
+        cb.checked = stored.includes(val);
+        cb.onchange = onChange;
         lbl.appendChild(cb);
-        lbl.appendChild(document.createTextNode(' ' + q));
+        lbl.appendChild(document.createTextNode(' ' + val));
         container.appendChild(lbl);
-        container.appendChild(document.createElement('br'));
       });
     }
 
-    function syncScopeInputs() {
-      const stored = JSON.parse(localStorage.getItem('filters')||'{}');
-      if (stored.start) document.getElementById('startMonthInput').value = stored.start;
-      if (stored.end)   document.getElementById('endMonthInput').value   = stored.end;
-      document.getElementById('startMonthInput').onchange = e => store('start', e.target.value);
-      document.getElementById('endMonthInput').onchange   = e => store('end',   e.target.value);
+    // CLIENTE
+    function populateClients() {
+      const clients = [...new Set(rawData.map(d => d.client))].sort();
+      const stored = get('clients') || [];
+      fillCheckboxes('clientWrapper', clients, stored, () => {
+        const sel = getChecked('clientWrapper');
+        set('clients', sel);
+        populatePrograms();
+      });
+      // initial
+      populatePrograms();
     }
 
-    function store(key, value) {
-      const s = JSON.parse(localStorage.getItem('filters')||'{}');
-      s[key] = value;
-      localStorage.setItem('filters', JSON.stringify(s));
+    // PROGRAMAS
+    function populatePrograms() {
+      const clients = get('clients') || [];
+      const filtered = rawData.filter(d => clients.includes(d.client));
+      const programs = [...new Set(filtered.map(d => d.program))].sort();
+      const stored = get('programs') || [];
+      fillCheckboxes('programWrapper', programs, stored, () => {
+        const sel = getChecked('programWrapper');
+        set('programs', sel);
+        populateTurmas();
+      });
+      populateTurmas();
     }
-    function getStored(key) {
-      return JSON.parse(localStorage.getItem('filters')||'{}')[key];
+
+    // TURMAS
+    function populateTurmas() {
+      const clients = get('clients') || [];
+      const programs = get('programs') || [];
+      const filtered = rawData.filter(d =>
+        clients.includes(d.client) && programs.includes(d.program)
+      );
+      const turmas = [...new Set(filtered.map(d => d.turma))].sort();
+      const stored = get('turmas') || [];
+      fillCheckboxes('turmaWrapper', turmas, stored, () => {
+        set('turmas', getChecked('turmaWrapper'));
+      });
+      populateTextQuestions(filtered);
+    }
+
+    // PERGUNTAS ABERTAS
+    function populateTextQuestions(filtered) {
+      const textQs = [...new Set(filtered.filter(d=>isNaN(+d.value)).map(d=>d.question))].sort();
+      const stored = get('textQuestions') || [];
+      fillCheckboxes('textQuestionSelect', textQs, stored, () => {
+        set('textQuestions', getChecked('textQuestionSelect'));
+      });
+    }
+
+    // SYNC trainer
+    function syncTrainer() {
+      const inp = document.getElementById('trainerInput');
+      inp.value = get('trainer') || '';
+      inp.oninput = () => set('trainer', inp.value);
+    }
+
+    // SYNC scope
+    function syncScope() {
+      const s = get('start');
+      const e = get('end');
+      if (s) document.getElementById('startMonthInput').value = s;
+      if (e) document.getElementById('endMonthInput').value   = e;
+      document.getElementById('startMonthInput').onchange = ev => set('start', ev.target.value);
+      document.getElementById('endMonthInput').onchange   = ev => set('end',   ev.target.value);
+    }
+
+    // Helpers
+    function get(key) {
+      return JSON.parse(localStorage.getItem('filters')||'{}')[key]||[];
+    }
+    function set(key,val) {
+      const f = JSON.parse(localStorage.getItem('filters')||'{}');
+      f[key] = val;
+      localStorage.setItem('filters', JSON.stringify(f));
+    }
+    function getChecked(wrapperId) {
+      return Array.from(document.getElementById(wrapperId).querySelectorAll('input:checked'))
+        .map(i => i.value);
     }
 
     function goToReport() {

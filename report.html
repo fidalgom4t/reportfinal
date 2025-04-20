@@ -11,32 +11,24 @@
   <script src="https://cdn.jsdelivr.net/npm/echarts@5"></script>
   <style>
     body { margin:0; padding:0; font-family:'Segoe UI',sans-serif; background:#fff; color:#333; }
-    /* Page header */
+    /* Top header */
     .page-header {
-      display: flex; align-items: center; padding:20px 30px;
+      display:flex; align-items:center; padding:20px 30px;
     }
     .page-header img { height:40px }
     .page-header .line { flex:1; height:1px; background:#40a3a3; margin-left:20px }
 
-    /* Program hero banner */
+    /* Program hero */
     .program-hero {
-      padding: 40px 30px;
-      border-top: 1px solid #eee;
+      padding:40px 30px; border-top:1px solid #eee;
     }
-    .program-hero:first-child { border-top: none; }
+    .program-hero:first-child { border-top:none; }
     .program-hero .hero-main {
-      display: flex; align-items: center; justify-content: center;
-      margin-bottom: 30px;
+      display:flex; align-items:center; justify-content:center; margin-bottom:30px;
     }
-    .program-hero .hero-image {
-      flex:0 0 200px; text-align:center;
-    }
-    .program-hero .hero-image img {
-      max-width:100%; height:auto;
-    }
-    .program-hero .hero-text {
-      flex:1; text-align:center;
-    }
+    .program-hero .hero-image { flex:0 0 200px; text-align:center; }
+    .program-hero .hero-image img { max-width:100%; height:auto; }
+    .program-hero .hero-text { flex:1; text-align:center; }
     .program-hero .hero-text .tagline {
       font-style:italic; color:#555; margin-bottom:8px;
     }
@@ -91,7 +83,6 @@
     <div class="line"></div>
   </div>
 
-  <!-- Report container -->
   <div id="reportContent"></div>
 
   <script>
@@ -201,8 +192,9 @@
         .toLocaleDateString('pt-PT',{ month:'long', year:'numeric' });
     }
 
+
     //
-    // 2) loadReport definition
+    // 2) loadReport
     //
 
     async function loadReport() {
@@ -218,15 +210,14 @@
       container.innerHTML = '';
 
       (filters.programs||[]).forEach(prog => {
-        // Program metadata
+        // Program info
         const progMeta = meta.titles.find(t=>t.program_id===prog) || {};
-        const rowsAll = data.filter(d =>
-          d.client === filters.client &&
-          d.program === prog &&
+        const rowsAll = data.filter(d=>
+          d.client===filters.client &&
+          d.program===prog &&
           (filters.turmas||[]).includes(d.turma)
         );
 
-        // Compute scope & trainer
         const start = filters.start
           ? formatMonthYearString(filters.start)
           : formatMonthYear(getExtremeDate(rowsAll,'assessment','min'));
@@ -235,7 +226,7 @@
           : formatMonthYear(getExtremeDate(rowsAll,'evaluation','max'));
         const trainer = filters.trainer || 'N/A';
 
-        // Hero banner
+        // Hero
         const hero = document.createElement('div');
         hero.className = 'program-hero';
         hero.innerHTML = `
@@ -268,24 +259,22 @@
 
         // Sections
         ['assessment','evaluation'].forEach(key => {
-          const secName = key==='assessment' ? 'Assessment' : 'Avaliação do Programa';
+          const secName = key==='assessment'? 'Assessment':'Avaliação do Programa';
           const hdr = document.createElement('div');
           hdr.className = 'section-title';
           hdr.textContent = secName;
           container.appendChild(hdr);
 
-          // Numeric rows
-          const rows = rowsAll.filter(d =>
+          // Numeric only
+          const rows = rowsAll.filter(d=>
             String(d.section||'').toLowerCase().includes(key) &&
             /^-?\d+(\.\d+)?$/.test(String(d.value||'').trim())
           );
 
-          // Global chart
           if ((filters.turmas||[]).length>1 && rows.length) {
             createBarChart(`Global (${secName})`, computeAverages(rows,labelMap,sortMap), container);
           }
 
-          // Per-turma
           const byTurma = groupBy(rows,'turma');
           Object.entries(byTurma).forEach(([turma, vals]) => {
             const tdiv = document.createElement('div');
@@ -295,8 +284,8 @@
             createBarChart(turma, computeAverages(vals,labelMap,sortMap), container);
           });
 
-          // Open-ended
-          const textRows = rowsAll.filter(d =>
+          // Open‑ended
+          const textRows = rowsAll.filter(d=>
             String(d.section||'').toLowerCase().includes(key) &&
             !/^-?\d+(\.\d+)?$/.test(String(d.value||'').trim()) &&
             (filters.textQuestions||[]).includes(d.question)
@@ -307,7 +296,7 @@
     }
 
     //
-    // 3) Kick off on DOMContentLoaded
+    // 3) Kick off
     //
 
     document.addEventListener('DOMContentLoaded', loadReport);

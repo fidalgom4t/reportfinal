@@ -4,13 +4,13 @@
   <meta charset="UTF-8" />
   <title>Training Report</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <!-- ECharts -->
   <script src="https://cdn.jsdelivr.net/npm/echarts@5/dist/echarts.min.js"></script>
   <style>
-    /* === Print: landscape, no mid‑box splits === */
+    /* — Print setup: landscape, every .hero-page and .page-break get forced pages — */
     @page { size: landscape; margin: 0; }
     @media print {
-      .page-break { page-break-after: always; }
+      .hero-page, .page-break { page-break-after: always; }
+      /* Prevent slicing inside questions or charts */
       .overall-chart,
       .chart-grid-page,
       .chart-container,
@@ -21,7 +21,60 @@
       }
     }
 
-    /* === Shared grid for turma charts (screen & print) === */
+    /* — Hero page “slide” styling — */
+    .hero-page {
+      position: relative;
+      width: 100vw; height: 100vh;
+      background: url('hourglass-bg.jpg') center/cover no-repeat;
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+      color: #fff;
+      text-align: center;
+    }
+    .hero-page::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: rgba(0, 124, 145, 0.6);
+    }
+    .hero-content {
+      position: relative;
+      z-index: 1;
+      max-width: 80%;
+    }
+    .hero-content small {
+      display: block;
+      color: #e0f2f3;
+      font-style: italic;
+      margin-bottom: 8px;
+      font-size: 1.2rem;
+    }
+    .hero-content h1 {
+      font-size: 4rem;
+      margin: 0;
+      font-weight: 600;
+    }
+    .hero-content .subtitle {
+      font-size: 1.8rem;
+      margin-top: 12px;
+    }
+    .hero-content .meta {
+      margin-top: 24px;
+      font-size: 1.2rem;
+      display: flex; justify-content: center; gap: 40px;
+    }
+    .hero-content .meta div span {
+      display: block;
+      font-style: italic;
+      color: #e0f2f3;
+      font-size: 1rem;
+    }
+    .hero-content .meta div strong {
+      color: #fff;
+      font-weight: 600;
+    }
+
+    /* — Shared grid for turma charts — */
     .chart-grid-page {
       display: grid;
       grid-template: 1fr 1fr / 1fr 1fr;
@@ -30,50 +83,16 @@
       box-sizing: border-box;
     }
 
-    /* === Screen styles === */
+    /* — Screen styles for the rest — */
     body {
       margin: 0; padding: 0;
       font-family: 'Segoe UI', sans-serif;
       background: #fff; color: #333;
     }
     .page-header {
-      display: flex; align-items: center;
-      padding: 20px 30px;
-    }
-    .page-header img { height: 40px; }
-    .page-header .line {
-      flex: 1; height: 1px; background: #40a3a3;
-      margin-left: 20px;
+      display: none; /* hide the small header, hero-pages now cover it */
     }
 
-    /* Program hero */
-    .program-hero {
-      padding: 40px 30px;
-      border-top: 1px solid #eee;
-    }
-    .program-hero:first-child { border-top: none; }
-    .hero-main {
-      display: flex; align-items: center; margin-bottom: 30px;
-    }
-    .hero-image { flex: 0 0 200px; text-align: center; }
-    .hero-image img { max-width: 100%; height: auto; }
-    .hero-text { flex: 1; text-align: center; }
-    .hero-text .tagline {
-      font-style: italic; color: #555; margin-bottom: 8px;
-    }
-    .hero-text .title {
-      font-size: 48px; color: #007c91;
-      margin: 0 0 8px; font-weight: 600;
-    }
-    .hero-text .subtitle { font-size: 20px; color: #007c91; }
-    .hero-meta {
-      display: flex; justify-content: center;
-      gap: 80px; font-size: 16px; color: #555;
-    }
-    .hero-meta .label { font-style: italic; }
-    .hero-meta .value { font-weight: bold; }
-
-    /* Section banner */
     .section-banner {
       background: #f0f8f9;
       padding: 40px 24px;
@@ -81,45 +100,41 @@
       border-left: 6px solid #007c91;
     }
     .section-banner h1 {
-      margin: 0 0 16px; font-size: 48px; color: #007c91;
+      margin: 0 0 16px;
+      font-size: 48px;
+      color: #007c91;
     }
     .section-banner .section-meta {
-      display: flex; gap: 40px; font-size: 18px; color: #555;
+      display: flex; gap: 40px;
+      font-size: 18px; color: #555;
     }
 
-    /* Charts & open‑ended */
     #reportContent { padding-bottom: 30px; }
-    .overall-chart {
-      width: 90vw; margin: auto; height: 400px;
-    }
-    .chart-container {
-      width: 100%; height: 300px;
-    }
+    .overall-chart { width: 90vw; margin: auto; height: 400px; }
+    .chart-container { width: 100%; height: 300px; }
     .text-question {
       border: 1px solid #007c91;
       border-left: 6px solid #007c91;
-      padding: 16px; margin: 20px auto 40px;
-      background: #f9f9f9; width: 90vw;
+      padding: 16px;
+      margin: 20px auto 40px;
+      background: #f9f9f9;
+      width: 90vw;
       box-sizing: border-box;
     }
     .text-question-title {
-      font-weight: bold; margin-bottom: 8px;
-      font-size: 18px; color: #007c91;
+      font-weight: bold;
+      margin-bottom: 8px;
+      font-size: 18px;
+      color: #007c91;
     }
     ul { padding-left: 20px; font-size: 16px; }
   </style>
 </head>
 <body>
-  <!-- Header -->
-  <div class="page-header">
-    <img src="mind4time-logo.png" alt="MIND4TIME" />
-    <div class="line"></div>
-  </div>
-
   <div id="reportContent"></div>
 
   <script>
-    // — Utility functions —
+    // Helpers (same as before)…
     function createLabelMap(labels) {
       const m = {};
       labels.forEach(l => {
@@ -137,43 +152,34 @@
       return m;
     }
     function groupBy(arr, key) {
-      return arr.reduce((a, i) => {
-        (a[i[key]] ||= []).push(i);
-        return a;
-      }, {});
+      return arr.reduce((a,i)=>(a[i[key]]||(a[i[key]]=[])).push(i)&&a,{});
     }
     function computeAverages(rows, labelMap, orderMap) {
       const groups = {};
-      rows.forEach(({question, value}) => {
-        (groups[question] ||= []).push(+value);
-      });
-      return Object.entries(groups)
-        .map(([q, vals]) => {
-          const avg = vals.reduce((a,b)=>a+b,0)/vals.length;
-          return { question: q, label: labelMap[q]||q, avg: +avg.toFixed(1) };
-        })
-        .sort((a,b)=>(orderMap[a.question]||0)-(orderMap[b.question]||0));
+      rows.forEach(({question,value})=>(groups[question]||(groups[question]=[])).push(+value));
+      return Object.entries(groups).map(([q,vals])=>{
+        const avg = vals.reduce((a,b)=>a+b,0)/vals.length;
+        return { question:q, label:labelMap[q]||q, avg:+avg.toFixed(1) };
+      }).sort((a,b)=>(orderMap[a.question]||0)-(orderMap[b.question]||0));
     }
-    function createBarChartIn(div, title, data) {
+    function createBarChartIn(div,title,data) {
       const chart = echarts.init(div);
       chart.setOption({
-        title:{ text: title, left: 'center', textStyle:{ fontSize:18 } },
+        title:{ text:title, left:'center', textStyle:{ fontSize:18 } },
         tooltip:{},
-        xAxis:{ type:'category', data: data.map(d=>d.label), axisLabel:{ rotate:30 } },
+        xAxis:{ type:'category', data:data.map(d=>d.label), axisLabel:{ rotate:30 } },
         yAxis:{ type:'value', min:0, max:5 },
         series:[{
-          type:'bar', data: data.map(d=>d.avg),
+          type:'bar', data:data.map(d=>d.avg),
           label:{ show:true, position:'top', formatter:'{c}' },
           itemStyle:{ color(p){ const v=p.value; if(v<3)return'#d94e5d'; if(v<4)return'#f2c037'; return'#61c277'; }}
         }]
       });
-      // force resize in case container was not fully laid out
-      chart.resize();
-      setTimeout(()=>chart.resize(),300);
+      chart.resize(); setTimeout(()=>chart.resize(),300);
     }
-    function renderTextQuestions(rows, container) {
-      const byQ = groupBy(rows, 'question');
-      Object.entries(byQ).forEach(([q, answers]) => {
+    function renderTextQuestions(rows,container){
+      const byQ = groupBy(rows,'question');
+      Object.entries(byQ).forEach(([q, answers])=>{
         const box = document.createElement('div');
         box.className = 'text-question';
         const h = document.createElement('div');
@@ -181,7 +187,7 @@
         h.textContent = q;
         box.appendChild(h);
         const ul = document.createElement('ul');
-        answers.forEach(a => {
+        answers.forEach(a=>{
           const li = document.createElement('li');
           li.textContent = a.value;
           ul.appendChild(li);
@@ -190,17 +196,17 @@
         container.appendChild(box);
       });
     }
-    function countUnique(rows, sec) {
+    function countUnique(rows,sec){
       return new Set(
         rows.filter(d=>String(d.section||'').toLowerCase().includes(sec))
             .map(d=>d.respondent_id||d.id)
       ).size;
     }
 
-    // — Main render —
+    // Main rendering
     async function loadReport() {
       const f = JSON.parse(localStorage.getItem('reportFilters')||'{}');
-      const [data, meta] = await Promise.all([
+      const [data,meta] = await Promise.all([
         fetch('data.json').then(r=>r.json()),
         fetch('meta.json').then(r=>r.json())
       ]);
@@ -209,65 +215,63 @@
             out = document.getElementById('reportContent');
       out.innerHTML = '';
 
-      for (const prog of f.programs || []) {
+      // For each program
+      for (const prog of f.programs||[]) {
         const rowsAll = data.filter(d=>
-          (f.clients||[]).includes(d.client) &&
-          d.program === prog &&
+          (f.clients||[]).includes(d.client)&&
+          d.program===prog&&
           (f.turmas||[]).includes(d.turma)
         );
 
-        // Program Hero
+        // ─── Hero page ─────────────────────────────────
         const pm = meta.titles.find(t=>t.program_id===prog) || {};
-        const hero = document.createElement('div'); hero.className='program-hero';
+        const hero = document.createElement('div');
+        hero.className = 'hero-page';
         hero.innerHTML = `
-          <div class="hero-main">
-            <div class="hero-image">
-              <img src="program-icon.png" alt="${pm.TÍTULO||prog}">
+          <div class="hero-content">
+            <small>${pm.SUBTÍTULO||''}</small>
+            <h1>${pm.TÍTULO||prog}</h1>
+            <div class="subtitle">${pm.TAGLINE||''}</div>
+            <div class="meta">
+              <div><span>time scope</span><strong>${f.start} – ${f.end}</strong></div>
+              <div><span>trainers</span><strong>${(f.trainers||{})[prog]||'N/A'}</strong></div>
             </div>
-            <div class="hero-text">
-              <div class="tagline">${pm.SUBTÍTULO||''}</div>
-              <h1 class="title">${pm.TÍTULO||prog}</h1>
-              <div class="subtitle">${pm.TAGLINE||''}</div>
-            </div>
-          </div>
-          <div class="hero-meta">
-            <div><span class="label">Formadora:</span>
-                 <span class="value">${(f.trainers||{})[prog]||'N/A'}</span></div>
           </div>`;
         out.appendChild(hero);
 
-        // Sections
+        // ─── Sections ─────────────────────────────────
         for (const sec of ['assessment','evaluation']) {
-          const secName = sec === 'assessment' ? 'Assessment' : 'Avaliação do Programa';
-          const uniq = countUnique(rowsAll, sec);
+          const secName = sec==='assessment'?'Assessment':'Avaliação do Programa';
+          const uniq = countUnique(rowsAll,sec);
 
-          // Section Banner
-          const sb = document.createElement('div'); sb.className='section-banner';
+          // Section banner
+          const sb = document.createElement('div');
+          sb.className = 'section-banner';
           sb.innerHTML = `
             <h1>${secName}</h1>
             <div class="section-meta">
-              <div><span class="label">Total de respostas:</span>
-                   <span class="value">${uniq}</span></div>
+              <div><span>Total de respostas:</span><strong>${uniq}</strong></div>
             </div>`;
           out.appendChild(sb);
 
-          // Numeric answers (anything parseable)
+          // Numeric answers
           const numeric = rowsAll.filter(d=>
-            String(d.section||'').toLowerCase().includes(sec) &&
+            String(d.section||'').toLowerCase().includes(sec)&&
             !isNaN(parseFloat(d.value))
           );
 
-          // Overall average chart (own page)
+          // Overall chart (own page)
           if (numeric.length) {
-            const pg = document.createElement('div'); pg.className='page-break';
+            const pg = document.createElement('div');
+            pg.className = 'page-break';
             const cdiv = document.createElement('div');
             cdiv.className = 'overall-chart chart-container';
             pg.appendChild(cdiv);
             out.appendChild(pg);
-            createBarChartIn(cdiv, `Global (${secName})`, computeAverages(numeric,labelMap,orderMap));
+            createBarChartIn(cdiv,`Global (${secName})`,computeAverages(numeric,labelMap,orderMap));
           }
 
-          // Per‑turma charts in 2×2 grid
+          // Per‑turma in 2×2
           const byT = Object.entries(groupBy(numeric,'turma'));
           for (let i = 0; i < byT.length; i += 4) {
             const grid = document.createElement('div');
@@ -281,19 +285,19 @@
             out.appendChild(grid);
           }
 
-          // Open‑ended responses
+          // Open‑ended
           const textRows = rowsAll.filter(d=>
-            String(d.section||'').toLowerCase().includes(sec) &&
-            isNaN(parseFloat(d.value)) &&
+            String(d.section||'').toLowerCase().includes(sec)&&
+            isNaN(parseFloat(d.value))&&
             (f.textQuestions||[]).includes(d.question)
           );
-          renderTextQuestions(textRows, out);
+          renderTextQuestions(textRows,out);
         }
       }
 
       // Auto‑print if requested
-      if (new URLSearchParams(location.search).get('download') === 'true') {
-        setTimeout(()=>window.print(), 500);
+      if (new URLSearchParams(location.search).get('download')==='true') {
+        setTimeout(()=>window.print(),500);
       }
     }
 

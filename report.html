@@ -3,7 +3,6 @@
 <head>
   <meta charset="UTF-8" />
   <title>Training Report</title>
-  <!-- Prevent caching -->
   <meta http-equiv="Cache-Control" content="no-store, no-cache, must-revalidate" />
   <meta http-equiv="Pragma" content="no-cache" />
   <meta http-equiv="Expires" content="0" />
@@ -11,7 +10,8 @@
   <script src="https://cdn.jsdelivr.net/npm/echarts@5"></script>
   <style>
     body { margin:0; padding:0; font-family:'Segoe UI',sans-serif; background:#fff; color:#333; }
-    /* Top header */
+
+    /* Header */
     .page-header {
       display:flex; align-items:center; padding:20px 30px;
     }
@@ -77,7 +77,7 @@
 </head>
 <body>
 
-  <!-- Top header -->
+  <!-- Header with logo -->
   <div class="page-header">
     <img src="mind4time-logo.png" alt="MIND4TIME" />
     <div class="line"></div>
@@ -86,10 +86,7 @@
   <div id="reportContent"></div>
 
   <script>
-    //
-    // 1) Helper functions
-    //
-
+    // 1) Helpers
     function createLabelMap(labels) {
       const m = {};
       labels.forEach(l => {
@@ -121,8 +118,8 @@
         (groups[question] ||= []).push(+value);
       });
       const out = Object.entries(groups).map(([q, vals]) => {
-        const avg = vals.reduce((a,b)=>a+b,0) / vals.length;
-        return { question: q, label: labelMap[q]||q, avg: +avg.toFixed(1) };
+        const avg = vals.reduce((a,b)=>a+b,0)/vals.length;
+        return { question:q, label:labelMap[q]||q, avg:+avg.toFixed(1) };
       });
       out.sort((a,b)=>(orderMap[a.question]||0) - (orderMap[b.question]||0));
       return out;
@@ -141,18 +138,13 @@
           type:'bar',
           data:data.map(d=>d.avg),
           label:{ show:true, position:'top', formatter:'{c}' },
-          itemStyle:{ color(params) {
-            const v = params.value;
-            if (v < 3) return '#d94e5d';
-            if (v < 4) return '#f2c037';
-            return '#61c277';
-          }}
+          itemStyle:{ color(p){ const v=p.value; if(v<3)return'#d94e5d'; if(v<4)return'#f2c037'; return'#61c277'; }}
         }]
       });
     }
 
     function renderTextQuestions(rows, container) {
-      const byQ = groupBy(rows, 'question');
+      const byQ = groupBy(rows,'question');
       Object.entries(byQ).forEach(([q, answers]) => {
         const box = document.createElement('div');
         box.className = 'text-question';
@@ -173,30 +165,25 @@
 
     function getExtremeDate(rows, sectionKey, mode) {
       const dates = rows
-        .filter(d => String(d.section||'').toLowerCase().includes(sectionKey))
-        .map(d => new Date(d.date || d.submitted_at));
-      if (!dates.length) return null;
+        .filter(d=>String(d.section||'').toLowerCase().includes(sectionKey))
+        .map(d=>new Date(d.date||d.submitted_at));
+      if(!dates.length) return null;
       return mode==='min'
         ? new Date(Math.min(...dates))
         : new Date(Math.max(...dates));
     }
 
     function formatMonthYear(dt) {
-      if (!dt) return 'N/A';
+      if(!dt) return 'N/A';
       return dt.toLocaleDateString('pt-PT',{ month:'long', year:'numeric' });
     }
 
     function formatMonthYearString(s) {
       const [y,m] = s.split('-').map(Number);
-      return new Date(y, m-1, 1)
-        .toLocaleDateString('pt-PT',{ month:'long', year:'numeric' });
+      return new Date(y,m-1,1).toLocaleDateString('pt-PT',{ month:'long', year:'numeric' });
     }
 
-
-    //
     // 2) loadReport
-    //
-
     async function loadReport() {
       const filters = JSON.parse(localStorage.getItem('reportFilters')||'{}');
       const [data, meta] = await Promise.all([
@@ -209,22 +196,23 @@
       const container = document.getElementById('reportContent');
       container.innerHTML = '';
 
+      // Loop each selected program
       (filters.programs||[]).forEach(prog => {
-        // Program info
-        const progMeta = meta.titles.find(t=>t.program_id===prog) || {};
-        const rowsAll = data.filter(d=>
-          d.client===filters.client &&
+        const progMeta = meta.titles.find(t=>t.program_id===prog)||{};
+        const rowsAll = data.filter(d =>
+          (filters.clients||[]).includes(d.client) &&
           d.program===prog &&
           (filters.turmas||[]).includes(d.turma)
         );
 
+        // Compute scope & trainer
         const start = filters.start
           ? formatMonthYearString(filters.start)
           : formatMonthYear(getExtremeDate(rowsAll,'assessment','min'));
         const end   = filters.end
           ? formatMonthYearString(filters.end)
           : formatMonthYear(getExtremeDate(rowsAll,'evaluation','max'));
-        const trainer = filters.trainer || 'N/A';
+        const trainer = filters.trainer||'N/A';
 
         // Hero
         const hero = document.createElement('div');
@@ -266,17 +254,17 @@
           container.appendChild(hdr);
 
           // Numeric only
-          const rows = rowsAll.filter(d=>
+          const rows = rowsAll.filter(d =>
             String(d.section||'').toLowerCase().includes(key) &&
             /^-?\d+(\.\d+)?$/.test(String(d.value||'').trim())
           );
 
-          if ((filters.turmas||[]).length>1 && rows.length) {
+          if((filters.turmas||[]).length>1 && rows.length) {
             createBarChart(`Global (${secName})`, computeAverages(rows,labelMap,sortMap), container);
           }
 
           const byTurma = groupBy(rows,'turma');
-          Object.entries(byTurma).forEach(([turma, vals]) => {
+          Object.entries(byTurma).forEach(([turma,vals])=>{
             const tdiv = document.createElement('div');
             tdiv.className = 'turma-title';
             tdiv.textContent = `Turma: ${turma}`;
@@ -285,7 +273,7 @@
           });
 
           // Open‑ended
-          const textRows = rowsAll.filter(d=>
+          const textRows = rowsAll.filter(d =>
             String(d.section||'').toLowerCase().includes(key) &&
             !/^-?\d+(\.\d+)?$/.test(String(d.value||'').trim()) &&
             (filters.textQuestions||[]).includes(d.question)
@@ -295,10 +283,7 @@
       });
     }
 
-    //
     // 3) Kick off
-    //
-
     document.addEventListener('DOMContentLoaded', loadReport);
   </script>
 </body>

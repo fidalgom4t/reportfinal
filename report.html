@@ -6,10 +6,16 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <script src="https://cdn.jsdelivr.net/npm/echarts@5/dist/echarts.min.js"></script>
   <style>
-    /* — Print: landscape, no mid‑box splits — */
-    @page { size: landscape; margin: 0; }
+    /* === Force US‑Letter landscape === */
+    @page {
+      size: 11in 8.5in;
+      margin: 0;
+    }
     @media print {
-      .hero-page, .page-break { page-break-after: always; }
+      .hero-page,
+      .page-break {
+        page-break-after: always;
+      }
       .overall-chart,
       .chart-grid-page,
       .chart-container,
@@ -20,14 +26,13 @@
       }
     }
 
-    /* — Hero‑page styling — */
+    /* === Hero slide styling === */
     .hero-page {
       position: relative;
       width: 100vw; height: 100vh;
       background: url('hourglass-bg.jpg') center/cover no-repeat;
-      display: flex; flex-direction: column;
-      align-items: center; justify-content: center;
-      color: #fff; text-align: center;
+      display: flex; align-items: center; justify-content: center;
+      text-align: center; color: #fff;
     }
     .hero-page::before {
       content: '';
@@ -39,8 +44,7 @@
     }
     .hero-content small {
       display: block; font-style: italic;
-      color: #e0f2f3; margin-bottom: 8px;
-      font-size: 1.2rem;
+      color: #e0f2f3; margin-bottom: 8px; font-size:1.2rem;
     }
     .hero-content h1 {
       font-size: 4rem; margin: 0; font-weight: 600;
@@ -49,26 +53,25 @@
       font-size: 1.8rem; margin-top: 12px;
     }
     .hero-content .meta {
-      margin-top: 24px;
+      margin-top: 24px; display: flex;
+      justify-content: center; gap: 40px;
       font-size: 1.2rem;
-      display: flex; justify-content: center;
-      gap: 40px;
     }
     .hero-content .meta div span {
-      display: block; font-style: italic; color: #e0f2f3; font-size:1rem;
+      display: block; font-style: italic; color:#e0f2f3;
     }
     .hero-content .meta div strong {
       color: #fff; font-weight: 600;
     }
 
-    /* — Shared grid for turma charts — */
+    /* === Shared grid for turma charts === */
     .chart-grid-page {
       display: grid;
       grid-template: 1fr 1fr / 1fr 1fr;
-      gap: 20px; padding:20px; box-sizing:border-box;
+      gap: 20px; padding: 20px; box-sizing: border-box;
     }
 
-    /* — Section banner — */
+    /* === Section banner === */
     .section-banner {
       background: #f0f8f9;
       padding: 40px 24px;
@@ -80,10 +83,11 @@
       font-size: 48px; color: #007c91;
     }
     .section-banner .section-meta {
-      display: flex; gap: 40px; font-size: 18px; color: #555;
+      display: flex; gap: 40px;
+      font-size: 18px; color: #555;
     }
 
-    /* — Charts & open‑ended — */
+    /* === Charts & open‑ended === */
     #reportContent { padding-bottom: 30px; }
     .overall-chart {
       width: 90vw; margin: auto; height: 400px;
@@ -95,7 +99,7 @@
       border: 1px solid #007c91;
       border-left: 6px solid #007c91;
       padding: 16px; margin: 20px auto 40px;
-      background: #f9f9f9; width: 90vw; box-sizing: border-box;
+      background: #f9f9f9; width: 90vw; box-sizing:border-box;
     }
     .text-question-title {
       font-weight: bold; margin-bottom: 8px;
@@ -130,81 +134,52 @@
     }
     function computeAverages(rows, labelMap, orderMap) {
       const groups = {};
-      rows.forEach(({question, value})=>(groups[question]||(groups[question]=[])).push(+value));
+      rows.forEach(({question,value})=>(groups[question]||(groups[question]=[])).push(+value));
       return Object.entries(groups)
         .map(([q,vals])=>{
-          const avg = vals.reduce((a,b)=>a+b,0)/vals.length;
+          const avg=vals.reduce((a,b)=>a+b,0)/vals.length;
           return { question:q, label:labelMap[q]||q, avg:+avg.toFixed(1) };
         })
         .sort((a,b)=>(orderMap[a.question]||0)-(orderMap[b.question]||0));
     }
 
-    // — Updated chart function with grid.bottom & axisLabel gap —
+    // — Chart with extra bottom space for labels —
     function createBarChartIn(div, title, data) {
       const chart = echarts.init(div);
       chart.setOption({
-        title: {
-          text: title,
-          left: 'center',
-          textStyle: { fontSize: 18 }
-        },
-        grid: {
-          top: 60,
-          left: '10%',
-          right: '10%',
-          bottom: 80
-        },
-        tooltip: {},
-        xAxis: {
-          type: 'category',
-          data: data.map(d=>d.label),
-          axisLabel: {
-            rotate: 30,
-            interval: 0,
-            formatter: val => val,
-            rich: { height: 40 }
+        title:{ text:title, left:'center', textStyle:{ fontSize:18 } },
+        grid: { top:60, left:'10%', right:'10%', bottom:80 },
+        tooltip:{},
+        xAxis:{
+          type:'category',
+          data:data.map(d=>d.label),
+          axisLabel:{
+            rotate:30,
+            interval:0,
+            formatter:val=>val,
+            rich:{ height:40 }
           }
         },
-        yAxis: {
-          type: 'value',
-          min: 0,
-          max: 5
-        },
-        series: [{
-          type: 'bar',
-          data: data.map(d=>d.avg),
-          label: {
-            show: true,
-            position: 'top',
-            formatter: '{c}'
-          },
-          itemStyle: {
-            color(p) {
-              const v = p.value;
-              if (v < 3) return '#d94e5d';
-              if (v < 4) return '#f2c037';
-              return '#61c277';
-            }
-          }
+        yAxis:{ type:'value', min:0, max:5 },
+        series:[{
+          type:'bar', data:data.map(d=>d.avg),
+          label:{ show:true, position:'top', formatter:'{c}' },
+          itemStyle:{ color(p){ const v=p.value; if(v<3)return'#d94e5d'; if(v<4)return'#f2c037'; return'#61c277'; }}
         }]
       });
       chart.resize();
-      setTimeout(()=>chart.resize(), 300);
+      setTimeout(()=>chart.resize(),300);
     }
 
     function renderTextQuestions(rows, container) {
-      const byQ = groupBy(rows, 'question');
-      Object.entries(byQ).forEach(([q, answers])=>{
-        const box = document.createElement('div');
-        box.className = 'text-question';
-        const h = document.createElement('div');
-        h.className = 'text-question-title';
-        h.textContent = q;
+      const byQ = groupBy(rows,'question');
+      Object.entries(byQ).forEach(([q,answers])=>{
+        const box = document.createElement('div'); box.className='text-question';
+        const h = document.createElement('div'); h.className='text-question-title'; h.textContent=q;
         box.appendChild(h);
         const ul = document.createElement('ul');
         answers.forEach(a=>{
-          const li = document.createElement('li');
-          li.textContent = a.value;
+          const li=document.createElement('li'); li.textContent=a.value;
           ul.appendChild(li);
         });
         box.appendChild(ul);
@@ -238,10 +213,9 @@
           (f.turmas||[]).includes(d.turma)
         );
 
-        // ─ Hero Page ─
+        // ─ Hero slide ─
         const pm = meta.titles.find(t=>t.program_id===prog)||{};
-        const hero = document.createElement('div');
-        hero.className = 'hero-page';
+        const hero = document.createElement('div'); hero.className='hero-page';
         hero.innerHTML = `
           <div class="hero-content">
             <small>${pm.SUBTÍTULO||''}</small>
@@ -260,8 +234,7 @@
           const uniq = countUnique(rowsAll,sec);
 
           // Banner
-          const sb = document.createElement('div');
-          sb.className = 'section-banner';
+          const sb = document.createElement('div'); sb.className='section-banner';
           sb.innerHTML = `
             <h1>${secName}</h1>
             <div class="section-meta">
@@ -283,11 +256,11 @@
             createBarChartIn(cdiv, `Global (${secName})`, computeAverages(numeric,labelMap,orderMap));
           }
 
-          // Per‑turma 2×2 grid
+          // Per‑turma 2×2
           const byT = Object.entries(groupBy(numeric,'turma'));
           for (let i=0; i<byT.length; i+=4) {
             const grid = document.createElement('div'); grid.className='chart-grid-page';
-            byT.slice(i,i+4).forEach(([tm, vals])=>{
+            byT.slice(i,i+4).forEach(([tm,vals])=>{
               const cc = document.createElement('div'); cc.className='chart-container';
               grid.appendChild(cc);
               createBarChartIn(cc, tm, computeAverages(vals,labelMap,orderMap));
@@ -305,7 +278,6 @@
         }
       }
 
-      // Auto-print?
       if (new URLSearchParams(location.search).get('download')==='true') {
         setTimeout(()=>window.print(),500);
       }

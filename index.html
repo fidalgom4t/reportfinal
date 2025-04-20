@@ -54,7 +54,6 @@
       cursor: pointer;
     }
 
-    /* Trainer & scope inputs */
     select,input { padding:5px; margin-top:5px; width:320px }
     .link-button {
       display:inline-block; margin-top:20px; padding:10px 20px;
@@ -71,7 +70,7 @@
   <div class="filter-group">
     <label>Cliente:</label>
     <div class="dropdown-multiselect" id="clientWrapper">
-      <div class="select-box" onclick="toggleDropdown('clientWrapper')">Selecionar cliente(s)</div>
+      <div class="select-box" data-placeholder="Selecionar cliente(s)" onclick="toggleDropdown('clientWrapper')">Selecionar cliente(s)</div>
       <div class="checkboxes" id="clientChecks"></div>
     </div>
   </div>
@@ -80,7 +79,7 @@
   <div class="filter-group">
     <label>Programas:</label>
     <div class="dropdown-multiselect" id="programWrapper">
-      <div class="select-box" onclick="toggleDropdown('programWrapper')">Selecionar programa(s)</div>
+      <div class="select-box" data-placeholder="Selecionar programa(s)" onclick="toggleDropdown('programWrapper')">Selecionar programa(s)</div>
       <div class="checkboxes" id="programChecks"></div>
     </div>
   </div>
@@ -89,7 +88,7 @@
   <div class="filter-group">
     <label>Turmas:</label>
     <div class="dropdown-multiselect" id="turmaWrapper">
-      <div class="select-box" onclick="toggleDropdown('turmaWrapper')">Selecionar turma(s)</div>
+      <div class="select-box" data-placeholder="Selecionar turma(s)" onclick="toggleDropdown('turmaWrapper')">Selecionar turma(s)</div>
       <div class="checkboxes" id="turmaChecks"></div>
     </div>
   </div>
@@ -104,7 +103,7 @@
   <div class="filter-group">
     <label>Perguntas Abertas:</label>
     <div class="dropdown-multiselect" id="textWrapper">
-      <div class="select-box" onclick="toggleDropdown('textWrapper')">Selecionar perguntas</div>
+      <div class="select-box" data-placeholder="Selecionar perguntas" onclick="toggleDropdown('textWrapper')">Selecionar perguntas</div>
       <div class="checkboxes" id="textQuestionSelect"></div>
     </div>
   </div>
@@ -119,7 +118,6 @@
 
   <a class="link-button" onclick="goToReport()">Ver Relatório</a>
 
-
   <script>
     let rawData = [];
 
@@ -129,12 +127,6 @@
         rawData = data;
         initFilters();
       });
-
-    function initFilters() {
-      populateClients();
-      syncTrainer();
-      syncScope();
-    }
 
     function toggleDropdown(wrapperId) {
       document.getElementById(wrapperId).classList.toggle('open');
@@ -149,7 +141,10 @@
         cb.type    = 'checkbox';
         cb.value   = val;
         cb.checked = stored.includes(val);
-        cb.onchange = onChange;
+        cb.onchange = () => {
+          onChange();
+          updateSelectBoxText(containerId);
+        };
         lbl.appendChild(cb);
         lbl.appendChild(document.createTextNode(' ' + val));
         container.appendChild(lbl);
@@ -158,100 +153,102 @@
     }
 
     function updateSelectBoxText(containerId) {
-      const wrapper = {
+      const map = {
         clientChecks: 'clientWrapper',
         programChecks: 'programWrapper',
         turmaChecks: 'turmaWrapper',
         textQuestionSelect: 'textWrapper'
-      }[containerId];
+      };
+      const wrapper = map[containerId];
       const box = document.querySelector(`#${wrapper} .select-box`);
-      const checked = Array.from(
-        document.getElementById(containerId).querySelectorAll('input:checked')
-      ).map(i => i.value);
+      const checked = Array.from(document.getElementById(containerId).querySelectorAll('input:checked'))
+        .map(i => i.value);
       box.textContent = checked.length
         ? checked.join(', ')
-        : box.getAttribute('data-placeholder') || box.textContent;
+        : box.getAttribute('data-placeholder');
     }
 
-    // CLIENTES
-    function populateClients() {
+    function getChecked(containerId) {
+      return Array.from(document.getElementById(containerId).querySelectorAll('input:checked'))
+        .map(i => i.value);
+    }
+
+    function setFilter(key, val) {
+      const s = JSON.parse(localStorage.getItem('filters')||'{}');
+      s[key] = val;
+      localStorage.setItem('filters', JSON.stringify(s));
+    }
+    function getFilter(key) {
+      return JSON.parse(localStorage.getItem('filters')||'{}')[key] || [];
+    }
+
+    function initFilters() {
+      // CLIENTES
       const clients = [...new Set(rawData.map(d=>d.client))].sort();
-      const stored = get('clients')||[];
-      fillChecks('clientChecks', clients, stored, () => {
-        set('clients', getChecked('clientChecks'));
+      const storedClients = getFilter('clients');
+      fillChecks('clientChecks', clients, storedClients, () => {
+        setFilter('clients', getChecked('clientChecks'));
         populatePrograms();
       });
+
+      // then programs, turmas, questions
+      populatePrograms();
+      syncTrainer();
+      syncScope();
     }
 
-    // PROGRAMAS
     function populatePrograms() {
-      const clients = get('clients')||[];
+      const clients = getFilter('clients');
       const progs = [...new Set(rawData.filter(d=>clients.includes(d.client)).map(d=>d.program))].sort();
-      const stored = get('programs')||[];
-      fillChecks('programChecks', progs, stored, () => {
-        set('programs', getChecked('programChecks'));
+      const storedProgs = getFilter('programs');
+      fillChecks('programChecks', progs, storedProgs, () => {
+        setFilter('programs', getChecked('programChecks'));
         populateTurmas();
       });
+      populateTurmas();
     }
 
-    // TURMAS
     function populateTurmas() {
-      const clients = get('clients')||[];
-      const progs = get('programs')||[];
+      const clients = getFilter('clients');
+      const progs   = getFilter('programs');
       const turmas = [...new Set(rawData
         .filter(d=>clients.includes(d.client)&&progs.includes(d.program))
         .map(d=>d.turma)
       )].sort();
-      const stored = get('turmas')||[];
-      fillChecks('turmaChecks', turmas, stored, () => {
-        set('turmas', getChecked('turmaChecks'));
+      const storedTurmas = getFilter('turmas');
+      fillChecks('turmaChecks', turmas, storedTurmas, () => {
+        setFilter('turmas', getChecked('turmaChecks'));
       });
       populateTextQs();
     }
 
-    // TEXT QUESTIONS
     function populateTextQs() {
-      const clients = get('clients')||[];
-      const progs = get('programs')||[];
-      const turmas = get('turmas')||[];
+      const clients  = getFilter('clients');
+      const progs    = getFilter('programs');
+      const turmas   = getFilter('turmas');
       const qs = [...new Set(rawData
         .filter(d=>clients.includes(d.client)&&progs.includes(d.program)&&turmas.includes(d.turma)&&isNaN(+d.value))
         .map(d=>d.question)
       )].sort();
-      const stored = get('textQuestions')||[];
-      fillChecks('textQuestionSelect', qs, stored, () => {
-        set('textQuestions', getChecked('textQuestionSelect'));
+      const storedQs = getFilter('textQuestions');
+      fillChecks('textQuestionSelect', qs, storedQs, () => {
+        setFilter('textQuestions', getChecked('textQuestionSelect'));
       });
     }
 
-    // TRAINER
     function syncTrainer() {
       const inp = document.getElementById('trainerInput');
-      inp.value = get('trainer')||'';
-      inp.oninput = () => set('trainer', inp.value);
+      inp.value = JSON.parse(localStorage.getItem('filters')||'{}').trainer || '';
+      inp.oninput = () => setFilter('trainer', inp.value);
     }
 
-    // SCOPE
     function syncScope() {
-      const s = get('start'), e = get('end');
-      if(s) document.getElementById('startMonthInput').value = s;
-      if(e) document.getElementById('endMonthInput').value   = e;
-      document.getElementById('startMonthInput').onchange = ev => set('start', ev.target.value);
-      document.getElementById('endMonthInput').onchange   = ev => set('end',   ev.target.value);
-    }
-
-    // LocalStorage helpers
-    function get(key) {
-      return JSON.parse(localStorage.getItem('filters')||'{}')[key]||[];
-    }
-    function set(key,val) {
-      const f = JSON.parse(localStorage.getItem('filters')||'{}');
-      f[key] = val;
-      localStorage.setItem('filters', JSON.stringify(f));
-    }
-    function getChecked(containerId) {
-      return Array.from(document.getElementById(containerId).querySelectorAll('input:checked'))
-        .map(i=>i.value);
+      const sVal = JSON.parse(localStorage.getItem('filters')||'{}').start;
+      const eVal = JSON.parse(localStorage.getItem('filters')||'{}').end;
+      if (sVal) document.getElementById('startMonthInput').value = sVal;
+      if (eVal) document.getElementById('endMonthInput').value   = eVal;
+      document.getElementById('startMonthInput').onchange = ev => setFilter('start', ev.target.value);
+      document.getElementById('endMonthInput').onchange   = ev => setFilter('end',   ev.target.value);
     }
 
     function goToReport() {

@@ -6,16 +6,13 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <script src="https://cdn.jsdelivr.net/npm/echarts@5/dist/echarts.min.js"></script>
   <style>
-    /* === Force US‑Letter landscape === */
+    /* === US‑Letter landscape === */
     @page {
       size: 11in 8.5in;
       margin: 0;
     }
     @media print {
-      .hero-page,
-      .page-break {
-        page-break-after: always;
-      }
+      .hero-page, .page-break { page-break-after: always; }
       .overall-chart,
       .chart-grid-page,
       .chart-container,
@@ -26,86 +23,73 @@
       }
     }
 
-    /* === Hero slide styling === */
+    /* === Hero slide === */
     .hero-page {
-      position: relative;
-      width: 100vw; height: 100vh;
+      position: relative; width:100vw; height:100vh;
       background: url('hourglass-bg.jpg') center/cover no-repeat;
-      display: flex; align-items: center; justify-content: center;
-      text-align: center; color: #fff;
+      display:flex; align-items:center; justify-content:center;
+      color:#fff; text-align:center;
     }
     .hero-page::before {
-      content: '';
-      position: absolute; inset: 0;
+      content:''; position:absolute; inset:0;
       background: rgba(0,124,145,0.6);
     }
     .hero-content {
-      position: relative; z-index: 1; max-width: 80%;
+      position:relative; z-index:1; max-width:80%;
     }
     .hero-content small {
-      display: block; font-style: italic;
-      color: #e0f2f3; margin-bottom: 8px; font-size:1.2rem;
+      display:block; font-style:italic; color:#e0f2f3;
+      margin-bottom:8px; font-size:1.2rem;
     }
     .hero-content h1 {
-      font-size: 4rem; margin: 0; font-weight: 600;
+      font-size:4rem; margin:0; font-weight:600;
     }
     .hero-content .subtitle {
-      font-size: 1.8rem; margin-top: 12px;
+      font-size:1.8rem; margin-top:12px;
     }
     .hero-content .meta {
-      margin-top: 24px; display: flex;
-      justify-content: center; gap: 40px;
-      font-size: 1.2rem;
+      margin-top:24px; display:flex; gap:40px;
+      justify-content:center; font-size:1.2rem;
     }
     .hero-content .meta div span {
-      display: block; font-style: italic; color:#e0f2f3;
+      display:block; font-style:italic; color:#e0f2f3;
     }
     .hero-content .meta div strong {
-      color: #fff; font-weight: 600;
+      color:#fff; font-weight:600;
     }
 
-    /* === Shared grid for turma charts === */
+    /* === Shared turma grid === */
     .chart-grid-page {
-      display: grid;
-      grid-template: 1fr 1fr / 1fr 1fr;
-      gap: 20px; padding: 20px; box-sizing: border-box;
+      display:grid; grid-template:1fr 1fr / 1fr 1fr;
+      gap:20px; padding:20px; box-sizing:border-box;
     }
 
     /* === Section banner === */
     .section-banner {
-      background: #f0f8f9;
-      padding: 40px 24px;
-      margin: 40px 30px 20px;
-      border-left: 6px solid #007c91;
+      background:#f0f8f9; padding:40px 24px; margin:40px 30px 20px;
+      border-left:6px solid #007c91;
     }
     .section-banner h1 {
-      margin: 0 0 16px;
-      font-size: 48px; color: #007c91;
+      margin:0 0 16px; font-size:48px; color:#007c91;
     }
     .section-banner .section-meta {
-      display: flex; gap: 40px;
-      font-size: 18px; color: #555;
+      display:flex; gap:40px; font-size:18px; color:#555;
     }
 
-    /* === Charts & open‑ended === */
-    #reportContent { padding-bottom: 30px; }
-    .overall-chart {
-      width: 90vw; margin: auto; height: 400px;
-    }
-    .chart-container {
-      width: 100%; height: 300px;
-    }
+    /* === Charts & text === */
+    #reportContent { padding-bottom:30px; }
+    .overall-chart { width:90vw; margin:auto; height:400px; }
+    .chart-container { width:100%; height:300px; }
     .text-question {
-      border: 1px solid #007c91;
-      border-left: 6px solid #007c91;
-      padding: 16px; margin: 20px auto 40px;
-      background: #f9f9f9; width: 90vw; box-sizing:border-box;
+      border:1px solid #007c91; border-left:6px solid #007c91;
+      padding:16px; margin:20px auto 40px;
+      background:#f9f9f9; width:90vw; box-sizing:border-box;
     }
     .text-question-title {
-      font-weight: bold; margin-bottom: 8px;
-      font-size: 18px; color: #007c91;
+      font-weight:bold; margin-bottom:8px;
+      font-size:18px; color:#007c91;
     }
-    ul { padding-left: 20px; font-size: 16px; }
+    ul { padding-left:20px; font-size:16px; }
   </style>
 </head>
 <body>
@@ -137,76 +121,63 @@
       rows.forEach(({question,value})=>(groups[question]||(groups[question]=[])).push(+value));
       return Object.entries(groups)
         .map(([q,vals])=>{
-          const avg=vals.reduce((a,b)=>a+b,0)/vals.length;
+          const avg = vals.reduce((a,b)=>a+b,0)/vals.length;
           return { question:q, label:labelMap[q]||q, avg:+avg.toFixed(1) };
         })
         .sort((a,b)=>(orderMap[a.question]||0)-(orderMap[b.question]||0));
     }
-
-    // — Chart with extra bottom space for labels —
-    function createBarChartIn(div, title, data) {
+    function createBarChartIn(div,title,data){
       const chart = echarts.init(div);
       chart.setOption({
-        title:{ text:title, left:'center', textStyle:{ fontSize:18 } },
-        grid: { top:60, left:'10%', right:'10%', bottom:80 },
+        title:{ text:title,left:'center',textStyle:{fontSize:18} },
+        grid:{ top:60,left:'10%',right:'10%',bottom:80 },
         tooltip:{},
         xAxis:{
           type:'category',
           data:data.map(d=>d.label),
-          axisLabel:{
-            rotate:30,
-            interval:0,
-            formatter:val=>val,
-            rich:{ height:40 }
-          }
+          axisLabel:{ rotate:30,interval:0,formatter:val=>val,rich:{height:40} }
         },
-        yAxis:{ type:'value', min:0, max:5 },
+        yAxis:{ type:'value',min:0,max:5 },
         series:[{
           type:'bar', data:data.map(d=>d.avg),
           label:{ show:true, position:'top', formatter:'{c}' },
           itemStyle:{ color(p){ const v=p.value; if(v<3)return'#d94e5d'; if(v<4)return'#f2c037'; return'#61c277'; }}
         }]
       });
-      chart.resize();
-      setTimeout(()=>chart.resize(),300);
+      chart.resize(); setTimeout(()=>chart.resize(),300);
     }
-
-    function renderTextQuestions(rows, container) {
-      const byQ = groupBy(rows,'question');
+    function renderTextQuestions(rows,container){
+      const byQ=groupBy(rows,'question');
       Object.entries(byQ).forEach(([q,answers])=>{
-        const box = document.createElement('div'); box.className='text-question';
-        const h = document.createElement('div'); h.className='text-question-title'; h.textContent=q;
+        const box=document.createElement('div'); box.className='text-question';
+        const h=document.createElement('div'); h.className='text-question-title'; h.textContent=q;
         box.appendChild(h);
-        const ul = document.createElement('ul');
-        answers.forEach(a=>{
-          const li=document.createElement('li'); li.textContent=a.value;
-          ul.appendChild(li);
-        });
+        const ul=document.createElement('ul');
+        answers.forEach(a=>{ const li=document.createElement('li'); li.textContent=a.value; ul.appendChild(li) });
         box.appendChild(ul);
         container.appendChild(box);
       });
     }
-
-    function countUnique(rows, sec) {
+    function countUnique(rows,sec){
       return new Set(
         rows.filter(d=>String(d.section||'').toLowerCase().includes(sec))
             .map(d=>d.respondent_id||d.id)
       ).size;
     }
 
-    // — Main render —
-    async function loadReport() {
+    // — Main —
+    async function loadReport(){
       const f = JSON.parse(localStorage.getItem('reportFilters')||'{}');
-      const [data, meta] = await Promise.all([
+      const [data,meta] = await Promise.all([
         fetch('data.json').then(r=>r.json()),
         fetch('meta.json').then(r=>r.json())
       ]);
       const labelMap = createLabelMap(meta.labels),
             orderMap = createSortMap(meta.labels),
             out = document.getElementById('reportContent');
-      out.innerHTML = '';
+      out.innerHTML='';
 
-      for (const prog of f.programs||[]) {
+      for(const prog of f.programs||[]){
         const rowsAll = data.filter(d=>
           (f.clients||[]).includes(d.client)&&
           d.program===prog&&
@@ -216,7 +187,7 @@
         // ─ Hero slide ─
         const pm = meta.titles.find(t=>t.program_id===prog)||{};
         const hero = document.createElement('div'); hero.className='hero-page';
-        hero.innerHTML = `
+        hero.innerHTML=`
           <div class="hero-content">
             <small>${pm.SUBTÍTULO||''}</small>
             <h1>${pm.TÍTULO||prog}</h1>
@@ -229,18 +200,9 @@
         out.appendChild(hero);
 
         // ─ Sections ─
-        for (const sec of ['assessment','evaluation']) {
+        for(const sec of ['assessment','evaluation']){
           const secName = sec==='assessment'?'Assessment':'Avaliação do Programa';
           const uniq = countUnique(rowsAll,sec);
-
-          // Banner
-          const sb = document.createElement('div'); sb.className='section-banner';
-          sb.innerHTML = `
-            <h1>${secName}</h1>
-            <div class="section-meta">
-              <div><span>Total de respostas:</span><strong>${uniq}</strong></div>
-            </div>`;
-          out.appendChild(sb);
 
           // Numeric answers
           const numeric = rowsAll.filter(d=>
@@ -248,20 +210,41 @@
             !isNaN(parseFloat(d.value))
           );
 
-          // Overall chart (own page)
-          if (numeric.length) {
+          // If we have numeric data, create a dedicated
+          // page containing both banner & global chart:
+          if(numeric.length){
             const pg = document.createElement('div'); pg.className='page-break';
-            const cdiv = document.createElement('div'); cdiv.className='overall-chart chart-container';
-            pg.appendChild(cdiv); out.appendChild(pg);
-            createBarChartIn(cdiv, `Global (${secName})`, computeAverages(numeric,labelMap,orderMap));
+            // banner
+            const sb = document.createElement('div'); sb.className='section-banner';
+            sb.innerHTML=`
+              <h1>${secName}</h1>
+              <div class="section-meta">
+                <div><span>Total de respostas:</span><strong>${uniq}</strong></div>
+              </div>`;
+            pg.appendChild(sb);
+            // overall chart
+            const cdiv = document.createElement('div');
+            cdiv.className='overall-chart chart-container';
+            pg.appendChild(cdiv);
+            createBarChartIn(cdiv,`Global (${secName})`,computeAverages(numeric,labelMap,orderMap));
+            out.appendChild(pg);
+          } else {
+            // otherwise just banner
+            const sb = document.createElement('div'); sb.className='section-banner';
+            sb.innerHTML=`
+              <h1>${secName}</h1>
+              <div class="section-meta">
+                <div><span>Total de respostas:</span><strong>${uniq}</strong></div>
+              </div>`;
+            out.appendChild(sb);
           }
 
-          // Per‑turma 2×2
+          // Per‑turma 2×2 grid
           const byT = Object.entries(groupBy(numeric,'turma'));
-          for (let i=0; i<byT.length; i+=4) {
+          for(let i=0;i<byT.length;i+=4){
             const grid = document.createElement('div'); grid.className='chart-grid-page';
             byT.slice(i,i+4).forEach(([tm,vals])=>{
-              const cc = document.createElement('div'); cc.className='chart-container';
+              const cc=document.createElement('div'); cc.className='chart-container';
               grid.appendChild(cc);
               createBarChartIn(cc, tm, computeAverages(vals,labelMap,orderMap));
             });
@@ -278,11 +261,10 @@
         }
       }
 
-      if (new URLSearchParams(location.search).get('download')==='true') {
+      if(new URLSearchParams(location.search).get('download')==='true'){
         setTimeout(()=>window.print(),500);
       }
     }
-
     document.addEventListener('DOMContentLoaded', loadReport);
   </script>
 </body>

@@ -6,28 +6,20 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <script src="https://cdn.jsdelivr.net/npm/echarts@5/dist/echarts.min.js"></script>
   <style>
-    /* Print = landscape */
     @page { size: landscape; margin:0; }
-    @media print {
-      .page-break { page-break-after: always; }
-    }
+    @media print { .page-break { page-break-after: always; } }
 
-    /* 2×2 grid for turma charts (screen & print) */
     .chart-grid-page {
       display: grid;
       grid-template: 1fr 1fr / 1fr 1fr;
-      gap: 20px;
-      padding: 20px;
-      box-sizing: border-box;
+      gap: 20px; padding:20px; box-sizing: border-box;
     }
 
-    /* Screen styling */
-    body { margin:0; padding:0; font-family:'Segoe UI',sans-serif; background:#fff; color:#333; }
+    body { margin:0; padding:0; font-family:'Segoe UI',sans-serif; }
     .page-header { display:flex; align-items:center; padding:20px 30px; }
     .page-header img { height:40px }
-    .page-header .line { flex:1; height:1px; background:#40a3a3; margin-left:20px; }
+    .page-header .line { flex:1; height:1px; background:#40a3a3; margin-left:20px }
 
-    /* Program hero */
     .program-hero { padding:40px 30px; border-top:1px solid #eee; }
     .program-hero:first-child { border-top:none; }
     .hero-main { display:flex; align-items:center; margin-bottom:30px; }
@@ -35,13 +27,17 @@
     .hero-image img { max-width:100%; height:auto; }
     .hero-text { flex:1; text-align:center; }
     .hero-text .tagline { font-style:italic; color:#555; margin-bottom:8px; }
-    .hero-text .title { font-size:48px; color:#007c91; margin:0 0 8px; font-weight:600; }
+    .hero-text .title {
+      font-size:48px; color:#007c91; margin:0 0 8px; font-weight:600;
+    }
     .hero-text .subtitle { font-size:20px; color:#007c91; }
-    .hero-meta { display:flex; justify-content:center; gap:80px; font-size:16px; color:#555; }
+    .hero-meta {
+      display:flex; justify-content:center; gap:80px;
+      font-size:16px; color:#555;
+    }
     .hero-meta .label { font-style:italic; }
     .hero-meta .value { font-weight:bold; }
 
-    /* Section banner */
     .section-banner {
       background:#f0f8f9; padding:40px 24px; margin:40px 30px 20px;
       border-left:6px solid #007c91;
@@ -53,202 +49,200 @@
       display:flex; gap:40px; font-size:18px; color:#555;
     }
 
-    /* Charts & text */
     #reportContent { padding-bottom:30px; }
     .overall-chart { width:90vw; margin:auto; height:400px; }
     .chart-container { width:100%; height:300px; }
     .text-question {
       border:1px solid #007c91; border-left:6px solid #007c91;
-      padding:16px; margin:20px auto 40px;
-      background:#f9f9f9; width:90vw; box-sizing:border-box;
+      padding:16px; margin:20px auto 40px; background:#f9f9f9;
+      width:90vw; box-sizing:border-box;
     }
     .text-question-title {
-      font-weight:bold; margin-bottom:8px; font-size:18px; color:#007c91;
+      font-weight:bold; margin-bottom:8px;
+      font-size:18px; color:#007c91;
     }
     ul { padding-left:20px; font-size:16px; }
   </style>
 </head>
 <body>
   <div class="page-header">
-    <img src="mind4time-logo.png" alt="MIND4TIME" />
+    <img src="mind4time-logo.png" alt="MIND4TIME">
     <div class="line"></div>
   </div>
   <div id="reportContent"></div>
 
   <script>
-  // — Helpers —
-  function createLabelMap(labels) {
-    const m = {};
-    labels.forEach(l => {
-      const q = l.questionId || l["QUESTION ID"];
-      m[q] = l.label || l["LABEL"];
-    });
-    return m;
-  }
-  function createSortMap(labels) {
-    const m = {};
-    labels.forEach(l => {
-      const q = l.questionId || l["QUESTION ID"];
-      m[q] = +(l.sortOrder || l["SORT ORDER"] || l.sort_order);
-    });
-    return m;
-  }
-  function groupBy(arr, key) {
-    return arr.reduce((a,i)=>(a[i[key]]||(a[i[key]]=[])).push(i)&&a,{});
-  }
-  function computeAverages(rows, labelMap, orderMap) {
-    const groups = {};
-    rows.forEach(({question,value})=>{
-      (groups[question] ||= []).push(+value);
-    });
-    return Object.entries(groups)
-      .map(([q,vals])=>{
-        const avg = vals.reduce((a,b)=>a+b,0)/vals.length;
-        return { question:q, label:labelMap[q]||q, avg:+avg.toFixed(1) };
-      })
-      .sort((a,b)=>(orderMap[a.question]||0)-(orderMap[b.question]||0));
-  }
-  function createBarChartIn(div,title,data){
-    console.log("📊", title, data);
-    echarts.init(div).setOption({
-      title:{ text:title, left:'center', textStyle:{ fontSize:18 } },
-      tooltip:{},
-      xAxis:{ type:'category', data:data.map(d=>d.label), axisLabel:{ rotate:30 } },
-      yAxis:{ type:'value', min:0, max:5 },
-      series:[{
-        type:'bar', data:data.map(d=>d.avg),
-        label:{ show:true, position:'top', formatter:'{c}' },
-        itemStyle:{ color(p){ const v=p.value; if(v<3)return'#d94e5d'; if(v<4)return'#f2c037'; return'#61c277'; }}
-      }]
-    });
-  }
-  function renderTextQuestions(rows,container){
-    const byQ=groupBy(rows,'question');
-    Object.entries(byQ).forEach(([q,answers])=>{
-      const box=document.createElement('div'); box.className='text-question';
-      const h=document.createElement('div'); h.className='text-question-title'; h.textContent=q;
-      box.appendChild(h);
-      const ul=document.createElement('ul');
-      answers.forEach(a=>{
-        const li=document.createElement('li'); li.textContent=a.value;
-        ul.appendChild(li);
+    // helpers
+    function createLabelMap(labels) {
+      const m={};
+      labels.forEach(l=>{
+        const q=l.questionId||l["QUESTION ID"];
+        m[q]=l.label||l["LABEL"];
       });
-      box.appendChild(ul);
-      container.appendChild(box);
-    });
-  }
-  function countUnique(rows,sec){
-    return new Set(
-      rows.filter(d=>String(d.section||'').toLowerCase().includes(sec))
-          .map(d=>d.respondent_id||d.id)
-    ).size;
-  }
+      return m;
+    }
+    function createSortMap(labels) {
+      const m={};
+      labels.forEach(l=>{
+        const q=l.questionId||l["QUESTION ID"];
+        m[q]=+(l.sortOrder||l["SORT ORDER"]||l.sort_order);
+      });
+      return m;
+    }
+    function groupBy(arr,key){
+      return arr.reduce((a,i)=>(a[i[key]]||(a[i[key]]=[])).push(i)&&a,{});
+    }
+    function computeAverages(rows,labelMap,orderMap){
+      const g={};
+      rows.forEach(({question,value})=>(g[question]||(g[question]=[])).push(+value));
+      return Object.entries(g).map(([q,vals])=>{
+        const avg=vals.reduce((a,b)=>a+b,0)/vals.length;
+        return {question:q,label:labelMap[q]||q,avg:+avg.toFixed(1)};
+      }).sort((a,b)=>(orderMap[a.question]||0)-(orderMap[b.question]||0));
+    }
 
-  // — Main —
-  async function loadReport(){
-    console.log("🔍 Loading report...");
-    const f=JSON.parse(localStorage.getItem('reportFilters')||'{}');
-    const [data,meta]=await Promise.all([
-      fetch('data.json').then(r=>r.json()),
-      fetch('meta.json').then(r=>r.json())
-    ]);
-    console.log("▶️ Data loaded:", data.length, "rows;", meta.labels.length, "labels");
+    // the updated chart function that forces a resize
+    function createBarChartIn(div,title,data){
+      console.log("📊 Drawing", title, "into", div, "data:", data);
+      // log container size
+      console.log("   container size:", div.clientWidth+"×"+div.clientHeight);
+      const chart = echarts.init(div);
+      chart.setOption({
+        title:{ text:title, left:'center', textStyle:{ fontSize:18 } },
+        tooltip:{},
+        xAxis:{ type:'category', data:data.map(d=>d.label), axisLabel:{ rotate:30 } },
+        yAxis:{ type:'value', min:0, max:5 },
+        series:[{
+          type:'bar', data:data.map(d=>d.avg),
+          label:{ show:true, position:'top', formatter:'{c}' },
+          itemStyle:{ color(p){ const v=p.value; if(v<3)return'#d94e5d'; if(v<4)return'#f2c037'; return'#61c277'; }}
+        }]
+      });
+      chart.resize();
+      // also resize again after browser has had a tick
+      setTimeout(()=>chart.resize(),300);
+    }
 
-    const labelMap = createLabelMap(meta.labels),
-          orderMap = createSortMap(meta.labels),
-          out = document.getElementById('reportContent');
-    out.innerHTML='';
+    function renderTextQuestions(rows,container){
+      const byQ=groupBy(rows,'question');
+      Object.entries(byQ).forEach(([q,ans])=>{
+        const box=document.createElement('div'); box.className='text-question';
+        const hd=document.createElement('div'); hd.className='text-question-title'; hd.textContent=q;
+        box.appendChild(hd);
+        const ul=document.createElement('ul');
+        ans.forEach(a=>{const li=document.createElement('li'); li.textContent=a.value; ul.appendChild(li)});
+        box.appendChild(ul);
+        container.appendChild(box);
+      });
+    }
+    function countUnique(rows,sec){
+      return new Set(rows.filter(d=>String(d.section||'').toLowerCase().includes(sec))
+        .map(d=>d.respondent_id||d.id)).size;
+    }
 
-    for(const prog of f.programs||[]){
-      const rowsAll = data.filter(d=>
-        (f.clients||[]).includes(d.client)&&
-        d.program===prog&&
-        (f.turmas||[]).includes(d.turma)
-      );
-      console.log("🏷️ Program:", prog, "| rowsAll:", rowsAll.length);
+    // main
+    async function loadReport(){
+      console.log("🔍 Loading report…");
+      const f=JSON.parse(localStorage.getItem('reportFilters')||'{}');
+      const [data,meta]=await Promise.all([
+        fetch('data.json').then(r=>r.json()),
+        fetch('meta.json').then(r=>r.json())
+      ]);
+      console.log("▶ Data:", data.length, "rows;", meta.labels.length, "labels");
 
-      // Program hero
-      const pm = meta.titles.find(t=>t.program_id===prog)||{};
-      const hero = document.createElement('div'); hero.className='program-hero';
-      hero.innerHTML=`
-        <div class="hero-main">
-          <div class="hero-image">
-            <img src="program-icon.png" alt="${pm.TÍTULO||prog}">
+      const labelMap=createLabelMap(meta.labels),
+            orderMap=createSortMap(meta.labels),
+            out=document.getElementById('reportContent');
+      out.innerHTML='';
+
+      for(const prog of f.programs||[]){
+        const rowsAll=data.filter(d=>
+          (f.clients||[]).includes(d.client)&&d.program===prog&&
+          (f.turmas||[]).includes(d.turma)
+        );
+        console.log("🏷 Program",prog,"rowsAll:",rowsAll.length);
+
+        // program hero
+        const pm=meta.titles.find(t=>t.program_id===prog)||{};
+        const hero=document.createElement('div'); hero.className='program-hero';
+        hero.innerHTML=`
+          <div class="hero-main">
+            <div class="hero-image">
+              <img src="program-icon.png" alt="${pm.TÍTULO||prog}">
+            </div>
+            <div class="hero-text">
+              <div class="tagline">${pm.SUBTÍTULO||''}</div>
+              <h1 class="title">${pm.TÍTULO||prog}</h1>
+              <div class="subtitle">${pm.TAGLINE||''}</div>
+            </div>
           </div>
-          <div class="hero-text">
-            <div class="tagline">${pm.SUBTÍTULO||''}</div>
-            <h1 class="title">${pm.TÍTULO||prog}</h1>
-            <div class="subtitle">${pm.TAGLINE||''}</div>
-          </div>
-        </div>
-        <div class="hero-meta">
-          <div><span class="label">Formadora:</span>
-               <span class="value">${(f.trainers||{})[prog]||'N/A'}</span></div>
-        </div>`;
-      out.appendChild(hero);
-
-      for(const sec of ['assessment','evaluation']){
-        const secName = sec==='assessment'?'Assessment':'Avaliação do Programa';
-        const uniq = countUnique(rowsAll,sec);
-        console.log(`▶️ Section ${secName}: unique=${uniq}`);
-
-        // banner
-        const sb=document.createElement('div'); sb.className='section-banner';
-        sb.innerHTML=`
-          <h1>${secName}</h1>
-          <div class="section-meta">
-            <div><span class="label">Total de respostas:</span>
-                 <span class="value">${uniq}</span></div>
+          <div class="hero-meta">
+            <div><span class="label">Formadora:</span>
+                 <span class="value">${(f.trainers||{})[prog]||'N/A'}</span></div>
           </div>`;
-        out.appendChild(sb);
+        out.appendChild(hero);
 
-        // numeric = anything parseable as number
-        const numeric = rowsAll.filter(d=>
-          String(d.section||'').toLowerCase().includes(sec) &&
-          !isNaN(parseFloat(d.value))
-        );
-        console.log("  numeric rows:", numeric.length);
+        for(const sec of ['assessment','evaluation']){
+          const secName = sec==='assessment'?'Assessment':'Avaliação do Programa';
+          const uniq = countUnique(rowsAll,sec);
+          console.log("▶ Section",secName,"unique:",uniq);
 
-        // overall chart page
-        if(numeric.length){
-          const pg=document.createElement('div'); pg.className='page-break';
-          const cdiv=document.createElement('div'); cdiv.className='overall-chart chart-container';
-          pg.appendChild(cdiv); out.appendChild(pg);
-          const avgData = computeAverages(numeric,labelMap,orderMap);
-          createBarChartIn(cdiv,`Global (${secName})`,avgData);
+          // banner
+          const sb=document.createElement('div'); sb.className='section-banner';
+          sb.innerHTML=`
+            <h1>${secName}</h1>
+            <div class="section-meta">
+              <div><span class="label">Total de respostas:</span>
+                   <span class="value">${uniq}</span></div>
+            </div>`;
+          out.appendChild(sb);
+
+          // numeric filter
+          const numeric=rowsAll.filter(d=>
+            String(d.section||'').toLowerCase().includes(sec)&&
+            !isNaN(parseFloat(d.value))
+          );
+          console.log("   numeric rows:",numeric.length);
+
+          // overall chart (own page)
+          if(numeric.length){
+            const pg=document.createElement('div'); pg.className='page-break';
+            const cdiv=document.createElement('div'); cdiv.className='overall-chart chart-container';
+            pg.appendChild(cdiv); out.appendChild(pg);
+            createBarChartIn(cdiv,`Global (${secName})`,computeAverages(numeric,labelMap,orderMap));
+          }
+
+          // per-turma charts 2×2
+          const byT=Object.entries(groupBy(numeric,'turma'));
+          console.log("   turmas:",byT.map(x=>x[0]));
+          for(let i=0;i<byT.length;i+=4){
+            const grid=document.createElement('div'); grid.className='chart-grid-page';
+            byT.slice(i,i+4).forEach(([tm,vals])=>{
+              const cc=document.createElement('div'); cc.className='chart-container';
+              grid.appendChild(cc);
+              createBarChartIn(cc,tm,computeAverages(vals,labelMap,orderMap));
+            });
+            out.appendChild(grid);
+          }
+
+          // open‑ended
+          const textRows=rowsAll.filter(d=>
+            String(d.section||'').toLowerCase().includes(sec)&&
+            isNaN(parseFloat(d.value))&&
+            (f.textQuestions||[]).includes(d.question)
+          );
+          console.log("   open-ended rows:",textRows.length);
+          renderTextQuestions(textRows,out);
         }
+      }
 
-        // per‑turma 4×per page
-        const byT = Object.entries(groupBy(numeric,'turma'));
-        console.log("  turmas:", byT.map(x=>x[0]));
-        for(let i=0;i<byT.length;i+=4){
-          const grid=document.createElement('div'); grid.className='chart-grid-page';
-          byT.slice(i,i+4).forEach(([turma, vals])=>{
-            const cc=document.createElement('div'); cc.className='chart-container';
-            grid.appendChild(cc);
-            createBarChartIn(cc, turma, computeAverages(vals,labelMap,orderMap));
-          });
-          out.appendChild(grid);
-        }
-
-        // open‑ended
-        const textRows = rowsAll.filter(d=>
-          String(d.section||'').toLowerCase().includes(sec) &&
-          isNaN(parseFloat(d.value)) &&
-          (f.textQuestions||[]).includes(d.question)
-        );
-        console.log("  open‑ended rows:", textRows.length);
-        renderTextQuestions(textRows,out);
+      if(new URLSearchParams(location.search).get('download')==='true'){
+        console.log("🖨 Auto-printing…");
+        setTimeout(()=>window.print(),500);
       }
     }
 
-    if(new URLSearchParams(location.search).get('download')==='true'){
-      console.log("🖨 Printing PDF…");
-      setTimeout(()=>window.print(),500);
-    }
-  }
-
-  document.addEventListener('DOMContentLoaded', loadReport);
+    document.addEventListener('DOMContentLoaded', loadReport);
   </script>
 </body>
 </html>

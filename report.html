@@ -134,8 +134,8 @@
           type:'bar', data:data.map(d=>d.avg),
           label:{show:true,position:'top',formatter:'{c}'},
           itemStyle: uniform
-            ? {color:'#61c277'}
-            : {color(p){const v=p.value;if(v<3)return'#d94e5d';if(v<4)return'#f2c037';return'#61c277';}}
+            ? {color:'#6A99D0'}
+            : {color(p){const v=p.value;if(v<3)return'#EA3323';if(v<4)return'#6A99D0';return'#9FCE63';}}
         }]
       });
       chart.resize(); setTimeout(()=>chart.resize(),300);

@@ -61,18 +61,25 @@
     .banner-box .meta { display:flex; gap:40px; font-size:18px; color:#555; }
 
     .chart-fullpage { display:flex; align-items:center; justify-content:center; background:#fff; }
-    .chart-full { width:90vw; height:80vh; }
+   .chart-full {
+  width: 90vw;
+  /* subtract header (80px) + footer (60px) from viewport height */
+  height: calc(100vh - 80px - 60px);
+}
 
-    .chart-grid {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      grid-template-rows:
-        calc((100vh - 80px - 60px - 40px)/2)
-        calc((100vh - 80px - 60px - 40px)/2);
-      gap: 30px;
-      padding: 100px;
-      box-sizing: border-box;
-    }
+/* 2×2 grid of smaller charts */
+.chart-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  /* subtract header/footer and total vertical gap (20px between rows) from vh,
+     then split that space in half */
+  grid-template-rows:
+    calc((100vh - 80px - 60px - 20px) / 2)
+    calc((100vh - 80px - 60px - 20px) / 2);
+  gap: 20px;
+  padding: 20px;
+  box-sizing: border-box;
+}
     .chart-box { width:100%; height:100%; }
 
     .text-page {

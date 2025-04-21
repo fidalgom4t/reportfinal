@@ -9,56 +9,41 @@
   <script src="https://cdn.jsdelivr.net/npm/echarts@5/dist/echarts.min.js"></script>
   <style>
     /* Apply Roboto globally */
-    body, .page, .header, .footer, .hero-content,
-    .banner-box, .chart-fullpage, .chart-grid,
-    .text-page, .text-question {
+    body, .page, .header, .footer, .hero-content, .banner-box,
+    .chart-fullpage, .chart-grid, .text-page, .text-question {
       font-family: 'Roboto', sans-serif;
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
+      margin: 0; padding: 0; box-sizing: border-box;
     }
 
-    /* Each page is exactly 10in × 7.5in (letter minus 0.5in margins) */
+    @page { size: 11in 8.5in; margin: 0; }
+    @media print { .page { page-break-after: always; } }
+
     .page {
       position: relative;
-      width: 10in;
-      height: 7.5in;
-      padding: 0.5in;
-      overflow: hidden;
+      width: 100vw; height: 100vh;
+      padding-top: 80px; padding-bottom: 60px;
+      overflow: visible;
     }
-
-    /* Header & footer remain absolute */
     .header, .footer {
-      position: absolute;
-      left: 0; right: 0;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      background: #fff;
-      padding: 0 0.3in;
-      z-index: 2;
+      position: absolute; left:0; right:0;
+      display: flex; justify-content: space-between; align-items: center;
+      background: #fff; padding: 0 30px; box-sizing: border-box; z-index:2;
     }
-    .header { top: 0; height: 1in; border-bottom:1px solid #40a3a3; }
-    .header img { height: 0.75in; }
-    .footer { bottom: 0; height: 0.75in; font-size:14px; color:#007c91; border-top:1px solid #40a3a3; }
+    .header { top:0; height:80px; border-bottom:1px solid #40a3a3; }
+    .header img { height:60px; }
+    .footer { bottom:0; height:60px; font-size:14px; color:#007c91; border-top:1px solid #40a3a3; }
 
-    /* Hero (first) page */
     .hero {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      text-align: center;
-      color: #fff;
-      background: url('hourglass-bg.jpg') center/cover no-repeat;
+      position: relative;
+      display:flex; align-items:center; justify-content:center; text-align:center; color:#fff;
+    }
+    .hero .bg {
+      position:absolute; top:0; left:0; width:100%; height:100%; object-fit:cover; z-index:0;
     }
     .hero-content {
-      z-index: 1;
-      max-width: 80%;
-      display:flex;
-      flex-direction:column;
-      align-items:center;
-      justify-content:center;
-      height: 100%;
+      position:relative; z-index:1;
+      max-width:80%;
+      display:flex; flex-direction:column; align-items:center; justify-content:center; height:100%;
     }
     .hero-content small { font-style:italic; color:#e0f2f3; margin-bottom:8px; font-size:1.2rem; }
     .hero-content h1 { font-size:4rem; margin:0; font-weight:600; }
@@ -67,71 +52,43 @@
     .hero-content .meta span { font-style:italic; color:#e0f2f3; }
     .hero-content .meta strong { color:#fff; font-weight:600; }
 
-    /* Banner page: own full sheet */
-    .banner {
-      page-break-before: always;
-      page-break-after:  always;
-      display:flex;
-      align-items:center;
-      justify-content:center;
-      background:#fff;
-      width:100%;
-      height:100%;
-    }
+    .banner { display:flex; align-items:center; justify-content:center; background:#fff; }
     .banner-box {
-      background:#f0f8f9;
-      padding:40px 60px;
-      border-left:6px solid #007c91;
-      box-shadow:0 2px 6px rgba(0,0,0,0.1);
-      width:70%;
+      background:#f0f8f9; padding:40px 60px; border-left:6px solid #007c91;
+      box-shadow:0 2px 6px rgba(0,0,0,0.1); width:70%;
     }
     .banner-box h1 { margin:0 0 16px; font-size:48px; color:#007c91; }
     .banner-box .meta { display:flex; gap:40px; font-size:18px; color:#555; }
 
-    /* Full-page chart: percent-based so it cannot overflow */
     .chart-fullpage {
-      display:flex;
-      align-items:center;
-      justify-content:center;
-      background:#fff;
-      width:100%;
-      height:100%;
+      display:flex; align-items:center; justify-content:center; background:#fff;
     }
+    /* use % instead of vw so chart cannot overflow */
     .chart-full {
-      width:100%;
-      height: calc(100% - 1.75in); /* subtract header (1in) + footer (0.75in) */
-      max-width:100%;
-      max-height:100%;
+      width: 90%;
+      height: calc(100% - 140px); /* account for header/footer */
+      margin: 0 auto;
+      box-sizing: border-box;
     }
 
-    /* Grid of 4 charts: 2×2 with equal rows */
     .chart-grid {
       display: grid;
       grid-template-columns: 1fr 1fr;
-      grid-template-rows: 1fr 1fr;
+      grid-template-rows:
+        calc((100vh - 80px - 60px - 40px)/2)
+        calc((100vh - 80px - 60px - 40px)/2);
       gap: 30px;
-      padding: 0.5in; /* inner gutter */
-      width:100%;
-      height:100%;
+      padding: 100px;
+      box-sizing: border-box;
     }
     .chart-box { width:100%; height:100%; }
 
-    /* Text pages */
-    .text-page {
-      overflow: visible;
-      background: #fff;
-      width:100%;
-      height:100%;
-    }
+    .text-page { background:#fff; overflow: visible; }
     .text-question {
-      border:1px solid #007c91;
-      border-left:6px solid #007c91;
-      width: 100%;
-      margin: auto;
-      padding: 24px 32px;
-      background:#f9f9f9;
-      height: calc(100% - 1.75in); /* leave space for header/footer */
-      overflow-y: auto;
+      border:1px solid #007c91; border-left:6px solid #007c91;
+      width: 80vw; margin: 80px auto; padding: 24px 32px;
+      background:#f9f9f9; box-sizing:border-box;
+      page-break-inside: avoid; break-inside: avoid;
     }
     .text-question-title { font-size:18px; font-weight:bold; margin-bottom:12px; color:#007c91; }
     .text-question ul { padding-left:20px; font-size:16px; line-height:1.8; }
@@ -163,18 +120,16 @@
 
     function groupBy(arr, key){
       return arr.reduce((out, item) => {
-        const k = item[key];
-        (out[k] || (out[k] = [])).push(item);
+        (out[item[key]] ||= []).push(item);
         return out;
       }, {});
     }
 
     function computeAverages(rows, LM, OM){
       const sums = {};
-      rows.forEach(({ question, value }) => {
-        const v = +value;
+      rows.forEach(({question,value}) => {
         sums[question] = sums[question] || [];
-        sums[question].push(v);
+        sums[question].push(+value);
       });
       return Object.entries(sums)
         .map(([q, vals]) => ({
@@ -189,7 +144,7 @@
       const chart = echarts.init(div);
       chart.setOption({
         title: { text: title, left: 'center', textStyle: { fontSize: 20 } },
-        grid: { top: 80, left: '10%', right: '10%', bottom: 100 },
+        grid: { top: 80, left: '15%', right: '15%', bottom: 100, containLabel: true },
         tooltip: {},
         xAxis: {
           type: 'category',
@@ -197,12 +152,9 @@
           axisLabel: { rotate: 30, interval: 0, rich: { height: 40 } }
         },
         yAxis: {
-          type: 'value',
-          min: 0, max: 5,
-          axisLine: { show: false },
-          axisTick: { show: false },
-          axisLabel: { show: false },
-          splitLine: { show: false }
+          type: 'value', min: 0, max: 5,
+          axisLine: { show: false }, axisTick: { show: false },
+          axisLabel: { show: false }, splitLine: { show: false }
         },
         series: [{
           type: 'bar',
@@ -224,11 +176,10 @@
       setTimeout(() => chart.resize(), 300);
     }
 
-    function countUnique(rows, sectionKeyword){
+    function countUnique(rows, sec){
       return new Set(
-        rows
-          .filter(d => String(d.section || '').toLowerCase().includes(sectionKeyword))
-          .map(d => d.respondent_id || d.id)
+        rows.filter(d => String(d.section || '').toLowerCase().includes(sec))
+            .map(d => d.respondent_id || d.id)
       ).size;
     }
 
@@ -277,6 +228,7 @@
         hero.className = 'page hero';
         hero.innerHTML = `
           <div class="header"><img src="mind4time-logo.png"><div></div></div>
+          <img class="bg" src="hourglass-bg.jpg">
           <div class="hero-content">
             <small>${pm.SUBTÍTULO || ''}</small>
             <h1>${pm.TÍTULO || prog}</h1>
@@ -288,12 +240,12 @@
           </div>
           <div class="footer"><div>www.MIND4TIME.com</div><div>© MIND4TIME ${currentYear}</div></div>
         `;
-        out.appendChild(hero);
+        out.appendChild(hero
+
+        );
 
         for (const sec of ['assessment','evaluation']) {
-          const name = sec === 'assessment'
-            ? 'Assessment'
-            : 'Avaliação do Programa';
+          const name = sec === 'assessment' ? 'Assessment' : 'Avaliação do Programa';
           const uniq = countUnique(all, sec);
           const numeric = all.filter(d =>
             String(d.section || '').toLowerCase().includes(sec) &&

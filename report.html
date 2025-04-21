@@ -16,11 +16,13 @@
       box-sizing: border-box;
       padding-top: 60px;   /* header */
       padding-bottom: 40px;/* footer */
+      overflow: hidden;
     }
     .header, .footer {
       position: absolute; left:0; right:0;
       display: flex; justify-content: space-between; align-items: center;
       background: #fff; padding: 0 30px; box-sizing: border-box;
+      z-index: 2;
     }
     .header { top:0; height:60px; border-bottom:1px solid #40a3a3; }
     .header img { height:40px; }
@@ -71,17 +73,19 @@
 
     /* 7) open‑ended answers – one question per page */
     .text-page {
-      overflow: visible; /* allow flow across pages */
+      overflow: visible;
       background: #fff;
       box-sizing: border-box;
     }
     .text-question {
       border:1px solid #007c91; border-left:6px solid #007c91;
-      width: 80vw;           /* centered block */
-      margin: 80px auto;     /* below header / above footer */
-      padding: 24px 32px;    /* breathing room */
+      width: 80vw;
+      margin: 80px auto;
+      padding: 24px 32px;
       background:#f9f9f9;
       box-sizing:border-box;
+      page-break-inside: auto;
+      break-inside: auto;
     }
     .text-question-title { font-size:18px; font-weight:bold; margin-bottom:12px; color:#007c91; }
     .text-question ul { padding-left:20px; font-size:16px; }
@@ -89,9 +93,8 @@
 </head>
 <body>
   <div id="report"></div>
-  <script src="https://cdn.jsdelivr.net/npm/echarts@5/dist/echarts.min.js"></script>
   <script>
-    // re‑use previous helpers...
+    // Helpers
     function createLabelMap(labels){
       const m={};
       labels.forEach(l=>{
@@ -132,7 +135,7 @@
           label:{show:true,position:'top',formatter:'{c}'},
           itemStyle: uniform
             ? {color:'#61c277'}
-            : {color(p){const v=p.value; if(v<3) return '#d94e5d'; if(v<4) return '#f2c037'; return '#61c277';}}
+            : {color(p){const v=p.value;if(v<3)return'#d94e5d';if(v<4)return'#f2c037';return'#61c277';}}
         }]
       });
       chart.resize(); setTimeout(()=>chart.resize(),300);
@@ -143,6 +146,7 @@
       ).size;
     }
 
+    // Build report
     async function build(){
       const f=JSON.parse(localStorage.getItem('reportFilters')||'{}');
       const [data,meta]=await Promise.all([
@@ -178,7 +182,6 @@
           <div class="footer"><div>www.MIND4TIME.com</div><div>Copyright © MIND4TIME 2024</div></div>`;
         container.appendChild(hero);
 
-        // each section
         for(const sec of ['assessment','evaluation']){
           const name=sec==='assessment'?'Assessment':'Avaliação do Programa';
           const uniq=countUnique(all,sec);
@@ -187,7 +190,7 @@
             !isNaN(parseFloat(d.value))
           );
 
-          // banner
+          // BANNER
           const ban=document.createElement('div'); ban.className='page banner';
           ban.innerHTML=`
             <div class="header"><img src="mind4time-logo.png"><div></div></div>
@@ -198,39 +201,54 @@
             <div class="footer"><div>www.MIND4TIME.com</div><div>Copyright © MIND4TIME 2024</div></div>`;
           container.appendChild(ban);
 
-          // global chart
+          // GLOBAL
           if(numeric.length){
-            const ch=document.createElement('div'); ch.className='page chart-fullpage';
-            ch.innerHTML=`
+            const gl=document.createElement('div'); gl.className='page chart-fullpage';
+            gl.innerHTML=`
               <div class="header"><img src="mind4time-logo.png"><div></div></div>
               <div class="chart-full" id="chart-global-${prog}-${sec}"></div>
               <div class="footer"><div>www.MIND4TIME.com</div><div>Copyright © MIND4TIME 2024</div></div>`;
-            container.appendChild(ch);
+            container.appendChild(gl);
             createBarChart(
-              ch.querySelector('.chart-full'),
+              gl.querySelector('.chart-full'),
               `Global (${name})`,
               computeAverages(numeric,LM,OM),
               sec==='evaluation'
             );
           }
 
-          // per‑turma grid
+          // PER‑TURMA GRID
           const byT=Object.entries(groupBy(numeric,'turma'));
           for(let i=0;i<byT.length;i+=4){
             const grid=document.createElement('div'); grid.className='page chart-grid';
-            grid.innerHTML=`<div class="header"><img src="mind4time-logo.png"><div></div></div>`;
+            // header
+            const hdr=document.createElement('div'); hdr.className='header';
+            hdr.innerHTML=`<img src="mind4time-logo.png"><div></div>`;
+            grid.appendChild(hdr);
+
+            // four charts
             byT.slice(i,i+4).forEach(([tm,vals],idx)=>{
-              const div=document.createElement('div'); div.className='chart-box';
-              div.id=`chart-${prog}-${sec}-${i+idx}`; grid.appendChild(div);
+              const box=document.createElement('div');
+              box.className='chart-box';
+              box.id=`chart-${prog}-${sec}-${i+idx}`;
+              grid.appendChild(box);
               setTimeout(()=>createBarChart(
-                div, tm, computeAverages(vals,LM,OM), sec==='evaluation'
+                box,
+                tm,
+                computeAverages(vals,LM,OM),
+                sec==='evaluation'
               ),0);
             });
-            grid.innerHTML += `<div class="footer"><div>www.MIND4TIME.com</div><div>Copyright © MIND4TIME 2024</div></div>`;
+
+            // footer
+            const ftr=document.createElement('div'); ftr.className='footer';
+            ftr.innerHTML=`<div>www.MIND4TIME.com</div><div>Copyright © MIND4TIME 2024</div>`;
+            grid.appendChild(ftr);
+
             container.appendChild(grid);
           }
 
-          // open‑ended — one question per page, grouped
+          // OPEN‑ENDED
           const byQ=groupBy(
             all.filter(d=>
               String(d.section||'').toLowerCase().includes(sec)&&
@@ -253,6 +271,7 @@
         }
       }
     }
+
     document.addEventListener('DOMContentLoaded', build);
   </script>
 </body>

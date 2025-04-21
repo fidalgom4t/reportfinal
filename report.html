@@ -6,123 +6,197 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <script src="https://cdn.jsdelivr.net/npm/echarts@5/dist/echarts.min.js"></script>
   <style>
-    /* PAGE SETUP */
-    @page { size: 11in 8.5in; margin: 0 }
+    /* —— 1) PAGE SETUP & PRINT RULES —— */
+    @page { size: 11in 8.5in; margin: 0; }
     @media print {
-      .page { page-break-after: always; overflow: visible !important; height: auto !important }
-      .chart-fullpage .chart-full { height: calc(100vh - 140px) !important }
-      .chart-grid .chart-box { height: calc((100vh - 140px - 20px) / 2) !important }
+      .page { page-break-after: always; overflow: visible !important; }
     }
 
-    /* BASE PAGE */
+    /* —— 2) PAGE PADDING —— */
     .page {
       position: relative;
-      width: 100vw; height: 100vh;
+      width: 100vw; 
+      height: 100vh;
+      padding: 80px 30px 100px; /* header + footer space */
       box-sizing: border-box;
-      padding: 80px 30px 60px;
       overflow: hidden;
+      background: #fff;
     }
 
-    /* HEADER & FOOTER */
+    /* —— 3) HEADER & FOOTER —— */
     .header, .footer {
       position: absolute; left: 0; right: 0;
       display: flex; justify-content: space-between; align-items: center;
-      background: #fff; padding: 0 30px; z-index: 2;
-      box-sizing: border-box;
+      padding: 0 30px; box-sizing: border-box;
+      background: #fff; z-index: 10;
     }
-    .header { top: 0; height: 80px; border-bottom: 1px solid #40a3a3 }
-    .header img { height: 60px }
-    .footer { bottom: 0; height: 60px; font-size: 14px; color: #007c91; border-top: 1px solid #40a3a3 }
+    .header {
+      top: 0; height: 80px;
+      border-bottom: 1px solid #40a3a3;
+    }
+    .header img {
+      height: 70px; /* larger logo */
+    }
+    .footer {
+      bottom: 0; height: 100px;
+      font-size: 16px; /* larger footer font */
+      color: #007c91;
+      border-top: 1px solid #40a3a3;
+    }
 
-    /* HERO SLIDE */
+    /* —— 4) HERO BANNER —— */
     .hero {
-      position: relative; display: flex; align-items: center; justify-content: center;
-      text-align: center; color: #fff;
+      position: relative;
+      width: 100%; height: 100%;
+      display: flex; align-items: center; justify-content: center;
+      text-align: center; overflow: hidden;
     }
     .hero .bg {
-      position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+      position: absolute; top:0; left:0;
+      width:100%; height:100%;
       object-fit: cover; z-index: 0;
     }
     .hero-content {
       position: relative; z-index: 1;
       max-width: 80%;
-      display: flex; flex-direction: column; align-items: center; justify-content: center;
-      height: 100%;
+      display: flex; flex-direction: column; align-items: center;
+      justify-content: center; height: 100%;
+      color: #fff;
     }
-    .hero-content small { font-style: italic; color: #e0f2f3; margin-bottom: 8px; font-size: 1.2rem }
-    .hero-content h1 { font-size: 4rem; margin: 0; font-weight: 600 }
-    .hero-content .subtitle { font-size: 1.8rem; margin-top: 12px }
+    .hero-content small {
+      font-style: italic; color: rgba(255,255,255,0.8);
+      margin-bottom: 8px; font-size: 1.2rem;
+    }
+    .hero-content h1 {
+      font-size: 4rem; margin: 0; font-weight: 600;
+    }
+    .hero-content .subtitle {
+      font-size: 1.8rem; margin-top: 12px;
+    }
     .hero-content .meta {
-      margin-top: 24px; display: flex; gap: 40px; justify-content: center; font-size: 1.2rem;
+      margin-top: 24px;
+      display: flex; gap: 40px;
+      justify-content: center; font-size: 1.2rem;
     }
-    .hero-content .meta span { display: block; font-style: italic; color: #e0f2f3 }
-    .hero-content .meta strong { color: #fff; font-weight: 600 }
+    .hero-content .meta span {
+      display: block; font-style: italic; color: rgba(255,255,255,0.8);
+    }
+    .hero-content .meta strong {
+      color: #fff; font-weight: 600;
+    }
 
-    /* SECTION BANNER */
-    .banner { display: flex; align-items: center; justify-content: center; background: #fff }
+    /* —— 5) SECTION BANNER —— */
+    .banner {
+      position: relative;
+      width: 100%; height: 100%;
+      display: flex; align-items: center; justify-content: center;
+      background: #fff;
+    }
     .banner-box {
-      background: #f0f8f9; padding: 40px 60px; border-left: 6px solid #007c91;
-      box-shadow: 0 2px 6px rgba(0,0,0,0.1); width: 70%;
+      background: #f0f8f9;
+      padding: 40px 60px;
+      border-left: 6px solid #007c91;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+      width: 70%;
+      box-sizing: border-box;
     }
-    .banner-box h1 { margin: 0 0 16px; font-size: 48px; color: #007c91 }
-    .banner-box .meta { display: flex; gap: 40px; font-size: 18px; color: #555 }
+    .banner-box h1 {
+      margin: 0 0 16px;
+      font-size: 48px;
+      color: #007c91;
+    }
+    .banner-box .meta {
+      display: flex; gap: 40px;
+      font-size: 18px; color: #555;
+    }
 
-    /* GLOBAL CHART */
-    .chart-fullpage { display: flex; align-items: center; justify-content: center; background: #fff }
-    .chart-full { width: 90vw; height: calc(100vh - 140px) }
+    /* —— 6) GLOBAL CHART (FULL PAGE) —— */
+    .chart-fullpage {
+      position: relative;
+      width: 100%; height: 100%;
+    }
+    .chart-full {
+      position: absolute;
+      top: 80px;     /* below header */
+      bottom: 100px; /* above footer */
+      left: 30px;    /* match page padding */
+      right: 30px;
+    }
 
-    /* PER-TURMA GRID */
+    /* —— 7) PER‑TURMA GRID —— */
     .chart-grid {
-      display: grid; grid-template: 1fr 1fr / 1fr 1fr; gap: 20px;
-      padding: 20px 0; box-sizing: border-box;
+      display: grid;
+      grid-template: 1fr 1fr / 1fr 1fr;
+      gap: 20px;
+      padding: 20px 0;
+      box-sizing: border-box;
+      width: 100%; height: calc(100% - 200px); /* allow header/footer space */
     }
     .chart-box-container {
       display: flex; flex-direction: column; align-items: center;
     }
     .turma-title {
-      font-size: 18px; font-weight: 600; color: #333; margin-bottom: 8px;
+      font-size: 18px; font-weight: 600; margin-bottom: 8px;
       text-align: center;
     }
-    .chart-box { width: 100%; height: calc((100vh - 140px - 20px) / 2) }
-
-    /* TEXT QUESTIONS */
-    .text-page { overflow: visible; background: #fff; box-sizing: border-box }
-    .text-question {
-      border: 1px solid #007c91; border-left: 6px solid #007c91;
-      width: 80vw; margin: 80px auto; padding: 24px 32px;
-      background: #f9f9f9; box-sizing: border-box;
-      page-break-inside: auto; break-inside: auto;
+    .chart-box {
+      width: 100%; height: 300px;
     }
-    .text-question-title { font-size: 18px; font-weight: bold; margin-bottom: 12px; color: #007c91 }
-    .text-question ul { padding-left: 20px; font-size: 16px }
+
+    /* —— 8) TEXT RESPONSES —— */
+    .text-page {
+      position: relative;
+      width: 100%; height: 100%;
+      box-sizing: border-box;
+      overflow: visible;
+      background: #fff;
+    }
+    .text-question {
+      border: 1px solid #007c91;
+      border-left: 6px solid #007c91;
+      width: 80vw;
+      margin: 80px auto;
+      padding: 24px 32px;
+      background: #f9f9f9;
+      box-sizing: border-box;
+      page-break-inside: auto;
+      break-inside: auto;
+    }
+    .text-question-title {
+      font-size: 18px; font-weight: bold;
+      margin-bottom: 12px; color: #007c91;
+    }
+    .text-question ul {
+      padding-left: 20px; font-size: 16px;
+    }
   </style>
 </head>
 <body>
   <div id="report"></div>
   <script>
-    // — HELPER FUNCTIONS (same as before) —
+    // — Helpers —
     function createLabelMap(labels){
-      const m = {};
+      const m={};
       labels.forEach(l=>{
-        const key = l.questionId||l['QUESTION ID'];
-        m[key] = l.label||l['LABEL'];
+        const key=l.questionId||l["QUESTION ID"];
+        m[key]=l.label||l["LABEL"];
       });
       return m;
     }
     function createSortMap(labels){
-      const m = {};
+      const m={};
       labels.forEach(l=>{
-        const key = l.questionId||l['QUESTION ID'];
-        m[key] = +(l.sortOrder||l['SORT ORDER']||l.sort_order||0);
+        const key=l.questionId||l["QUESTION ID"];
+        m[key]=+(l.sortOrder||l["SORT ORDER"]||l.sort_order||0);
       });
       return m;
     }
-    function groupBy(arr, k){
-      return arr.reduce((o,i)=>( (o[i[k]] ||= []).push(i), o ), {});
+    function groupBy(arr,k){
+      return arr.reduce((o,i)=>( (o[i[k]]||=[]).push(i), o ),{});
     }
-    function computeAverages(rows, LM, OM){
-      const g = {};
-      rows.forEach(({question,value})=>( g[question] ||= []).push(+value) );
+    function computeAverages(rows,LM,OM){
+      const g={};
+      rows.forEach(({question,value})=> (g[question]||=[]).push(+value));
       return Object.entries(g)
         .map(([q,vals])=>({
           question:q,
@@ -131,71 +205,86 @@
         }))
         .sort((a,b)=>(OM[a.question]||0)-(OM[b.question]||0));
     }
-    function createBarChart(div, data, uniform){
-      const chart = echarts.init(div);
+    function createBarChart(div,title,data,uniform){
+      const chart=echarts.init(div);
       chart.setOption({
-        grid:{ top:'15%', left:'10%', right:'10%', bottom:'15%' },
+        title:{text:title,left:'center',textStyle:{fontSize:20}},
+        grid:{top:80,left:'10%',right:'10%',bottom:100},
         tooltip:{},
-        xAxis:{ type:'category', data:data.map(d=>d.label), axisLabel:{ rotate:30, interval:0, rich:{ height:40 } }},
-        yAxis:{ type:'value', min:0, max:5 },
-        series:[{ type:'bar',
+        xAxis:{type:'category',data:data.map(d=>d.label),axisLabel:{rotate:30,interval:0}},
+        yAxis:{type:'value',min:0,max:5},
+        series:[{
+          type:'bar',
           data:data.map(d=>d.avg),
-          label:{ show:true, position:'top', formatter:'{c}' },
+          label:{show:true,position:'top',formatter:'{c}'},
           itemStyle: uniform
             ? { color:'#6A99D0' }
-            : { color(p){ const v=p.value; if(v<3)return '#EA3323'; if(v<4)return '#6A99D0'; return '#9FCE63' } }
+            : { color(p){
+                const v=p.value;
+                if(v<3) return '#EA3323';
+                if(v<4) return '#6A99D0';
+                return '#9FCE63';
+              }}
         }]
       });
       chart.resize(); setTimeout(()=>chart.resize(),300);
     }
-    function countUnique(rows, sec){
+    function countUnique(rows,sec){
       return new Set(
         rows.filter(d=>String(d.section||'').toLowerCase().includes(sec))
             .map(d=>d.respondent_id||d.id)
       ).size;
     }
     function formatMonthYear(val){
-      const monthNames={
-        '01':'janeiro','02':'fevereiro','03':'março','04':'abril','05':'maio','06':'junho',
-        '07':'julho','08':'agosto','09':'setembro','10':'outubro','11':'novembro','12':'dezembro'
-      };
-      let [year,mon] = val.split('-');
-      return { month: monthNames[mon]||mon, year };
+      const mnames={ '01':'janeiro','02':'fevereiro','03':'março','04':'abril','05':'maio',
+                     '06':'junho','07':'julho','08':'agosto','09':'setembro','10':'outubro',
+                     '11':'novembro','12':'dezembro' };
+      let m='',y='';
+      if(/^\d{4}-\d{2}$/.test(val)){
+        [y,m]=val.split('-');
+        m=mnames[m]||m;
+      } else {
+        const p=val.split(' ');
+        m=p[0]; y=p[1];
+      }
+      return {month:m,year:y};
     }
 
-    // — BUILD REPORT —
+    // — Build Report —
     async function build(){
-      const f = JSON.parse(localStorage.getItem('reportFilters')||'{}');
-      const [data,meta] = await Promise.all([
+      const f=JSON.parse(localStorage.getItem('reportFilters')||'{}');
+      const [data,meta]=await Promise.all([
         fetch('data.json').then(r=>r.json()),
         fetch('meta.json').then(r=>r.json())
       ]);
-      const LM = createLabelMap(meta.labels),
-            OM = createSortMap(meta.labels),
-            C = document.getElementById('report');
-      C.innerHTML='';
+      const LM=createLabelMap(meta.labels),
+            OM=createSortMap(meta.labels),
+            container=document.getElementById('report');
+      container.innerHTML='';
 
-      // timeScope
+      // compute timeScope
       let timeScope='';
-      if(f.start&&f.end){
-        const s=formatMonthYear(f.start),
-              e=formatMonthYear(f.end);
+      if(f.start && f.end){
+        const s=formatMonthYear(f.start), e=formatMonthYear(f.end);
         timeScope=`${s.month} – ${e.month} ${e.year}`;
       }
 
       for(const prog of f.programs||[]){
-        const all = data.filter(d=>
+        const all=data.filter(d=>
           (f.clients||[]).includes(d.client) &&
           d.program===prog &&
           (f.turmas||[]).includes(d.turma)
         );
-        const pm = meta.titles.find(t=>t.program_id===prog)||{};
+        const pm=meta.titles.find(t=>t.program_id===prog)||{};
 
-        // — HERO SLIDE —
-        const hero = document.createElement('div');
+        // HERO PAGE
+        const hero=document.createElement('div');
         hero.className='page hero';
         hero.innerHTML=`
-          <div class="header"><img src="mind4time-logo.png"><div></div></div>
+          <div class="header">
+            <img src="mind4time-logo.png">
+            <div></div>
+          </div>
           <img class="bg" src="hourglass-bg.jpg">
           <div class="hero-content">
             <small>${pm.SUBTÍTULO||''}</small>
@@ -206,19 +295,22 @@
               <div><span>trainers</span><strong>${(f.trainers||{})[prog]||'N/A'}</strong></div>
             </div>
           </div>
-          <div class="footer"><div>www.MIND4TIME.com</div><div>Copyright © MIND4TIME 2024</div></div>`;
-        C.appendChild(hero);
+          <div class="footer">
+            <div>www.MIND4TIME.com</div>
+            <div>Copyright © MIND4TIME 2024</div>
+          </div>`;
+        container.appendChild(hero);
 
         for(const sec of ['assessment','evaluation']){
-          const name = sec==='assessment'?'Assessment':'Avaliação do Programa';
-          const uniq = countUnique(all,sec);
-          const numeric = all.filter(d=>
-            String(d.section||'').toLowerCase().includes(sec) &&
+          const name=sec==='assessment'?'Assessment':'Avaliação do Programa';
+          const uniq=countUnique(all,sec);
+          const numeric=all.filter(d=>
+            String(d.section||'').toLowerCase().includes(sec)&&
             !isNaN(parseFloat(d.value))
           );
 
-          // — SECTION BANNER —
-          const ban = document.createElement('div');
+          // SECTION BANNER
+          const ban=document.createElement('div');
           ban.className='page banner';
           ban.innerHTML=`
             <div class="header"><img src="mind4time-logo.png"><div></div></div>
@@ -227,67 +319,80 @@
               <div class="meta"><div><span>Total de respostas:</span><strong>${uniq}</strong></div></div>
             </div>
             <div class="footer"><div>www.MIND4TIME.com</div><div>© MIND4TIME 2024</div></div>`;
-          C.appendChild(ban);
+          container.appendChild(ban);
 
-          // — GLOBAL CHART —
+          // GLOBAL CHART
           if(numeric.length){
-            const gl = document.createElement('div');
-            gl.className='page chart-fullpage';
-            gl.innerHTML=`
+            const glp=document.createElement('div');
+            glp.className='page chart-fullpage';
+            glp.innerHTML=`
               <div class="header"><img src="mind4time-logo.png"><div></div></div>
               <div class="chart-full" id="chart-global-${prog}-${sec}"></div>
               <div class="footer"><div>www.MIND4TIME.com</div><div>© MIND4TIME 2024</div></div>`;
-            C.appendChild(gl);
+            container.appendChild(glp);
             createBarChart(
-              gl.querySelector('.chart-full'),
+              glp.querySelector('.chart-full'),
+              \`Global (\${name})\`,
               computeAverages(numeric,LM,OM),
               sec==='evaluation'
             );
           }
 
-          // — PER‑TURMA GRID —
-          const byT = Object.entries(groupBy(numeric,'turma'));
-          for(let i=0; i<byT.length; i+=4){
-            const grid = document.createElement('div');
-            grid.className='page chart-grid';
-            grid.innerHTML=`<div class="header"><img src="mind4time-logo.png"><div></div></div>`;
-            byT.slice(i,i+4).forEach(([tm,vals],idx)=>{
-              const cont = document.createElement('div');
-              cont.className='chart-box-container';
-              cont.innerHTML=`
-                <div class="turma-title">${tm}</div>
-                <div class="chart-box" id="chart-${prog}-${sec}-${i+idx}"></div>`;
-              grid.appendChild(cont);
-              setTimeout(()=>createBarChart(
-                document.getElementById(`chart-${prog}-${sec}-${i+idx}`),
-                computeAverages(vals,LM,OM),
-                sec==='evaluation'
-              ),0);
-            });
-            grid.innerHTML+=`<div class="footer"><div>www.MIND4TIME.com</div><div>© MIND4TIME 2024</div></div>`;
-            C.appendChild(grid);
+          // PER‑TURMA GRID (only if more than 1 turma)
+          const byT=Object.entries(groupBy(numeric,'turma'));
+          if(byT.length>1){
+            for(let i=0;i<byT.length;i+=4){
+              const grid=document.createElement('div');
+              grid.className='page chart-grid';
+              // header
+              const hdr=document.createElement('div'); hdr.className='header';
+              hdr.innerHTML=`<img src="mind4time-logo.png"><div></div>`;
+              grid.appendChild(hdr);
+
+              byT.slice(i,i+4).forEach(([tm,vals])=>{
+                const containerBox=document.createElement('div');
+                containerBox.className='chart-box-container';
+                containerBox.innerHTML=\`
+                  <div class="turma-title">\${tm}</div>
+                  <div class="chart-box"></div>\`;
+                grid.appendChild(containerBox);
+                setTimeout(()=>{
+                  createBarChart(
+                    containerBox.querySelector('.chart-box'),
+                    tm,
+                    computeAverages(vals,LM,OM),
+                    sec==='evaluation'
+                  );
+                },0);
+              });
+
+              const ftr=document.createElement('div'); ftr.className='footer';
+              ftr.innerHTML=\`<div>www.MIND4TIME.com</div><div>© MIND4TIME 2024</div>\`;
+              grid.appendChild(ftr);
+              container.appendChild(grid);
+            }
           }
 
-          // — OPEN‑ENDED QUESTIONS —
-          const byQ = groupBy(
+          // OPEN‑ENDED QUESTIONS
+          const byQ=groupBy(
             all.filter(d=>
-              String(d.section||'').toLowerCase().includes(sec) &&
-              isNaN(parseFloat(d.value)) &&
+              String(d.section||'').toLowerCase().includes(sec)&&
+              isNaN(parseFloat(d.value))&&
               (f.textQuestions||[]).includes(d.question)
             ),
             'question'
           );
           for(const [q,answers] of Object.entries(byQ)){
-            const tp = document.createElement('div');
+            const tp=document.createElement('div');
             tp.className='page text-page';
             tp.innerHTML=`
               <div class="header"><img src="mind4time-logo.png"><div></div></div>
               <div class="text-question">
-                <div class="text-question-title">${q}</div>
-                <ul>${answers.map(a=>`<li>${a.value.replace(/\n/g,'</li><li>')}</li>`).join('')}</ul>
+                <div class="text-question-title">\${q}</div>
+                <ul>\${answers.map(a=>\`<li>\${a.value.replace(/\\n/g,'</li><li>')}</li>\`).join('')}</ul>
               </div>
               <div class="footer"><div>www.MIND4TIME.com</div><div>© MIND4TIME 2024</div></div>`;
-            C.appendChild(tp);
+            container.appendChild(tp);
           }
         }
       }

@@ -34,18 +34,18 @@
       height: 80px;
       border-bottom: 1px solid #40a3a3;
     }
-    /* ↑ logo size increased */
     .header img {
       height: 80px;
     }
     .footer {
       bottom: 0;
       height: 60px;
-      font-size: 16px;     /* ↑ footer text enlarged */
+      font-size: 16px;
       color: #007c91;
       border-top: 1px solid #40a3a3;
     }
 
+    /* hero elements */
     .hero {
       position: relative;
       display: flex;
@@ -83,12 +83,8 @@
     .hero-content .meta span { display: block; font-style: italic; color: #e0f2f3; }
     .hero-content .meta strong { color: #fff; font-weight: 600; }
 
-    .banner {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      background: #fff;
-    }
+    /* banner */
+    .banner { display: flex; align-items: center; justify-content: center; background: #fff; }
     .banner-box {
       background: #f0f8f9;
       padding: 40px 60px;
@@ -99,6 +95,7 @@
     .banner-box h1 { margin: 0 0 16px; font-size: 48px; color: #007c91; }
     .banner-box .meta { display: flex; gap: 40px; font-size: 18px; color: #555; }
 
+    /* full-page chart */
     .chart-fullpage {
       position: absolute;
       top: 80px;
@@ -114,6 +111,7 @@
       margin: 0 30px;
     }
 
+    /* 4-up grid */
     .chart-grid {
       position: absolute;
       top: 80px;
@@ -131,6 +129,7 @@
       height: 100%;
     }
 
+    /* text pages */
     .text-page {
       position: absolute;
       top: 80px;
@@ -153,6 +152,15 @@
     }
     .text-question-title { font-size: 18px; font-weight: bold; margin-bottom: 12px; color: #007c91; }
     .text-question ul { padding-left: 20px; font-size: 16px; }
+
+    /* hide hero overlays on non-hero pages */
+    .bg, .hero-content {
+      display: none !important;
+    }
+    .page.hero .bg,
+    .page.hero .hero-content {
+      display: block !important;
+    }
   </style>
 </head>
 <body>
@@ -333,7 +341,8 @@
           // Open‑ended
           const byQ=groupBy(
             all.filter(d=>
-              String(d.section||'').toLowerCase().includes(sec)&&
+              String(d.section||'').
+toLowerCase().includes(sec)&&
               isNaN(parseFloat(d.value))&&
               (f.textQuestions||[]).includes(d.question)
             ),

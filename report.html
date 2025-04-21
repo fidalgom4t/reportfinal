@@ -21,17 +21,14 @@
     .header, .footer {
       position: absolute; left:0; right:0;
       display: flex; justify-content: space-between; align-items: center;
-      background: #fff; padding: 0 30px; box-sizing: border-box;
-      z-index: 2;
+      background: #fff; padding: 0 30px; box-sizing: border-box; z-index:2;
     }
     .header { top:0; height:60px; border-bottom:1px solid #40a3a3; }
     .header img { height:40px; }
     .footer { bottom:0; height:40px; font-size:12px; color:#007c91; border-top:1px solid #40a3a3; }
 
     /* 3) hero slide */
-    .hero {
-      position: relative; display:flex; align-items:center; justify-content:center; text-align:center; color:#fff;
-    }
+    .hero { position: relative; display:flex; align-items:center; justify-content:center; text-align:center; color:#fff; }
     .hero .bg {
       position:absolute; top:0; left:0; width:100%; height:100%; object-fit:cover; z-index:0;
     }
@@ -48,9 +45,7 @@
     .hero-content .meta strong { color:#fff; font-weight:600; }
 
     /* 4) section banner */
-    .banner {
-      display:flex; align-items:center; justify-content:center; background:#fff;
-    }
+    .banner { display:flex; align-items:center; justify-content:center; background:#fff; }
     .banner-box {
       background:#f0f8f9; padding:40px 60px; border-left:6px solid #007c91;
       box-shadow:0 2px 6px rgba(0,0,0,0.1); width:70%;
@@ -59,9 +54,7 @@
     .banner-box .meta { display:flex; gap:40px; font-size:18px; color:#555; }
 
     /* 5) full‑page chart */
-    .chart-fullpage {
-      display:flex; align-items:center; justify-content:center; background:#fff;
-    }
+    .chart-fullpage { display:flex; align-items:center; justify-content:center; background:#fff; }
     .chart-full { width:90vw; height:80vh; }
 
     /* 6) grid of charts */
@@ -157,11 +150,19 @@
       const container=document.getElementById('report');
       container.innerHTML='';
 
+      // derive "month – month year"
+      let timeScope = '';
+      if(f.start && f.end){
+        const [sMon] = f.start.split(' ');
+        const [eMon, eYr] = f.end.split(' ');
+        timeScope = `${sMon} – ${eMon} ${eYr}`;
+      }
+
       for(const prog of f.programs||[]){
         const all=data.filter(d=>
-          f.clients.includes(d.client)&&
+          (f.clients||[]).includes(d.client)&&
           d.program===prog&&
-          f.turmas.includes(d.turma)
+          (f.turmas||[]).includes(d.turma)
         );
 
         // HERO
@@ -175,7 +176,7 @@
             <h1>${pm.TÍTULO||prog}</h1>
             <div class="subtitle">${pm.TAGLINE||''}</div>
             <div class="meta">
-              <div><span>time scope</span><strong>${f.start} – ${f.end}</strong></div>
+              <div><span>time scope</span><strong>${timeScope}</strong></div>
               <div><span>trainers</span><strong>${(f.trainers||{})[prog]||'N/A'}</strong></div>
             </div>
           </div>
@@ -226,21 +227,16 @@
             hdr.innerHTML=`<img src="mind4time-logo.png"><div></div>`;
             grid.appendChild(hdr);
 
-            // four charts
             byT.slice(i,i+4).forEach(([tm,vals],idx)=>{
               const box=document.createElement('div');
               box.className='chart-box';
               box.id=`chart-${prog}-${sec}-${i+idx}`;
               grid.appendChild(box);
               setTimeout(()=>createBarChart(
-                box,
-                tm,
-                computeAverages(vals,LM,OM),
-                sec==='evaluation'
+                box, tm, computeAverages(vals,LM,OM), sec==='evaluation'
               ),0);
             });
 
-            // footer
             const ftr=document.createElement('div'); ftr.className='footer';
             ftr.innerHTML=`<div>www.MIND4TIME.com</div><div>Copyright © MIND4TIME 2024</div>`;
             grid.appendChild(ftr);
@@ -253,7 +249,7 @@
             all.filter(d=>
               String(d.section||'').toLowerCase().includes(sec)&&
               isNaN(parseFloat(d.value))&&
-              f.textQuestions.includes(d.question)
+              (f.textQuestions||[]).includes(d.question)
             ),
             'question'
           );

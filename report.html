@@ -4,15 +4,20 @@
   <meta charset="UTF-8"/>
   <title>Training Report</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <script src="https://cdn.jsdelivr.net/npm/echarts@5/dist/echarts.min.js"></script>
   <!-- Roboto font -->
   <link href="https://fonts.googleapis.com/css?family=Roboto:400,500,700&display=swap" rel="stylesheet">
   <script src="https://cdn.jsdelivr.net/npm/echarts@5/dist/echarts.min.js"></script>
+
+    /* Apply Roboto globally */
+    body, .page, .header, .footer, .hero-content, .banner-box, .chart-fullpage, .chart-grid, .text-page, .text-question {
+      font-family: 'Roboto', sans-serif;
+    }
   <style>
     /* Apply Roboto globally */
     body, .page, .header, .footer, .hero-content, .banner-box, .chart-fullpage, .chart-grid, .text-page, .text-question {
       font-family: 'Roboto', sans-serif;
     }
-
     @page { size: 11in 8.5in; margin: 0; }
     @media print { .page { page-break-after: always; } }
 
@@ -128,12 +133,28 @@
     function createBarChart(div,title,data,uniform){
       const chart=echarts.init(div);
       chart.setOption({
+        backgroundColor:'transparent',
         title:{text:title,left:'center',textStyle:{fontSize:20}},
-        grid:{top:80,left:'10%',right:'10%',bottom:100},
+        grid:{top:80,left:'10%',right:'10%',bottom:100,backgroundColor:'transparent'},
         tooltip:{},
-        xAxis:{type:'category',data:data.map(d=>d.label),axisLabel:{rotate:30,interval:0,rich:{height:40}}},
-        yAxis:{type:'value',min:0,max:5,axisLine:{show:false},axisTick:{show:false},axisLabel:{show:false},splitLine:{show:false}},
-        series:[{type:'bar',data:data.map(d=>d.avg),label:{show:true,position:'top',formatter:'{c}'},itemStyle: uniform?{color:'#6A99D0'}:{color(p){const v=p.value;if(v<3)return'#EA3323';if(v<4)return'#6A99D0';return'#9FCE63';}}}]
+        xAxis:{
+          type:'category',
+          data:data.map(d=>d.label),
+          axisLabel:{rotate:30,interval:0,rich:{height:40}}
+        },
+        yAxis:{
+          type:'value',min:0,max:5,
+          axisLine:{show:false},axisTick:{show:false},
+          axisLabel:{show:false},splitLine:{show:false}
+        },
+        series:[{
+          type:'bar',
+          data:data.map(d=>d.avg),
+          label:{show:true,position:'top',formatter:'{c}'},
+          itemStyle: uniform
+            ? {color:'#6A99D0'}
+            : {color(p){const v=p.value; if(v<3)return'#EA3323'; if(v<4)return'#6A99D0'; return'#9FCE63';}}
+        }]
       });
       chart.resize(); setTimeout(()=>chart.resize(),300);
     }
@@ -145,7 +166,13 @@
     }
     function formatMonthYear(val){
       const names={ '01':'janeiro','02':'fevereiro','03':'março','04':'abril','05':'maio','06':'junho','07':'julho','08':'agosto','09':'setembro','10':'outubro','11':'novembro','12':'dezembro' };
-      if(/^
+      if(/^\d{4}-\d{2}$/.test(val)){
+        const [y,m]=val.split('-');
+        return {month:names[m],year:y};
+      } else {
+        const [m,y]=val.split(' ');
+        return {month:m,year:y};
+      }
     }
 
     async function build(){
@@ -173,6 +200,7 @@
         );
         const pm=meta.titles.find(t=>t.program_id===prog)||{};
 
+        // HERO
         const hero=document.createElement('div'); hero.className='page hero';
         hero.innerHTML=`
           <div class="header"><img src="mind4time-logo.png"><div></div></div>
@@ -198,6 +226,7 @@
                 ),
                 byTurma=Object.entries(groupBy(numeric,'turma'));
 
+          // BANNER
           const ban=document.createElement('div'); ban.className='page banner';
           ban.innerHTML=`
             <div class="header"><img src="mind4time-logo.png"><div></div></div>
@@ -208,6 +237,7 @@
             <div class="footer"><div>www.MIND4TIME.com</div><div>© MIND4TIME 2024</div></div>`;
           out.appendChild(ban);
 
+          // GLOBAL (always if numeric)
           if(numeric.length){
             const gl=document.createElement('div'); gl.className='page chart-fullpage';
             gl.innerHTML=`
@@ -223,6 +253,7 @@
             );
           }
 
+          // PER-TURMA (only if >1 turma)
           if(byTurma.length>1){
             for(let i=0;i<byTurma.length;i+=4){
               const grid=document.createElement('div'); grid.className='page chart-grid';
@@ -243,6 +274,7 @@
             }
           }
 
+          // OPEN-ENDED
           const byQ=groupBy(
             all.filter(d=>
               String(d.section||'').toLowerCase().includes(sec) &&
@@ -263,6 +295,7 @@
         }
       }
     }
+
     document.addEventListener('DOMContentLoaded', build);
   </script>
 </body>

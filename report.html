@@ -24,7 +24,7 @@
     }
     .header { top:0; height:80px; border-bottom:1px solid #40a3a3; }
     .header img { height:60px; }
-    .footer { bottom:0; height:60px; font-size:16px; color:#007c91; border-top:1px solid #40a3a3; }
+    .footer { bottom:0; height:60px; font-size:14px; color:#007c91; border-top:1px solid #40a3a3; }
 
     .hero {
       position: relative; display:flex; align-items:center; justify-content:center; text-align:center; color:#fff;
@@ -56,19 +56,10 @@
     .chart-full { width:90vw; height:80vh; }
 
     .chart-grid {
-      display:grid; grid-template:  auto 1fr 1fr / 1fr 1fr; gap:20px;
+      display:grid; grid-template:1fr 1fr / 1fr 1fr; gap:20px;
       padding:20px; box-sizing:border-box;
     }
     .chart-box { width:100%; height:300px; }
-
-    .turma-title {
-      grid-column: span 1;
-      text-align: center;
-      font-size:20px;
-      font-weight:600;
-      margin-top:8px;
-      margin-bottom:4px;
-    }
 
     .text-page {
       overflow: visible;
@@ -123,18 +114,20 @@
         }))
         .sort((a, b) => (OM[a.question] || 0) - (OM[b.question] || 0));
     }
+
+    // UPDATED createBarChart with reduced top/bottom
     function createBarChart(div, title, data, uniform){
       const chart = echarts.init(div);
       chart.setOption({
-        title:{text:title, left:'center', textStyle:{fontSize:20}},
-        grid:{top:80, left:'10%', right:'10%', bottom:100},
+        title:{ text: title, left:'center', textStyle:{ fontSize:20 } },
+        grid:{ top:40, left:'10%', right:'10%', bottom:60 },
         tooltip:{},
-        xAxis:{type:'category', data:data.map(d=>d.label), axisLabel:{rotate:30, interval:0, rich:{height:40}}},
-        yAxis:{type:'value', min:0, max:5},
+        xAxis:{ type:'category', data:data.map(d=>d.label), axisLabel:{ rotate:30, interval:0, rich:{ height:40 } } },
+        yAxis:{ type:'value', min:0, max:5 },
         series:[{
           type:'bar',
           data: data.map(d=>d.avg),
-          label:{show:true, position:'top', formatter:'{c}'},
+          label:{ show:true, position:'top', formatter:'{c}' },
           itemStyle: uniform
             ? { color:'#6A99D0' }
             : { color(p){
@@ -148,6 +141,7 @@
       chart.resize();
       setTimeout(()=>chart.resize(),300);
     }
+
     function countUnique(rows, sec){
       return new Set(
         rows
@@ -164,6 +158,10 @@
       if(/^\d{4}-\d{2}$/.test(val)){
         [year, m] = val.split('-');
         month = monthNames[m] || m;
+      } else {
+        const parts = val.split(' ');
+        month = parts[0];
+        year = parts[1];
       }
       return {month, year};
     }
@@ -180,6 +178,7 @@
             container = document.getElementById('report');
       container.innerHTML = '';
 
+      // compute timeScope
       let timeScope = '';
       if(f.start && f.end){
         const s = formatMonthYear(f.start);
@@ -193,9 +192,9 @@
           d.program === prog &&
           (f.turmas||[]).includes(d.turma)
         );
-        const pm = meta.titles.find(t=>t.program_id===prog) || {};
 
         // HERO
+        const pm = meta.titles.find(t=>t.program_id===prog) || {};
         const hero = document.createElement('div');
         hero.className = 'page hero';
         hero.innerHTML = `
@@ -205,8 +204,8 @@
           </div>
           <img class="bg" src="hourglass-bg.jpg">
           <div class="hero-content">
-            <small>${pm.SUBTÍTULO||''}</small>
             <h1>${pm.TÍTULO||prog}</h1>
+            <small>${pm.SUBTÍTULO||''}</small>
             <div class="subtitle">${pm.TAGLINE||''}</div>
             <div class="meta">
               <div><span>time scope</span><strong>${timeScope}</strong></div>
@@ -266,19 +265,11 @@
             grid.appendChild(hdr);
 
             byT.slice(i, i+4).forEach(([tm, vals], idx) => {
-              // Turma title
-              const titleDiv = document.createElement('div');
-              titleDiv.className = 'turma-title';
-              titleDiv.textContent = tm;
-              grid.appendChild(titleDiv);
-
-              // Chart box
               const box = document.createElement('div');
               box.className = 'chart-box';
               box.id = `chart-${prog}-${sec}-${i+idx}`;
               grid.appendChild(box);
-
-              setTimeout(() => createBarChart(
+              setTimeout(()=>createBarChart(
                 box, tm, computeAverages(vals, LM, OM), sec==='evaluation'
               ), 0);
             });

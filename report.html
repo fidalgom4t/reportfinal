@@ -6,33 +6,31 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <script src="https://cdn.jsdelivr.net/npm/echarts@5/dist/echarts.min.js"></script>
   <style>
-    /* === Page size === */
+    /* 1) full‐page size */
     @page { size: 11in 8.5in; margin: 0; }
-    @media print {
-      .page-wrapper { page-break-after: always; }
-    }
+    @media print { .page { page-break-after: always; } }
 
-    /* === Shared header/footer container === */
-    .page-wrapper {
-      position: relative;
-      width: 100vw; height: 100vh;
-      padding-top: 60px;    /* header height */
-      padding-bottom: 40px; /* footer height */
+    /* 2) header & footer */
+    .page {
+      position: relative; width:100vw; height:100vh;
       box-sizing: border-box;
-      overflow: hidden;
+      padding-top: 60px;   /* header */
+      padding-bottom: 40px;/* footer */
     }
-    .page-header, .page-footer {
+    .header, .footer {
       position: absolute; left:0; right:0;
-      display:flex; align-items:center; justify-content:space-between;
-      background:#fff; padding:0 30px; z-index:2; box-sizing:border-box;
+      display: flex; justify-content: space-between; align-items: center;
+      background: #fff; padding: 0 30px; box-sizing: border-box;
     }
-    .page-header { top:0; height:60px; border-bottom:1px solid #40a3a3; }
-    .page-header img { height:40px; }
-    .page-footer { bottom:0; height:40px; font-size:12px; color:#007c91; border-top:1px solid #40a3a3; }
+    .header { top:0; height:60px; border-bottom:1px solid #40a3a3; }
+    .header img { height:40px; }
+    .footer { bottom:0; height:40px; font-size:12px; color:#007c91; border-top:1px solid #40a3a3; }
 
-    /* === Hero slide === */
-    .hero-page { position: relative; display:flex; align-items:center; justify-content:center; text-align:center; color:#fff; }
-    .hero-page img.bg {
+    /* 3) hero slide */
+    .hero {
+      position: relative; display:flex; align-items:center; justify-content:center; text-align:center; color:#fff;
+    }
+    .hero .bg {
       position:absolute; top:0; left:0; width:100%; height:100%; object-fit:cover; z-index:0;
     }
     .hero-content {
@@ -43,53 +41,57 @@
     .hero-content small { font-style:italic; color:#e0f2f3; margin-bottom:8px; font-size:1.2rem; }
     .hero-content h1 { font-size:4rem; margin:0; font-weight:600; }
     .hero-content .subtitle { font-size:1.8rem; margin-top:12px; }
-    .hero-content .meta {
-      margin-top:24px; display:flex; gap:40px; justify-content:center; font-size:1.2rem;
-    }
+    .hero-content .meta { margin-top:24px; display:flex; gap:40px; justify-content:center; font-size:1.2rem; }
     .hero-content .meta span { display:block; font-style:italic; color:#e0f2f3; }
     .hero-content .meta strong { color:#fff; font-weight:600; }
 
-    /* === Section banner === */
-    .banner-page { display:flex; align-items:center; justify-content:center; background:#fff; }
-    .section-banner {
+    /* 4) section banner */
+    .banner {
+      display:flex; align-items:center; justify-content:center; background:#fff;
+    }
+    .banner-box {
       background:#f0f8f9; padding:40px 60px; border-left:6px solid #007c91;
       box-shadow:0 2px 6px rgba(0,0,0,0.1); width:70%;
     }
-    .section-banner h1 { margin:0 0 16px; font-size:48px; color:#007c91; }
-    .section-banner .section-meta { display:flex; gap:40px; font-size:18px; color:#555; }
+    .banner-box h1 { margin:0 0 16px; font-size:48px; color:#007c91; }
+    .banner-box .meta { display:flex; gap:40px; font-size:18px; color:#555; }
 
-    /* === Full‑page chart === */
-    .chart-page { display:flex; align-items:center; justify-content:center; background:#fff; }
+    /* 5) full‑page chart */
+    .chart-fullpage {
+      display:flex; align-items:center; justify-content:center; background:#fff;
+    }
     .chart-full { width:90vw; height:80vh; }
 
-    /* === Grid chart slides === */
-    .chart-grid-page {
-      display:grid; grid-template:1fr 1fr / 1fr 1fr;
-      gap:20px; padding:20px; box-sizing:border-box;
+    /* 6) grid of charts */
+    .chart-grid {
+      display:grid; grid-template:1fr 1fr / 1fr 1fr; gap:20px;
+      padding:20px; box-sizing:border-box;
     }
-    .chart-container { width:100%; height:300px; }
+    .chart-box { width:100%; height:300px; }
 
-    /* === Open‑ended text answers — natural flow === */
+    /* 7) open‑ended answers – one question per page */
+    .text-page {
+      overflow: visible; /* allow flow across pages */
+      background: #fff;
+      box-sizing: border-box;
+    }
     .text-question {
       border:1px solid #007c91; border-left:6px solid #007c91;
-      /* center within page and add breathing room */
-      width: 80vw;
-      margin: 80px auto;      /* 80px below header and above footer */
-      padding: 24px 32px;     /* comfortable inside padding */
+      width: 80vw;           /* centered block */
+      margin: 80px auto;     /* below header / above footer */
+      padding: 24px 32px;    /* breathing room */
       background:#f9f9f9;
       box-sizing:border-box;
-      /* allow break across pages */
-      page-break-inside: auto;
-      break-inside: auto;
     }
-    .text-question-title { font-weight:bold; margin-bottom:8px; font-size:18px; color:#007c91; }
+    .text-question-title { font-size:18px; font-weight:bold; margin-bottom:12px; color:#007c91; }
     .text-question ul { padding-left:20px; font-size:16px; }
   </style>
 </head>
 <body>
-  <div id="reportContent"></div>
+  <div id="report"></div>
+  <script src="https://cdn.jsdelivr.net/npm/echarts@5/dist/echarts.min.js"></script>
   <script>
-    // Helpers
+    // re‑use previous helpers...
     function createLabelMap(labels){
       const m={};
       labels.forEach(l=>{
@@ -117,7 +119,7 @@
         return {question:q,label:LM[q]||q,avg:+avg.toFixed(1)};
       }).sort((a,b)=>(OM[a.question]||0)-(OM[b.question]||0));
     }
-    function createBarChartIn(div,title,data,uniform){
+    function createBarChart(div,title,data,uniform){
       const chart=echarts.init(div);
       chart.setOption({
         title:{text:title,left:'center',textStyle:{fontSize:20}},
@@ -126,16 +128,14 @@
         xAxis:{type:'category',data:data.map(d=>d.label),axisLabel:{rotate:30,interval:0,rich:{height:40}}},
         yAxis:{type:'value',min:0,max:5},
         series:[{
-          type:'bar',
-          data:data.map(d=>d.avg),
+          type:'bar', data:data.map(d=>d.avg),
           label:{show:true,position:'top',formatter:'{c}'},
           itemStyle: uniform
             ? {color:'#61c277'}
-            : {color(p){const v=p.value; if(v<3)return'#d94e5d'; if(v<4)return'#f2c037'; return'#61c277';}}
+            : {color(p){const v=p.value; if(v<3) return '#d94e5d'; if(v<4) return '#f2c037'; return '#61c277';}}
         }]
       });
-      chart.resize();
-      setTimeout(()=>chart.resize(),300);
+      chart.resize(); setTimeout(()=>chart.resize(),300);
     }
     function countUnique(rows,sec){
       return new Set(rows.filter(d=>String(d.section||'').toLowerCase().includes(sec))
@@ -143,110 +143,117 @@
       ).size;
     }
 
-    // Render
-    async function loadReport(){
-      const f = JSON.parse(localStorage.getItem('reportFilters')||'{}');
-      const [data,meta] = await Promise.all([
+    async function build(){
+      const f=JSON.parse(localStorage.getItem('reportFilters')||'{}');
+      const [data,meta]=await Promise.all([
         fetch('data.json').then(r=>r.json()),
         fetch('meta.json').then(r=>r.json())
       ]);
       const LM=createLabelMap(meta.labels), OM=createSortMap(meta.labels);
-      const out=document.getElementById('reportContent');
-      out.innerHTML='';
+      const container=document.getElementById('report');
+      container.innerHTML='';
 
       for(const prog of f.programs||[]){
-        const rowsAll=data.filter(d=>
-          (f.clients||[]).includes(d.client)&& d.program===prog && (f.turmas||[]).includes(d.turma)
+        const all=data.filter(d=>
+          f.clients.includes(d.client)&&
+          d.program===prog&&
+          f.turmas.includes(d.turma)
         );
 
-        // HERO slide
+        // HERO
         const pm=meta.titles.find(t=>t.program_id===prog)||{};
-        const hw=document.createElement('div'); hw.className='page-wrapper hero-page';
-        const ph=hw.appendChild(document.createElement('div')); ph.className='page-header';
-        ph.innerHTML=`<img src="mind4time-logo.png" alt="MIND4TIME"><div></div>`;
-        const bg=hw.appendChild(document.createElement('img')); bg.className='bg'; bg.src='hourglass-bg.jpg';
-        const hc=hw.appendChild(document.createElement('div')); hc.className='hero-content';
-        hc.innerHTML=`
-          <small>${pm.SUBTÍTULO||''}</small>
-          <h1>${pm.TÍTULO||prog}</h1>
-          <div class="subtitle">${pm.TAGLINE||''}</div>
-          <div class="meta">
-            <div><span>time scope</span><strong>${f.start} – ${f.end}</strong></div>
-            <div><span>trainers</span><strong>${(f.trainers||{})[prog]||'N/A'}</strong></div>
-          </div>`;
-        const pf=hw.appendChild(document.createElement('div')); pf.className='page-footer';
-        pf.innerHTML=`<div class="left">www.MIND4TIME.com</div><div class="right">Copyright © MIND4TIME 2024</div>`;
-        out.appendChild(hw);
+        const hero=document.createElement('div'); hero.className='page hero';
+        hero.innerHTML=`
+          <div class="header"><img src="mind4time-logo.png"><div></div></div>
+          <img class="bg" src="hourglass-bg.jpg">
+          <div class="hero-content">
+            <small>${pm.SUBTÍTULO||''}</small>
+            <h1>${pm.TÍTULO||prog}</h1>
+            <div class="subtitle">${pm.TAGLINE||''}</div>
+            <div class="meta">
+              <div><span>time scope</span><strong>${f.start} – ${f.end}</strong></div>
+              <div><span>trainers</span><strong>${(f.trainers||{})[prog]||'N/A'}</strong></div>
+            </div>
+          </div>
+          <div class="footer"><div>www.MIND4TIME.com</div><div>Copyright © MIND4TIME 2024</div></div>`;
+        container.appendChild(hero);
 
-        // Sections
+        // each section
         for(const sec of ['assessment','evaluation']){
-          const secName=sec==='assessment'?'Assessment':'Avaliação do Programa';
-          const uniq=countUnique(rowsAll,sec);
-          const numeric=rowsAll.filter(d=>
-            String(d.section||'').toLowerCase().includes(sec)&& !isNaN(parseFloat(d.value))
+          const name=sec==='assessment'?'Assessment':'Avaliação do Programa';
+          const uniq=countUnique(all,sec);
+          const numeric=all.filter(d=>
+            String(d.section||'').toLowerCase().includes(sec)&&
+            !isNaN(parseFloat(d.value))
           );
 
-          // Banner
-          const bw=document.createElement('div'); bw.className='page-wrapper banner-page';
-          const ph2=bw.appendChild(document.createElement('div')); ph2.className='page-header';
-          ph2.innerHTML=`<img src="mind4time-logo.png" alt="MIND4TIME"><div></div>`;
-          const sb=bw.appendChild(document.createElement('div')); sb.className='section-banner';
-          sb.innerHTML=`<h1>${secName}</h1><div class="section-meta"><div><span>Total de respostas:</span><strong>${uniq}</strong></div></div>`;
-          const pf2=bw.appendChild(document.createElement('div')); pf2.className='page-footer';
-          pf2.innerHTML=`<div class="left">www.MIND4TIME.com</div><div class="right">Copyright © MIND4TIME 2024</div>`;
-          out.appendChild(bw);
+          // banner
+          const ban=document.createElement('div'); ban.className='page banner';
+          ban.innerHTML=`
+            <div class="header"><img src="mind4time-logo.png"><div></div></div>
+            <div class="banner-box">
+              <h1>${name}</h1>
+              <div class="meta"><div><span>Total de respostas:</span><strong>${uniq}</strong></div></div>
+            </div>
+            <div class="footer"><div>www.MIND4TIME.com</div><div>Copyright © MIND4TIME 2024</div></div>`;
+          container.appendChild(ban);
 
-          // Global chart
+          // global chart
           if(numeric.length){
-            const cw=document.createElement('div'); cw.className='page-wrapper chart-page';
-            const ph3=cw.appendChild(document.createElement('div')); ph3.className='page-header';
-            ph3.innerHTML=`<img src="mind4time-logo.png" alt="MIND4TIME"><div></div>`;
-            const cdiv=cw.appendChild(document.createElement('div')); cdiv.className='chart-full';
-            const pf3=cw.appendChild(document.createElement('div')); pf3.className='page-footer';
-            pf3.innerHTML=`<div class="left">www.MIND4TIME.com</div><div class="right">Copyright © MIND4TIME 2024</div>`;
-            out.appendChild(cw);
-            createBarChartIn(cdiv,`Global (${secName})`,computeAverages(numeric,LM,OM), sec==='evaluation');
+            const ch=document.createElement('div'); ch.className='page chart-fullpage';
+            ch.innerHTML=`
+              <div class="header"><img src="mind4time-logo.png"><div></div></div>
+              <div class="chart-full" id="chart-global-${prog}-${sec}"></div>
+              <div class="footer"><div>www.MIND4TIME.com</div><div>Copyright © MIND4TIME 2024</div></div>`;
+            container.appendChild(ch);
+            createBarChart(
+              ch.querySelector('.chart-full'),
+              `Global (${name})`,
+              computeAverages(numeric,LM,OM),
+              sec==='evaluation'
+            );
           }
 
-          // Grid charts
+          // per‑turma grid
           const byT=Object.entries(groupBy(numeric,'turma'));
           for(let i=0;i<byT.length;i+=4){
-            const grid=out.appendChild(document.createElement('div')); grid.className='chart-grid-page';
-            byT.slice(i,i+4).forEach(([tm,vals])=>{
-              const cc=grid.appendChild(document.createElement('div')); cc.className='chart-container';
-              createBarChartIn(cc,tm,computeAverages(vals,LM,OM), sec==='evaluation');
+            const grid=document.createElement('div'); grid.className='page chart-grid';
+            grid.innerHTML=`<div class="header"><img src="mind4time-logo.png"><div></div></div>`;
+            byT.slice(i,i+4).forEach(([tm,vals],idx)=>{
+              const div=document.createElement('div'); div.className='chart-box';
+              div.id=`chart-${prog}-${sec}-${i+idx}`; grid.appendChild(div);
+              setTimeout(()=>createBarChart(
+                div, tm, computeAverages(vals,LM,OM), sec==='evaluation'
+              ),0);
             });
+            grid.innerHTML += `<div class="footer"><div>www.MIND4TIME.com</div><div>Copyright © MIND4TIME 2024</div></div>`;
+            container.appendChild(grid);
           }
 
-          // Open‑ended — just text-question blocks
-          rowsAll
-            .filter(d=>
+          // open‑ended — one question per page, grouped
+          const byQ=groupBy(
+            all.filter(d=>
               String(d.section||'').toLowerCase().includes(sec)&&
               isNaN(parseFloat(d.value))&&
-              (f.textQuestions||[]).includes(d.question)
-            )
-            .sort((a,b)=>a.question.localeCompare(b.question))
-            .forEach(d=>{
-              const box=document.createElement('div'); box.className='text-question';
-              const title=document.createElement('div'); title.className='text-question-title';
-              title.textContent=d.question;
-              box.appendChild(title);
-              const ul=document.createElement('ul');
-              d.value.split('\n').forEach(line=>{
-                const li=document.createElement('li'); li.textContent=line; ul.appendChild(li);
-              });
-              box.appendChild(ul);
-              out.appendChild(box);
-            });
+              f.textQuestions.includes(d.question)
+            ),
+            'question'
+          );
+          for(const [q,answers] of Object.entries(byQ)){
+            const tp=document.createElement('div'); tp.className='page text-page';
+            tp.innerHTML=`
+              <div class="header"><img src="mind4time-logo.png"><div></div></div>
+              <div class="text-question">
+                <div class="text-question-title">${q}</div>
+                <ul>${answers.map(a=>`<li>${a.value.replace(/\n/g,'</li><li>')}</li>`).join('')}</ul>
+              </div>
+              <div class="footer"><div>www.MIND4TIME.com</div><div>Copyright © MIND4TIME 2024</div></div>`;
+            container.appendChild(tp);
+          }
         }
       }
-
-      if(new URLSearchParams(location.search).get('download')==='true'){
-        setTimeout(()=>window.print(),500);
-      }
     }
-
-    document.addEventListener('DOMContentLoaded', loadReport);
+    document.addEventListener('DOMContentLoaded', build);
   </script>
 </body>
 </html>

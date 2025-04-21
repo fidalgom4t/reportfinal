@@ -60,43 +60,20 @@
     .banner-box h1 { margin:0 0 16px; font-size:48px; color:#007c91; }
     .banner-box .meta { display:flex; gap:40px; font-size:18px; color:#555; }
 
-    /* chart‑page wrapper */
-.chart-fullpage {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 0 30px;         /* same side padding as header/footer */
-  box-sizing: border-box;
-  overflow-x: hidden;      /* clamp anything that would overflow */
-  background: #fff;
-}
+    .chart-fullpage { display:flex; align-items:center; justify-content:center; background:#fff; }
+    .chart-full { width:90vw; height:80vh; }
 
-/* full‑screen chart */
-.chart-full {
-  width: 100%;                                     /* fill available width */
-  max-width: calc(100% - 60px);                    /* respect the 30px side padding */
-  height: calc(100% - 80px - 60px);                /* subtract header+footer */
-}
-
-/* 2×2 grid of smaller charts */
-.chart-grid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 20px;
-  padding: 20px 30px;          /* left/right padding */
-  box-sizing: border-box;
-  /* two rows sharing the remaining vertical space minus header/footer and gap */
-  grid-template-rows:
-    calc((100% - 80px - 60px - 20px) / 2)
-    calc((100% - 80px - 60px - 20px) / 2);
-  overflow: hidden;
-}
-
-.chart-box {
-  width: 100%;
-  height: 100%;
-}
-
+    .chart-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      grid-template-rows:
+        calc((100vh - 80px - 60px - 40px)/2)
+        calc((100vh - 80px - 60px - 40px)/2);
+      gap: 30px;
+      padding: 100px;
+      box-sizing: border-box;
+    }
+    .chart-box { width:100%; height:100%; }
 
     .text-page {
       overflow: visible;

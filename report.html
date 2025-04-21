@@ -90,37 +90,33 @@
     .text-question ul { padding-left:20px; font-size:16px; line-height:1.8; }
     .text-question li { margin-bottom: 12px; }
     @media print {
-  /* 1) Make the sheet truly borderless */
-  @page { margin: 0; size: landscape; }
-
-  /* 2) Kill default body margins so our .page exactly matches screen */
-  html, body {
-    margin: 0;
-    padding: 0;
-    width: 100vw;
-    height: 100vh;
-  }
-
-  /* 3) Force each .page to render at full viewport, without adjusting your paddings */
+  /* 1) Force every .page variant to fill the printable viewport */
   .page {
-    display: block !important;
-    position: relative !important;
     width: 100vw !important;
     height: 100vh !important;
     overflow: visible !important;
-    /* keep your top/bottom padding exactly as you wrote it on-screen */
+    /* preserve the top/bottom padding you already set */
   }
 
-  /* 4) Pin your header/footer so they don’t scroll off-page */
-  .header { position: fixed; top: 0; }
-  .footer { position: fixed; bottom: 0; }
-
-  /* 5) Don’t re‑flow or clip internal elements */
-  * {
-    -webkit-print-color-adjust: exact; /* preserve colors */
-    box-sizing: border-box;
+  /* 2) Ensure your chart‑grid pages behave the same as your fullpage chart */
+  .page.chart-grid {
+    display: grid !important;
+    grid-template-columns: 1fr 1fr !important;
+    grid-template-rows:
+      calc((100vh - 80px - 60px - 40px)/2)
+      calc((100vh - 80px - 60px - 40px)/2) !important;
+    gap: 30px !important;
+    padding: 100px !important;           /* ← keep the same padding you had on‑screen */
+    box-sizing: border-box !important;
+  }
+  /* and make sure each chart box can expand and never be clipped */
+  .page.chart-grid .chart-box {
+    overflow: visible !important;
+    page-break-inside: avoid !important;
+    break-inside: avoid !important;
   }
 }
+
   </style>
 </head>
 <body>

@@ -6,223 +6,156 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <script src="https://cdn.jsdelivr.net/npm/echarts@5/dist/echarts.min.js"></script>
   <style>
-    /* === Force US‑Letter landscape === */
     @page { size: 11in 8.5in; margin: 0; }
-
-    /* === Global styles for header/footer wrapper === */
     .page-wrapper {
-      position: relative;
-      width: 100vw; height: 100vh;
-      padding-top: 60px;    /* header height */
-      padding-bottom: 40px; /* footer height */
-      box-sizing: border-box;
-      overflow: hidden;
+      position: relative; width:100vw; height:100vh;
+      padding-top:60px; padding-bottom:40px; box-sizing:border-box; overflow:hidden;
     }
     .page-header, .page-footer {
-      position: absolute; left: 0; right: 0;
-      display: flex; align-items: center; justify-content: space-between;
-      background: #fff; padding: 0 30px; z-index: 2; box-sizing: border-box;
+      position:absolute; left:0; right:0; display:flex;
+      align-items:center; justify-content:space-between;
+      background:#fff; padding:0 30px; box-sizing:border-box; z-index:2;
     }
-    .page-header { top: 0; height: 60px; border-bottom: 1px solid #40a3a3; }
-    .page-header img { height: 40px; }
-    .page-footer { bottom: 0; height: 40px; font-size: 12px; color: #007c91; border-top: 1px solid #40a3a3; }
-
-    /* === Hero slide using an actual <img> for reliable printing === */
-    .hero-page {
-      position: relative;
-      display: flex; align-items: center; justify-content: center;
-      text-align: center; color: #fff;
-    }
+    .page-header { top:0; height:60px; border-bottom:1px solid #40a3a3 }
+    .page-header img { height:40px }
+    .page-footer { bottom:0; height:40px; font-size:12px; color:#007c91; border-top:1px solid #40a3a3 }
+    .hero-page { position:relative; display:flex; align-items:center; justify-content:center; text-align:center; color:#fff }
     .hero-page img.bg {
-      position: absolute; top: 0; left: 0;
-      width: 100%; height: 100%; object-fit: cover; z-index: 0;
+      position:absolute; top:0; left:0; width:100%; height:100%;
+      object-fit:cover; z-index:0;
     }
     .hero-content {
-      position: relative; z-index: 1;
-      max-width: 80%;
-      display: flex; flex-direction: column; align-items: center; justify-content: center;
-      height: 100%;
+      position:relative; z-index:1; max-width:80%;
+      display:flex; flex-direction:column; align-items:center; justify-content:center; height:100%;
     }
-    .hero-content small { font-style: italic; color: #e0f2f3; margin-bottom: 8px; font-size: 1.2rem; }
-    .hero-content h1 { font-size: 4rem; margin: 0; font-weight: 600; }
-    .hero-content .subtitle { font-size: 1.8rem; margin-top: 12px; }
+    .hero-content small { font-style:italic; color:#e0f2f3; margin-bottom:8px; font-size:1.2rem }
+    .hero-content h1 { font-size:4rem; margin:0; font-weight:600 }
+    .hero-content .subtitle { font-size:1.8rem; margin-top:12px }
     .hero-content .meta {
-      margin-top: 24px; display: flex; gap: 40px; justify-content: center; font-size: 1.2rem;
+      margin-top:24px; display:flex; gap:40px; justify-content:center; font-size:1.2rem;
     }
-    .hero-content .meta span { display: block; font-style: italic; color: #e0f2f3; }
-    .hero-content .meta strong { color: #fff; font-weight: 600; }
-
-    /* === Section banner slide === */
-    .banner-page { display: flex; align-items: center; justify-content: center; background: #fff; }
+    .hero-content .meta span { display:block; font-style:italic; color:#e0f2f3 }
+    .hero-content .meta strong { color:#fff; font-weight:600 }
+    .banner-page { display:flex; align-items:center; justify-content:center; background:#fff }
     .section-banner {
-      background: #f0f8f9; padding: 40px 60px; border-left: 6px solid #007c91;
-      box-shadow: 0 2px 6px rgba(0,0,0,0.1); width: 70%;
+      background:#f0f8f9; padding:40px 60px; border-left:6px solid #007c91;
+      box-shadow:0 2px 6px rgba(0,0,0,0.1); width:70%;
     }
-    .section-banner h1 { margin: 0 0 16px; font-size: 48px; color: #007c91; }
-    .section-banner .section-meta { display: flex; gap: 40px; font-size: 18px; color: #555; }
-
-    /* === Full‑page chart slide === */
-    .chart-page { display: flex; align-items: center; justify-content: center; background: #fff; }
-    .chart-full { width: 90vw; height: 80vh; }
-
-    /* === Per‑turma grid and text responses === */
+    .section-banner h1 { margin:0 0 16px; font-size:48px; color:#007c91 }
+    .section-banner .section-meta { display:flex; gap:40px; font-size:18px; color:#555 }
+    .chart-page { display:flex; align-items:center; justify-content:center; background:#fff }
+    .chart-full { width:90vw; height:80vh }
     .chart-grid-page {
-      display: grid; grid-template: 1fr 1fr / 1fr 1fr;
-      gap: 20px; padding: 20px; box-sizing: border-box;
+      display:grid; grid-template:1fr 1fr / 1fr 1fr; gap:20px; padding:20px; box-sizing:border-box;
     }
-    .chart-container { width: 100%; height: 300px; }
+    .chart-container { width:100%; height:300px }
     .text-question {
-      border: 1px solid #007c91; border-left: 6px solid #007c91;
-      padding: 16px; margin: 20px auto 40px; background: #f9f9f9;
-      width: 90vw; box-sizing: border-box;
+      border:1px solid #007c91; border-left:6px solid #007c91;
+      padding:16px; margin:20px auto 40px; background:#f9f9f9;
+      width:90vw; box-sizing:border-box;
     }
-    .text-question-title { font-weight: bold; margin-bottom: 8px; font-size: 18px; color: #007c91; }
-    ul { padding-left: 20px; font-size: 16px; }
-
-    /* === Print‑specific rules === */
+    .text-question-title { font-weight:bold; margin-bottom:8px; font-size:18px; color:#007c91 }
+    ul { padding-left:20px; font-size:16px }
     @media print {
-      /* each wrapper starts a new PDF page */
-      .page-wrapper { page-break-after: always; }
-
-      /* never split these across pages */
-      .hero-content,
-      .section-banner,
-      .chart-full,
-      .chart-grid-page {
-        page-break-inside: avoid;
-        break-inside: avoid;
+      .page-wrapper { page-break-after: always }
+      .hero-content, .section-banner, .chart-full, .chart-grid-page {
+        page-break-inside: avoid; break-inside: avoid;
       }
-
-      /* allow long text answers to flow to next page */
-      .text-question {
-        page-break-inside: auto;
-        break-inside: auto;
-      }
+      .text-question { page-break-inside: auto; break-inside: auto }
     }
   </style>
 </head>
 <body>
   <div id="reportContent"></div>
   <script>
-    // — Helpers —
-    function createLabelMap(labels) {
-      const m = {};
-      labels.forEach(l => {
-        const q = l.questionId || l["QUESTION ID"];
-        m[q] = l.label || l["LABEL"];
+    function createLabelMap(labels){
+      const m={};
+      labels.forEach(l=>{
+        const q=l.questionId||l["QUESTION ID"];
+        m[q]=l.label||l["LABEL"];
       });
       return m;
     }
-    function createSortMap(labels) {
-      const m = {};
-      labels.forEach(l => {
-        const q = l.questionId || l["QUESTION ID"];
-        m[q] = +(l.sortOrder || l["SORT ORDER"] || l.sort_order);
+    function createSortMap(labels){
+      const m={};
+      labels.forEach(l=>{
+        const q=l.questionId||l["QUESTION ID"];
+        m[q]=+(l.sortOrder||l["SORT ORDER"]||l.sort_order);
       });
       return m;
     }
-    function groupBy(arr, key) {
-      return arr.reduce((o,i) => {
-        (o[i[key]] ||= []).push(i);
-        return o;
-      }, {});
+    function groupBy(arr,key){
+      return arr.reduce((o,i)=>((o[i[key]]||(o[i[key]]=[])).push(i), o), {});
     }
-    function computeAverages(rows, LM, OM) {
-      const g = {};
-      rows.forEach(({question,value}) => {
-        (g[question] ||= []).push(+value);
-      });
-      return Object.entries(g).map(([q,vals]) => {
-        const avg = vals.reduce((a,b)=>a+b, 0)/vals.length;
+    function computeAverages(rows,LM,OM){
+      const g={};
+      rows.forEach(({question,value})=>(g[question]||(g[question]=[])).push(+value));
+      return Object.entries(g).map(([q,vals])=>{
+        const avg=vals.reduce((a,b)=>a+b,0)/vals.length;
         return { question:q, label:LM[q]||q, avg:+avg.toFixed(1) };
-      }).sort((a,b)=> (OM[a.question]||0) - (OM[b.question]||0));
+      }).sort((a,b)=>(OM[a.question]||0)-(OM[b.question]||0));
     }
-    function createBarChartIn(div, title, data) {
-      const chart = echarts.init(div);
+    function createBarChartIn(div,title,data, uniform){
+      const chart=echarts.init(div);
       chart.setOption({
-        title:{ text:title, left:'center', textStyle:{ fontSize:20 } },
-        grid:{ top:60, left:'10%', right:'10%', bottom:80 },
+        title:{ text:title, left:'center', textStyle:{fontSize:20} },
+        grid:{ top:60,left:'10%',right:'10%',bottom:80 },
         tooltip:{},
-        xAxis:{
-          type:'category',
-          data:data.map(d=>d.label),
-          axisLabel:{ rotate:30, interval:0, rich:{ height:40 } }
-        },
+        xAxis:{ type:'category', data:data.map(d=>d.label), axisLabel:{rotate:30,interval:0,rich:{height:40}} },
         yAxis:{ type:'value', min:0, max:5 },
         series:[{
           type:'bar',
           data:data.map(d=>d.avg),
           label:{ show:true, position:'top', formatter:'{c}' },
-          itemStyle:{ color(p){ const v=p.value; if(v<3) return '#d94e5d'; if(v<4) return '#f2c037'; return '#61c277'; } }
+          itemStyle: uniform
+            ? { color:'#61c277' }
+            : { color(p){ const v=p.value; if(v<3)return'#d94e5d'; if(v<4)return'#f2c037'; return'#61c277'; } }
         }]
       });
       chart.resize();
-      setTimeout(()=>chart.resize(), 300);
+      setTimeout(()=>chart.resize(),300);
     }
-    function renderTextQuestions(rows, container) {
-      const byQ = groupBy(rows, 'question');
-      Object.entries(byQ).forEach(([q, answers]) => {
-        const box = document.createElement('div');
-        box.className = 'text-question';
-        const title = document.createElement('div');
-        title.className = 'text-question-title';
-        title.textContent = q;
-        box.appendChild(title);
-
-        const ul = document.createElement('ul');
-        answers.forEach(a => {
-          const li = document.createElement('li');
-          li.textContent = a.value;
-          ul.appendChild(li);
-        });
+    function renderTextQuestions(rows,container){
+      const byQ=groupBy(rows,'question');
+      Object.entries(byQ).forEach(([q,ans])=>{
+        const box=document.createElement('div'); box.className='text-question';
+        const h=document.createElement('div'); h.className='text-question-title'; h.textContent=q;
+        box.appendChild(h);
+        const ul=document.createElement('ul');
+        ans.forEach(a=>{ const li=document.createElement('li'); li.textContent=a.value; ul.appendChild(li); });
         box.appendChild(ul);
         container.appendChild(box);
       });
     }
-    function countUnique(rows, sec) {
-      return new Set(
-        rows
-          .filter(d => String(d.section||'').toLowerCase().includes(sec))
-          .map(d => d.respondent_id || d.id)
-      ).size;
+    function countUnique(rows,sec){
+      return new Set(rows.filter(d=>String(d.section||'').toLowerCase().includes(sec)).map(d=>d.respondent_id||d.id)).size;
     }
 
-    // — Main render —
-    async function loadReport() {
-      const f = JSON.parse(localStorage.getItem('reportFilters')||'{}');
-      const [data, meta] = await Promise.all([
+    async function loadReport(){
+      const f=JSON.parse(localStorage.getItem('reportFilters')||'{}');
+      const [data,meta]=await Promise.all([
         fetch('data.json').then(r=>r.json()),
         fetch('meta.json').then(r=>r.json())
       ]);
-      const LM = createLabelMap(meta.labels);
-      const OM = createSortMap(meta.labels);
-      const out = document.getElementById('reportContent');
-      out.innerHTML = '';
+      const LM=createLabelMap(meta.labels), OM=createSortMap(meta.labels);
+      const out=document.getElementById('reportContent');
+      out.innerHTML='';
 
-      for (const prog of f.programs || []) {
-        // filter data for this program
-        const rowsAll = data.filter(d =>
-          (f.clients||[]).includes(d.client) &&
-          d.program === prog &&
+      for(const prog of f.programs||[]){
+        const rowsAll=data.filter(d=>
+          (f.clients||[]).includes(d.client)&&
+          d.program===prog&&
           (f.turmas||[]).includes(d.turma)
         );
 
         // Hero slide
-        const pm = meta.titles.find(t=>t.program_id===prog) || {};
-        const hw = document.createElement('div');
-        hw.className = 'page-wrapper hero-page';
-        // header
-        const ph = hw.appendChild(document.createElement('div'));
-        ph.className = 'page-header';
-        ph.innerHTML = `<img src="mind4time-logo.png" alt="MIND4TIME"><div></div>`;
-        // bg img
-        const bg = hw.appendChild(document.createElement('img'));
-        bg.className = 'bg';
-        bg.src = 'hourglass-bg.jpg';
-        // content
-        const hc = hw.appendChild(document.createElement('div'));
-        hc.className = 'hero-content';
-        hc.innerHTML = `
+        const pm=meta.titles.find(t=>t.program_id===prog)||{};
+        const hw=document.createElement('div'); hw.className='page-wrapper hero-page';
+        const ph=hw.appendChild(document.createElement('div')); ph.className='page-header';
+        ph.innerHTML=`<img src="mind4time-logo.png" alt="MIND4TIME"><div></div>`;
+        const bg=hw.appendChild(document.createElement('img')); bg.className='bg'; bg.src='hourglass-bg.jpg';
+        const hc=hw.appendChild(document.createElement('div')); hc.className='hero-content';
+        hc.innerHTML=`
           <small>${pm.SUBTÍTULO||''}</small>
           <h1>${pm.TÍTULO||prog}</h1>
           <div class="subtitle">${pm.TAGLINE||''}</div>
@@ -230,80 +163,66 @@
             <div><span>time scope</span><strong>${f.start} – ${f.end}</strong></div>
             <div><span>trainers</span><strong>${(f.trainers||{})[prog]||'N/A'}</strong></div>
           </div>`;
-        // footer
-        const pf = hw.appendChild(document.createElement('div'));
-        pf.className = 'page-footer';
-        pf.innerHTML = `<div class="left">www.MIND4TIME.com</div><div class="right">Copyright © MIND4TIME 2024</div>`;
-
+        const pf=hw.appendChild(document.createElement('div')); pf.className='page-footer';
+        pf.innerHTML=`<div class="left">www.MIND4TIME.com</div><div class="right">Copyright © MIND4TIME 2024</div>`;
         out.appendChild(hw);
 
-        // Each section: assessment & evaluation
-        for (const sec of ['assessment','evaluation']) {
-          const secName = sec==='assessment' ? 'Assessment' : 'Avaliação do Programa';
-          const uniq = countUnique(rowsAll, sec);
-          const numeric = rowsAll.filter(d =>
-            String(d.section||'').toLowerCase().includes(sec) &&
+        // Sections
+        for(const sec of ['assessment','evaluation']){
+          const secName=sec==='assessment'?'Assessment':'Avaliação do Programa';
+          const uniq=countUnique(rowsAll,sec);
+          const numeric=rowsAll.filter(d=>
+            String(d.section||'').toLowerCase().includes(sec)&&
             !isNaN(parseFloat(d.value))
           );
 
-          // section banner slide
-          const bw = document.createElement('div');
-          bw.className = 'page-wrapper banner-page';
-          const ph2 = bw.appendChild(document.createElement('div'));
-          ph2.className = 'page-header';
-          ph2.innerHTML = `<img src="mind4time-logo.png" alt="MIND4TIME"><div></div>`;
-          const sb = bw.appendChild(document.createElement('div'));
-          sb.className = 'section-banner';
-          sb.innerHTML = `<h1>${secName}</h1><div class="section-meta"><div><span>Total de respostas:</span><strong>${uniq}</strong></div></div>`;
-          const pf2 = bw.appendChild(document.createElement('div'));
-          pf2.className = 'page-footer';
-          pf2.innerHTML = `<div class="left">www.MIND4TIME.com</div><div class="right">Copyright © MIND4TIME 2024</div>`;
+          // Banner
+          const bw=document.createElement('div'); bw.className='page-wrapper banner-page';
+          const ph2=bw.appendChild(document.createElement('div')); ph2.className='page-header';
+          ph2.innerHTML=`<img src="mind4time-logo.png" alt="MIND4TIME"><div></div>`;
+          const sb=bw.appendChild(document.createElement('div')); sb.className='section-banner';
+          sb.innerHTML=`<h1>${secName}</h1><div class="section-meta"><div><span>Total de respostas:</span><strong>${uniq}</strong></div></div>`;
+          const pf2=bw.appendChild(document.createElement('div')); pf2.className='page-footer';
+          pf2.innerHTML=`<div class="left">www.MIND4TIME.com</div><div class="right">Copyright © MIND4TIME 2024</div>`;
           out.appendChild(bw);
 
-          // global chart slide
-          if (numeric.length) {
-            const cw = document.createElement('div');
-            cw.className = 'page-wrapper chart-page';
-            const ph3 = cw.appendChild(document.createElement('div'));
-            ph3.className = 'page-header';
-            ph3.innerHTML = `<img src="mind4time-logo.png" alt="MIND4TIME"><div></div>`;
-            const cdiv = cw.appendChild(document.createElement('div'));
-            cdiv.className = 'chart-full';
-            const pf3 = cw.appendChild(document.createElement('div'));
-            pf3.className = 'page-footer';
-            pf3.innerHTML = `<div class="left">www.MIND4TIME.com</div><div class="right">Copyright © MIND4TIME 2024</div>`;
+          // Global chart
+          if(numeric.length){
+            const cw=document.createElement('div'); cw.className='page-wrapper chart-page';
+            const ph3=cw.appendChild(document.createElement('div')); ph3.className='page-header';
+            ph3.innerHTML=`<img src="mind4time-logo.png" alt="MIND4TIME"><div></div>`;
+            const cdiv=cw.appendChild(document.createElement('div')); cdiv.className='chart-full';
+            const pf3=cw.appendChild(document.createElement('div')); pf3.className='page-footer';
+            pf3.innerHTML=`<div class="left">www.MIND4TIME.com</div><div class="right">Copyright © MIND4TIME 2024</div>`;
             out.appendChild(cw);
-            createBarChartIn(cdiv, `Global (${secName})`, computeAverages(numeric, LM, OM));
+            // uniform color for evaluation, heatmap for assessment
+            createBarChartIn(cdiv,`Global (${secName})`,computeAverages(numeric,LM,OM), sec==='evaluation');
           }
 
-          // per-turma grid
-          const byT = Object.entries(groupBy(numeric, 'turma'));
-          for (let i=0; i<byT.length; i+=4) {
-            const grid = out.appendChild(document.createElement('div'));
-            grid.className = 'chart-grid-page';
-            byT.slice(i, i+4).forEach(([tm, vals])=>{
-              const cc = grid.appendChild(document.createElement('div'));
-              cc.className = 'chart-container';
-              createBarChartIn(cc, tm, computeAverages(vals, LM, OM));
+          // Per-turma grid
+          const byT=Object.entries(groupBy(numeric,'turma'));
+          for(let i=0;i<byT.length;i+=4){
+            const grid=out.appendChild(document.createElement('div')); grid.className='chart-grid-page';
+            byT.slice(i,i+4).forEach(([tm,vals])=>{
+              const cc=grid.appendChild(document.createElement('div')); cc.className='chart-container';
+              createBarChartIn(cc,tm,computeAverages(vals,LM,OM), sec==='evaluation');
             });
           }
 
-          // open-ended responses
-          const textRows = rowsAll.filter(d=>
-            String(d.section||'').toLowerCase().includes(sec) &&
-            isNaN(parseFloat(d.value)) &&
+          // Open-ended
+          const textRows=rowsAll.filter(d=>
+            String(d.section||'').toLowerCase().includes(sec)&&
+            isNaN(parseFloat(d.value))&&
             (f.textQuestions||[]).includes(d.question)
           );
-          renderTextQuestions(textRows, out);
+          renderTextQuestions(textRows,out);
         }
       }
 
-      // auto-print if requested via ?download=true
-      if (new URLSearchParams(location.search).get('download')==='true') {
-        setTimeout(()=>window.print(), 500);
+      if(new URLSearchParams(location.search).get('download')==='true'){
+        setTimeout(()=>window.print(),500);
       }
     }
-
     document.addEventListener('DOMContentLoaded', loadReport);
   </script>
 </body>

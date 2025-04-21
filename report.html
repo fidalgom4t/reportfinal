@@ -125,31 +125,66 @@
         }))
         .sort((a, b) => (OM[a.question] || 0) - (OM[b.question] || 0));
     }
-    function createBarChart(div, title, data, uniform){
-      const chart = echarts.init(div);
-      chart.setOption({
-        title:{text:title, left:'center', textStyle:{fontSize:20}},
-        grid:{top:80, left:'10%', right:'10%', bottom:100},
-        tooltip:{},
-        xAxis:{type:'category', data:data.map(d=>d.label), axisLabel:{rotate:30,interval:0,rich:{height:40}}},
-        yAxis:{type:'value', min:0, max:5},
-        series:[{
-          type:'bar',
-          data: data.map(d=>d.avg),
-          label:{show:true,position:'top',formatter:'{c}'},
-          itemStyle: uniform
-            ? { color:'#6A99D0' }
-            : { color(p){
-                const v = p.value;
-                if(v < 3) return '#EA3323';
-                if(v < 4) return '#6A99D0';
-                return '#9FCE63';
-              }}
-        }]
-      });
-      chart.resize();
-      setTimeout(()=>chart.resize(),300);
-    }
+    function createBarChart(div, title, data, uniform) {
+  const chart = echarts.init(div);
+  chart.setOption({
+    backgroundColor: 'transparent',      // → make chart canvas transparent
+    title: {
+      text: title,
+      left: 'center',
+      textStyle: { fontSize: 20 }
+    },
+    grid: {
+      top: 80,
+      left: '10%',
+      right: '10%',
+      bottom: 100,
+      backgroundColor: 'transparent'     // optional
+    },
+    tooltip: {},
+    xAxis: {
+      type: 'category',
+      data: data.map(d => d.label),
+      axisLabel: {
+        rotate: 30,
+        interval: 0,
+        rich: { height: 40 }
+      }
+    },
+    yAxis: {
+      type: 'value',
+      min: 1,
+      max: 5,
+      axisLine: { show: false },      // hide axis line
+      axisTick: { show: false },      // hide ticks
+      axisLabel: { show: false },     // hide labels
+      splitLine: { show: false }      // hide gridlines
+    },
+    series: [{
+      type: 'bar',
+      data: data.map(d => d.avg),
+      label: {
+        show: true,
+        position: 'top',
+        formatter: '{c}'
+      },
+      itemStyle: uniform
+        ? { color: '#6A99D0' }
+        : {
+            color(p) {
+              const v = p.value;
+              if (v < 3) return '#EA3323';
+              if (v < 4) return '#6A99D0';
+              return '#9FCE63';
+            }
+          }
+    }]
+  });
+
+  // ensure it redraws to fill the container
+  chart.resize();
+  setTimeout(() => chart.resize(), 300);
+}
     function countUnique(rows, sec){
       return new Set(
         rows.filter(d => String(d.section||'').toLowerCase().includes(sec))

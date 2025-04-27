@@ -13,6 +13,14 @@
       font-family: 'Roboto', sans-serif;
     }
 
+    /* Fixed full-screen pages for preview */
+    @media screen {
+      .page {
+        width: 100vw;
+        height: 100vh;
+      }
+    }
+
     /* Define paper and page size for print */
     @page {
       size: 11in 8.5in landscape;
@@ -121,83 +129,19 @@
     });
 
     const currentYear = new Date().getFullYear();
-
     function createLabelMap(labels){ const m={}; labels.forEach(l=>{ const k=l.questionId||l['QUESTION ID']; m[k]=l.label||l['LABEL']; }); return m; }
     function createSortMap(labels){ const m={}; labels.forEach(l=>{ const k=l.questionId||l['QUESTION ID']; m[k]=+(l.sortOrder||l['SORT ORDER']||l.sort_order); }); return m; }
     function groupBy(arr,k){ return arr.reduce((o,i)=>( (o[i[k]]||=[]).push(i), o ),{}); }
     function computeAverages(rows,LM,OM){ const g={}; rows.forEach(({question,value})=>{ (g[question]||=[]).push(+value); }); return Object.entries(g).map(([q,vals])=>({question:q,label:LM[q]||q,avg:+(vals.reduce((a,b)=>a+b,0)/vals.length).toFixed(1)})).sort((a,b)=> (OM[a.question]||0)-(OM[b.question]||0)); }
-
     function createBarChart(div,title,data,uniform){ const chart=echarts.init(div); chart.setOption({ title:{text:title,left:'center',textStyle:{fontSize:20}}, grid:{top:80,left:'10%',right:'10%',bottom:100}, tooltip:{}, xAxis:{type:'category',data:data.map(d=>d.label),axisLabel:{rotate:30,interval:0,rich:{height:40}}}, yAxis:{type:'value',min:0,max:5,axisLine:{show:false},axisTick:{show:false},axisLabel:{show:false},splitLine:{show:false}}, series:[{type:'bar',data:data.map(d=>d.avg),label:{show:true,position:'top',formatter:'{c}'},itemStyle: uniform?{color:'#6A99D0'}:{color(p){const v=p.value;if(v<3)return'#EA3323';if(v<4)return'#6A99D0';return'#9FCE63';}}}]} ); chart.resize(); setTimeout(()=>chart.resize(),300); }
-
     function countUnique(rows,sec){ return new Set(rows.filter(d=>String(d.section||'').toLowerCase().includes(sec)).map(d=>d.respondent_id||d.id)).size; }
     function formatMonthYear(val){ const names={'01':'janeiro','02':'fevereiro','03':'março','04':'abril','05':'maio','06':'junho','07':'julho','08':'agosto','09':'setembro','10':'outubro','11':'novembro','12':'dezembro'}; if(/^\d{4}-\d{2}$/.test(val)){const[y,m]=val.split('-');return{month:names[m],year:y};}const[m,y]=val.split(' ');return{month:m,year:y}; }
-
-    async function build(){
-      const f=JSON.parse(localStorage.getItem('reportFilters')||'{}');
-      const [data,meta]=await Promise.all([fetch('data.json').then(r=>r.json()),fetch('meta.json').then(r=>r.json())]);
-      const LM=createLabelMap(meta.labels), OM=createSortMap(meta.labels);
-      const out=document.getElementById('report'); out.innerHTML='';
-      let timeScope=''; if(f.start&&f.end){const s=formatMonthYear(f.start),e=formatMonthYear(f.end); timeScope=`${s.month} – ${e.month} ${e.year}`;}
-
-      for(const prog of f.programs||[]){
-        const all=data.filter(d=>(f.clients||[]).includes(d.client)&&d.program===prog&&(f.turmas||[]).includes(d.turma));
-        const pm=meta.titles.find(t=>t.program_id===prog)||{};
-
-        // HERO
-        const hero=document.createElement('div'); hero.className='page hero';
-        hero.innerHTML=`<div class="header"><img src="mind4time-logo.png"><div></div></div>
-          <img class="bg" src="hourglass-bg.jpg">
-          <div class="hero-content">
-            <small>${pm.SUBTÍTULO||''}</small>
-            <h1>${pm.TÍTULO||prog}</h1>
-            <div class="subtitle">${pm.TAGLINE||''}</div>
-            <div class="meta"><div><span>time scope</span><strong>${timeScope}</strong></div><div><span>trainers</span><strong>${(f.trainers||{})[prog]||'N/A'}</strong></div></div>
-          </div>
-          <div class="footer"><div>www.MIND4TIME.com</div><div>© MIND4TIME ${currentYear}</div></div>`;
-        out.appendChild(hero);
-
-        // SECTIONS
-        for(const sec of ['assessment','evaluation']){
-          const name = sec==='assessment'?'Assessment':'Avaliação do Programa';
-          const uniq = countUnique(all,sec);
-          const numeric = all.filter(d=>String(d.section||'').toLowerCase().includes(sec)&&/^\d+(\.\d+)?$/.test(String(d.value).trim()));
-          const byTurma = Object.entries(groupBy(numeric,'turma'));
-
-          // BANNER
-          const ban=document.createElement('div'); ban.className=`page banner ${sec}`;
-          let metaHtml=`<div><span>Total de respostas:</span><strong>${uniq}</strong></div>`;
-          if(sec==='assessment') metaHtml+=`<div><span>time scope</span><strong>${timeScope}</strong></div><div><span>trainers</span><strong>${(f.trainers||{})[prog]||'N/A'}</strong></div>`;
-          ban.innerHTML=`<div class="header"><img src="mind4time-logo.png"><div></div></div><div class="banner-box"><h1>${name}</h1><div class="meta">${metaHtml}</div></div><div class="footer"><div>www.MIND4TIME.com</div><div>© MIND4TIME ${currentYear}</div></div>`;
-          out.appendChild(ban);
-
-          // GLOBAL CHART
-          if(numeric.length){
-            const gl=document.createElement('div'); gl.className='page chart-fullpage';
-            gl.innerHTML=`<div class="header"><img src="mind4time-logo.png"><div></div></div><div class="chart-full" id="chart-global-${prog}-${sec}"></div><div class="footer"><div>www.MIND4TIME.com</div><div>© MIND4TIME ${currentYear}</div></div>`;
-            out.appendChild(gl);
-            createBarChart(gl.querySelector('.chart-full'),`Global (${name})`,computeAverages(numeric,LM,OM),sec==='evaluation');
-          }
-
-          // CHART GRID
-          if(byTurma.length>1){
-            for(let i=0;i<byTurma.length;i+=4){
-              const grid=document.createElement('div'); grid.className='page chart-grid';
-              grid.innerHTML=`<div class="header"><img src="mind4time-logo.png"><div></div></div>`;
-              byTurma.slice(i,i+4).forEach(([,vals],idx)=>{ grid.innerHTML+=`<div class="chart-box" id="chart-${prog}-${sec}-${i+idx}"></div>`; });
-              grid.innerHTML+=`<div class="footer"><div>www.MIND4TIME.com</div><div>© MIND4TIME ${currentYear}</div></div>`;
-              out.appendChild(grid);
-              byTurma.slice(i,i+4).forEach(([,vals],idx)=>{ createBarChart(document.getElementById(`chart-${prog}-${sec}-${i+idx}`),byTurma[i+idx][0],computeAverages(vals,LM,OM),sec==='evaluation'); });
-            }
-          }
-
-          // TEXT QUESTIONS
-          const byQ=groupBy(all.filter(d=>String(d.section||'').toLowerCase().includes(sec)&&isNaN(parseFloat(d.value))&&(f.textQuestions||[]).includes(d.question)),'question');
-          Object.entries(byQ).forEach(([q,ans])=>{
-            const tp=document.createElement('div'); tp.className='page text-page';
-            tp.innerHTML=`<div class="header"><img src="mind4time-logo.png"><div></div></div><div class="text-question"><div class="text-question-title">${q}</div><ul>${ans.map(a=>`<li>${a.value.replace(/\n/g,'</li><li>')}</li>`).join('')}</ul></div><div class="footer"><div>www.MIND4TIME.com</div><div>© MIND4TIME ${currentYear}</div></div>`;
-            out.appendChild(tp);
-          });
-        }
+    async function build(){ const f=JSON.parse(localStorage.getItem('reportFilters')||'{}'); const [data,meta]=await Promise.all([fetch('data.json').then(r=>r.json()),fetch('meta.json').then(r=>r.json())]); const LM=createLabelMap(meta.labels), OM=createSortMap(meta.labels); const out=document.getElementById('report'); out.innerHTML=''; let timeScope=''; if(f.start&&f.end){const s=formatMonthYear(f.start),e=formatMonthYear(f.end); timeScope=`${s.month} – ${e.month} ${e.year}`;} for(const prog of f.programs||[]){ const all=data.filter(d=>(f.clients||[]).includes(d.client)&&d.program===prog&&(f.turmas||[]).includes(d.turma)); const pm=meta.titles.find(t=>t.program_id===prog)||{};
+        const hero=document.createElement('div'); hero.className='page hero'; hero.innerHTML=`<div class="header"><img src="mind4time-logo.png"><div></div></div><img class="bg" src="hourglass-bg.jpg"><div class="hero-content"><small>${pm.SUBTÍTULO||''}</small><h1>${pm.TÍTULO||prog}</h1><div class="subtitle">${pm.TAGLINE||''}</div><div class="meta"><div><span>time scope</span><strong>${timeScope}</strong></div><div><span>trainers</span><strong>${(f.trainers||{})[prog]||'N/A'}</strong></div></div></div><div class="footer"><div>www.MIND4TIME.com</div><div>© MIND4TIME ${currentYear}</div></div>`; out.appendChild(hero);
+        for(const sec of ['assessment','evaluation']){ const name=sec==='assessment'?'Assessment':'Avaliação do Programa'; const uniq=countUnique(all,sec); const numeric=all.filter(d=>String(d.section||'').toLowerCase().includes(sec)&&/^\d+(\.\d+)?$/.test(String(d.value).trim())); const byTurma=Object.entries(groupBy(numeric,'turma')); const ban=document.createElement('div'); ban.className=`page banner ${sec}`; let metaHtml=`<div><span>Total de respostas:</span><strong>${uniq}</strong></div>`; if(sec==='assessment') metaHtml+=`<div><span>time scope</span><strong>${timeScope}</strong></div><div><span>trainers</span><strong>${(f.trainers||{})[prog]||'N/A'}</strong></div>`; ban.innerHTML=`<div class="header"><img src="mind4time-logo.png"><div></div></div><div class="banner-box"><h1>${name}</h1><div class="meta">${metaHtml}</div></div><div class="footer"><div>www.MIND4TIME.com</div><div>© MIND4TIME ${currentYear}</div></div>`; out.appendChild(ban);
+          if(numeric.length){ const gl=document.createElement('div'); gl.className='page chart-fullpage'; gl.innerHTML=`<div class="header"><img src="mind4time-logo.png"><div></div></div><div class="chart-full" id="chart-global-${prog}-${sec}"></div><div class="footer"><div>www.MIND4TIME.com</div><div>© MIND4TIME ${currentYear}</div></div>`; out.appendChild(gl); createBarChart(gl.querySelector('.chart-full'),`Global (${name})`,computeAverages(numeric,LM,OM),sec==='evaluation'); }
+          if(byTurma.length>1){ for(let i=0;i<byTurma.length;i+=4){ const grid=document.createElement('div'); grid.className='page chart-grid'; grid.innerHTML=`<div class="header"><img src="mind4time-logo.png"><div></div></div>`; byTurma.slice(i,i+4).forEach(([,vals],idx)=>{ grid.innerHTML+=`<div class="chart-box" id="chart-${prog}-${sec}-${i+idx}"></div>`; }); grid.innerHTML+=`<div class="footer"><div>www.MIND4TIME.com</div><div>© MIND4TIME ${currentYear}</div></div>`; out.appendChild(grid); byTurma.slice(i,i+4).forEach(([,vals],idx)=>{ createBarChart(document.getElementById(`chart-${prog}-${sec}-${i+idx}`),byTurma[i+idx][0],computeAverages(vals,LM,OM),sec==='evaluation'); }); }}
+          const byQ=groupBy(all.filter(d=>String(d.section||'').toLowerCase().includes(sec)&&isNaN(parseFloat(d.value))&&(f.textQuestions||[]).includes(d.question)),'question'); Object.entries(byQ).forEach(([q,ans])=>{ const tp=document.createElement('div'); tp.className='page text-page'; tp.innerHTML=`<div class="header"><img src="mind4time-logo.png"><div></div></div><div class="text-question"><div class="text-question-title">${q}</div><ul>${ans.map(a=>`<li>${a.value.replace(/\n/g,'</li><li>')}</li>`).join('')}</ul></div><div class="footer"><div>www.MIND4TIME.com</div><div>© MIND4TIME ${currentYear}</div></div>`; out.appendChild(tp); }); }
       }
     }
     document.addEventListener('DOMContentLoaded', build);

@@ -9,120 +9,204 @@
   <link href="https://fonts.googleapis.com/css?family=Roboto:400,500,700&display=swap" rel="stylesheet">
   <!-- ECharts -->
   <script src="https://cdn.jsdelivr.net/npm/echarts@5/dist/echarts.min.js"></script>
-  <!-- pdfMake -->
+  <!-- html2canvas for screenshotting pages -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+  <!-- pdfMake for PDF generation -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.7/pdfmake.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.7/vfs_fonts.js"></script>
 
   <style>
-    /* Reset & global */
-    * { box-sizing: border-box; margin:0; padding:0; }
-    html, body { height:100%; font-family: 'Roboto', sans-serif; }
-    body { background: #f5f5f5; padding: 20px; }
+    /* Global font & reset */
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body, .page, .header, .footer, .hero-content, .banner-box,
+    .chart-fullpage, .chart-grid, .text-page, .text-question {
+      font-family: 'Roboto', sans-serif;
+    }
+    body { background: #f5f5f5; }
 
-    /* Page container (simulate A4) */
+    /* Page container simulating A4 */
     .page {
       background: #fff;
       width: 210mm;
       min-height: 297mm;
-      margin: 0 auto 20px;
-      padding: 20mm 15mm;
+      margin: 10mm auto;
       box-shadow: 0 0 5px rgba(0,0,0,0.1);
-      position: relative;
       display: flex;
       flex-direction: column;
+      position: relative;
     }
 
-    /* Header/Footer fixed height inside page */
+    /* Header & Footer */
     .header, .footer {
       flex-shrink: 0;
       display: flex;
       justify-content: space-between;
       align-items: center;
-      padding: 0 0 10px;
+      padding: 5px 15px;
+      background: #fff;
       border-color: #40a3a3;
     }
-    .header { border-bottom:1px solid; height: 20mm; }
+    .header { border-bottom: 1px solid; height: 20mm; }
     .header img { height: 18mm; }
-    .footer { border-top:1px solid; height: 15mm; font-size: 12px; color: #007c91; }
+    .footer { border-top: 1px solid; height: 15mm; font-size: 12px; color: #007c91; }
 
-    /* Content area flows below header and above footer */
-    .content { flex:1; overflow: hidden; display: flex; flex-direction: column; }
+    /* Scrollable content area */
+    .content { flex: 1; overflow-y: auto; padding: 10px 0; }
 
-    /* Hero/banner as normal block */
+    /* Hero/banner styles */
     .hero, .banner {
-      width: 100%;
-      margin-bottom: 10mm;
-      background-size: cover;
-      background-position: center;
-      color: #fff;
+      width: 100%; text-align: center;
       position: relative;
-      text-align: center;
-      padding: 20mm 0;
+      margin-bottom: 10mm;
     }
-    .hero .bg { position: absolute; inset: 0; object-fit: cover; z-index: 0; }
+    .hero { background-image: url('hourglass-bg.jpg'); background-size: cover; background-position: center; color: #fff; padding: 30px 0; }
+    .banner { background: #f0f8f9; padding: 20px 0; }
     .hero-content, .banner-box {
-      position: relative; z-index:1;
       max-width: 80%; margin: 0 auto;
     }
-    .hero-content small { font-style: italic; color:#e0f2f3; display: block; margin-bottom: 5px; }
-    .hero-content h1 { font-size: 32px; color: #fff; }
-    .hero-content .subtitle { font-size: 18px; color: #e0f2f3; margin-top: 5px; }
-    .hero-content .meta { display:flex; justify-content: center; gap: 20px; margin-top:10px; }
-    .hero-content .meta span { font-style: italic; color: #e0f2f3; }
-    .hero-content .meta strong { color:#fff; }
+    .hero-content small { font-style: italic; color: #e0f2f3; display: block; margin-bottom: 5px; }
+    .hero-content h1 { font-size: 32px; }
+    .hero-content .subtitle { font-size: 18px; margin-top: 5px; }
+    .hero-content .meta { margin-top: 10px; display: flex; justify-content: center; gap: 20px; }
+    .hero-content .meta span { font-style: italic; }
 
-    .banner-box { background: #f0f8f9; padding: 15px; border-left: 6px solid #007c91; }
-    .banner-box h1 { font-size: 28px; color: #007c91; }
-    .banner-box .meta { display:flex; gap: 20px; margin-top:10px; font-size: 14px; color:#555; }
+    .banner-box { display: inline-block; text-align: left; border-left: 6px solid #007c91; padding-left: 10px; }
+    .banner-box h1 { color: #007c91; font-size: 28px; }
+    .banner-box .meta { margin-top: 8px; font-size: 14px; color: #555; display: flex; gap: 20px; }
 
-    /* Charts & text in scrollable area */
-    .inner-scroll { flex:1; overflow-y: auto; }
-
-    .chart-fullpage { width: 100%; margin: 10mm 0; height: 120mm; }
+    /* Charts & text */
+    .chart-fullpage { width: 100%; height: 120mm; margin: 10mm 0; }
     .chart-full { width: 100%; height: 100%; }
 
-    .chart-grid { display: grid; grid-template-columns: 1fr 1fr; gap:10mm; margin:10mm 0; }
-    .chart-box { width:100%; height:80mm; }
+    .chart-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10mm; margin: 10mm 0; }
+    .chart-box { width: 100%; height: 80mm; }
 
-    .text-question { background:#f9f9f9; border:1px solid #007c91; border-left:6px solid #007c91; padding: 10mm; margin:10mm 0; }
-    .text-question-title { font-size: 16px; color:#007c91; margin-bottom:5mm; font-weight:bold; }
-    .text-question ul { list-style-type: disc; margin-left:10mm; }
-    .text-question li { margin-bottom:3mm; }
+    .text-question { background: #f9f9f9; border: 1px solid #007c91; border-left: 6px solid #007c91; margin: 10mm 0; padding: 10mm; }
+    .text-question-title { color: #007c91; font-size: 16px; margin-bottom: 5mm; }
+    .text-question ul { margin-left: 10mm; list-style-type: disc; }
+    .text-question li { margin-bottom: 3mm; }
 
-    /* PDF button (outside pages) */
-    #gerar-pdf { position:fixed; top:20px; right:20px; padding:10px 20px; background:#007c91; color:#fff; border:none; border-radius:4px; cursor:pointer; z-index:1000; }
+    /* PDF button */
+    #gerar-pdf { position: fixed; top: 20px; right: 20px; padding: 10px 20px; background: #007c91; color: #fff; border: none; border-radius: 4px; cursor: pointer; z-index: 1000; }
   </style>
 </head>
 <body>
   <button id="gerar-pdf">Gerar Relatório (PDF)</button>
-
-  <div id="report">
-    <!-- Pages appended here -->
-  </div>
+  <div id="report"></div>
 
   <script>
     const currentYear = new Date().getFullYear();
 
-    // [Helper functions: createLabelMap, createSortMap, groupBy,
-    // computeAverages, createBarChart, countUnique, formatMonthYear]
-    // ... (same as before) ...
+    // Helper functions (same as before)
+    function createLabelMap(labels){ const m={}; labels.forEach(l=>{ const k=l.questionId||l['QUESTION ID']; m[k]=l.label||l['LABEL']; }); return m; }
+    function createSortMap(labels){ const m={}; labels.forEach(l=>{ const k=l.questionId||l['QUESTION ID']; m[k]=+(l.sortOrder||l['SORT ORDER']||l.sort_order); }); return m; }
+    function groupBy(arr,key){ return arr.reduce((o,i)=>( (o[i[key]]||=[]).push(i),o ),{}); }
+    function computeAverages(rows,LM,OM){ const g={}; rows.forEach(({question,value})=>{ (g[question]||=[]).push(+value); }); return Object.entries(g).map(([q,vals])=>({question:q,label:LM[q]||q,avg:+(vals.reduce((a,b)=>a+b,0)/vals.length).toFixed(1)})).sort((a,b)=>(OM[a.question]||0)-(OM[b.question]||0)); }
+    function createBarChart(div,title,data,uniform){ const chart=echarts.init(div); chart.setOption({ title:{text:title,left:'center',textStyle:{fontSize:16}}, grid:{top:50,left:50,right:50,bottom:50}, tooltip:{}, xAxis:{type:'category',data:data.map(d=>d.label),axisLabel:{rotate:30}}, yAxis:{type:'value',min:0,max:5}, series:[{type:'bar',data:data.map(d=>d.avg),itemStyle: uniform?{color:'#6A99D0'}:{color:'#6A99D0'}}] }); chart.resize(); setTimeout(()=>chart.resize(),300); return chart; }
+    function countUnique(rows,sec){ return new Set(rows.filter(d=>String(d.section||'').toLowerCase().includes(sec)).map(d=>d.respondent_id||d.id)).size; }
+    function formatMonthYear(val){ const n={'01':'janeiro','02':'fevereiro','03':'março','04':'abril','05':'maio','06':'junho','07':'julho','08':'agosto','09':'setembro','10':'outubro','11':'novembro','12':'dezembro'}; if(/^\d{4}-\d{2}$/.test(val)){ const[y,m]=val.split('-'); return {month:n[m],year:y}; } const[m,y]=val.split(' '); return {month:m,year:y}; }
 
+    // Build the report pages under #report\    
     async function build() {
-      // fetch filters, data.json, meta.json
-      // for each program: append .page to #report
-      // within page: header, .content (hero/banner & inner-scroll), footer
-      // in .content: hero/navbar, inner-scroll with charts/text
-      // uses helper functions unchanged
+      const f = JSON.parse(localStorage.getItem('reportFilters')||'{}');
+      const [data,meta] = await Promise.all([ fetch('data.json').then(r=>r.json()), fetch('meta.json').then(r=>r.json()) ]);
+      const LM = createLabelMap(meta.labels), OM = createSortMap(meta.labels);
+      const container = document.getElementById('report'); container.innerHTML='';
+      let timeScope=''; if(f.start&&f.end){ const s=formatMonthYear(f.start),e=formatMonthYear(f.end); timeScope=`${s.month} – ${e.month} ${e.year}`; }
+
+      for(const prog of f.programs||[]) {
+        const all = data.filter(d=> (f.clients||[]).includes(d.client) && d.program===prog && (f.turmas||[]).includes(d.turma));
+        const pm = meta.titles.find(t=>t.program_id===prog)||{};
+
+        // Create page wrapper
+        const page = document.createElement('div'); page.className='page';
+        page.innerHTML = `
+          <div class="header"><img src="mind4time-logo.png"></div>
+          <div class="content"></div>
+          <div class="footer">© MIND4TIME ${currentYear}</div>
+        `;
+        const content = page.querySelector('.content');
+
+        // Hero section
+        const hero = document.createElement('div'); hero.className='hero';
+        hero.innerHTML = `
+          <div class="hero-content">
+            <small>${pm.SUBTÍTULO||''}</small>
+            <h1>${pm.TÍTULO||prog}</h1>
+            <div class="subtitle">${pm.TAGLINE||''}</div>
+            <div class="meta"><span>time scope:</span><strong>${timeScope}</strong><span>trainers:</span><strong>${(f.trainers||{})[prog]||'N/A'}</strong></div>
+          </div>
+        `;
+        content.appendChild(hero);
+
+        // Sections
+        for(const sec of ['assessment','evaluation']){
+          const name = sec==='assessment' ? 'Assessment' : 'Avaliação do Programa';
+          const uniq = countUnique(all,sec);
+          const numeric = all.filter(d=>String(d.section||'').toLowerCase().includes(sec)&&/^\d+(\.\d+)?$/.test(d.value));
+          const byTurma = Object.entries(groupBy(numeric,'turma'));
+
+          // Banner
+          const ban = document.createElement('div'); ban.className='banner';
+          ban.innerHTML = `
+            <div class="banner-box">
+              <h1>${name}</h1>
+              <div class="meta"><span>Total respostas:</span><strong>${uniq}</strong></div>
+            </div>
+          `;
+          content.appendChild(ban);
+
+          // Global chart
+          if(numeric.length){
+            const chartPg = document.createElement('div'); chartPg.className='chart-fullpage';
+            chartPg.innerHTML = `<div class="chart-full" id="chart-global-${prog}-${sec}"></div>`;
+            content.appendChild(chartPg);
+            createBarChart(chartPg.querySelector('.chart-full'),`Global (${name})`,computeAverages(numeric,LM,OM),sec==='evaluation');
+          }
+
+          // By-turma grid
+          if(byTurma.length>1){
+            const grid = document.createElement('div'); grid.className='chart-grid';
+            byTurma.forEach(([t,vals])=>{
+              const box = document.createElement('div'); box.className='chart-box'; box.id=`chart-${prog}-${sec}-${t}`;
+              grid.appendChild(box);
+            });
+            content.appendChild(grid);
+            byTurma.forEach(([t,vals])=> createBarChart(document.getElementById(`chart-${prog}-${sec}-${t}`),t,computeAverages(vals,LM,OM),sec==='evaluation'));
+          }
+
+          // Text questions
+          const byQ = groupBy(all.filter(d=>String(d.section||'').toLowerCase().includes(sec)&&isNaN(parseFloat(d.value))&&(f.textQuestions||[]).includes(d.question)),'question');
+          Object.entries(byQ).forEach(([q,answers])=>{
+            const txt = document.createElement('div'); txt.className='text-question';
+            txt.innerHTML = `<div class="text-question-title">${q}</div><ul>${answers.map(a=>`<li>${a.value}</li>`).join('')}</ul>`;
+            content.appendChild(txt);
+          });
+        }
+
+        // Append page to DOM
+        container.appendChild(page);
+      }
     }
 
-    async function generatePdf() {
+    // Capture each page with html2canvas, then assemble PDF
+    async function generatePdf(){
       await build();
-      await new Promise(r => setTimeout(r,200));
-      // capture charts & build pdfMake
-      // same logic as before
+      const pages = Array.from(document.querySelectorAll('.page'));
+      const images = [];
+      for(const pg of pages){
+        await new Promise(r=>pg.scrollIntoView()||setTimeout(r,200));
+        const canvas = await html2canvas(pg, {backgroundColor:'#ffffff', scale:2});
+        images.push(canvas.toDataURL('image/png'));
+      }
+      const docDef = {
+        pageSize:'A4', pageOrientation:'landscape', pageMargins:0,
+        content: images.map((img,i)=>({image:img, width:842, pageBreak:i<images.length-1?'after':undefined}))
+      };
+      pdfMake.createPdf(docDef).download('report.pdf');
     }
 
-    document.addEventListener('DOMContentLoaded', async () => {
+    document.addEventListener('DOMContentLoaded', async ()=>{
       await build();
       document.getElementById('gerar-pdf').addEventListener('click', generatePdf);
     });

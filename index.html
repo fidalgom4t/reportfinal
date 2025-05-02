@@ -104,6 +104,14 @@
       <div class="checkboxes" id="clientChecks"></div>
     </div>
 
+    <!-- Cliente Info -->
+    <label>Cliente Info:</label>
+    <div class="dropdown-multiselect" id="clientInfoWrapper">
+      <div class="select-box" data-placeholder="Selecionar info(s)"
+           onclick="toggleDropdown('clientInfoWrapper')">Selecionar info(s)</div>
+      <div class="checkboxes" id="clientInfoChecks"></div>
+    </div>
+
     <!-- Programas -->
     <label>Programas:</label>
     <div class="dropdown-multiselect" id="programWrapper">
@@ -185,6 +193,7 @@
     function updateSelectText(id) {
       const map = {
         clientChecks: 'clientWrapper',
+        clientInfoChecks: 'clientInfoWrapper',
         programChecks: 'programWrapper',
         turmaChecks: 'turmaWrapper',
         textQuestionSelect: 'textWrapper'
@@ -218,7 +227,11 @@
       fillChecks('clientChecks', clients, getFilter('clients'), () => {
         setFilter('clients', getChecked('clientChecks'));
         populatePrograms();
+        populateClientInfo();
       });
+
+      // CLIENTE INFO
+      populateClientInfo();
 
       // PROGRAMAS / TURMAS / PERGUNTAS
       populatePrograms();
@@ -234,6 +247,17 @@
 
       // TRAINERS
       renderTrainerInputs();
+    }
+
+    function populateClientInfo() {
+      const cl = getFilter('clients');
+      const infos = [...new Set(rawData
+        .filter(d => cl.includes(d.client))
+        .map(d => d.client_info)
+      )].sort();
+      fillChecks('clientInfoChecks', infos, getFilter('clientInfos'), () => {
+        setFilter('clientInfos', getChecked('clientInfoChecks'));
+      });
     }
 
     function populatePrograms() {
@@ -299,6 +323,7 @@
     function goToReport(download) {
       const f = {
         clients: getChecked('clientChecks'),
+        clientInfos: getChecked('clientInfoChecks'),
         programs: getChecked('programChecks'),
         turmas: getChecked('turmaChecks'),
         textQuestions: getChecked('textQuestionSelect'),

@@ -3,43 +3,109 @@
 <head>
   <meta charset="UTF-8" />
   <title>Selecionar Filtros</title>
-  <style>/* ... existing CSS ... */</style>
+  <style>
+    /* General styling */
+    body { font-family: 'Segoe UI',sans-serif; background:#f5f5f5; margin:40px auto; max-width:800px; padding:0 20px; }
+    h2 { text-align:center; color:#007c91; margin-bottom:24px; }
+    form { display:grid; grid-template-columns:200px 1fr; gap:20px; align-items:center; }
+    label { font-weight:bold; }
+
+    /* Dropdown Multiselect */
+    .dropdown-multiselect { position:relative; width:100%; }
+    .select-box { background:#fff; border:1px solid #ccc; border-radius:4px; padding:8px 12px; cursor:pointer; position:relative; user-select:none; }
+    .select-box::after { content:'▾'; position:absolute; right:12px; top:50%; transform:translateY(-50%); color:#666; font-size:12px; }
+    .checkboxes { display:none; position:absolute; top:calc(100% + 4px); width:100%; max-height:180px; overflow-y:auto; background:#fff; border:1px solid #ccc; border-radius:4px; padding:8px; box-shadow:0 2px 6px rgba(0,0,0,0.1); z-index:10; }
+    .dropdown-multiselect.open .checkboxes { display:block; }
+    .checkboxes label { display:flex; align-items:center; margin-bottom:6px; cursor:pointer; }
+    .checkboxes input { margin-right:8px; }
+    .select-all { background:none; border:none; color:#007c91; cursor:pointer; display:block; margin-bottom:8px; padding:0; text-align:left; width:100%; font-size:0.9em; }
+
+    /* Inputs */
+    input[type="month"], input[type="text"] { padding:8px; border:1px solid #ccc; border-radius:4px; width:100%; box-sizing:border-box; }
+
+    /* Trainer fields */
+    .program-trainer { grid-column:span 2; display:grid; grid-template-columns:200px 1fr; gap:0 20px; margin-top:10px; }
+
+    /* Buttons */
+    .submit-row { grid-column:span 2; text-align:center; margin-top:30px; }
+    .link-button { background:#007c91; color:#fff; padding:10px 30px; border-radius:4px; text-decoration:none; font-weight:bold; margin:0 10px; display:inline-block; }
+  </style>
 </head>
 <body>
   <h2>Gerar Relatório Dinâmico</h2>
   <form id="filtersForm" onsubmit="return false;">
-    <!-- Filters markup ... -->
+    <label>Cliente:</label>
+    <div class="dropdown-multiselect" id="clientWrapper">
+      <div class="select-box" id="clientBox" data-placeholder="Selecionar cliente(s)">Selecionar cliente(s)</div>
+      <div class="checkboxes" id="clientChecks"></div>
+    </div>
+
+    <label>Cliente Info:</label>
+    <div class="dropdown-multiselect" id="clientInfoWrapper">
+      <div class="select-box" id="clientInfoBox" data-placeholder="Selecionar info(s)">Selecionar info(s)</div>
+      <div class="checkboxes" id="clientInfoChecks"></div>
+    </div>
+
+    <label>Programas:</label>
+    <div class="dropdown-multiselect" id="programWrapper">
+      <div class="select-box" id="programBox" data-placeholder="Selecionar programa(s)">Selecionar programa(s)</div>
+      <div class="checkboxes" id="programChecks"></div>
+    </div>
+
+    <label>Turmas:</label>
+    <div class="dropdown-multiselect" id="turmaWrapper">
+      <div class="select-box" id="turmaBox" data-placeholder="Selecionar turma(s)">Selecionar turma(s)</div>
+      <div class="checkboxes" id="turmaChecks"></div>
+    </div>
+
+    <label>Perguntas Abertas:</label>
+    <div class="dropdown-multiselect" id="textWrapper">
+      <div class="select-box" id="textBox" data-placeholder="Selecionar perguntas">Selecionar perguntas</div>
+      <div class="checkboxes" id="textChecks"></div>
+    </div>
+
+    <label>Scope temporal - Início:</label>
+    <input type="month" id="startMonth" />
+    <label>Scope temporal - Fim:</label>
+    <input type="month" id="endMonth" />
+
+    <div id="trainersContainer" class="program-trainer"></div>
+
+    <div class="submit-row">
+      <a href="#" class="link-button" id="viewReport">Ver Relatório</a>
+      <a href="#" class="link-button" id="downloadReport">Download Relatório</a>
+    </div>
   </form>
+
   <script>
     let rawData = [];
-    function getStorageFilters() { return JSON.parse(localStorage.getItem('filters')||'{}'); }
+    function getStorageFilters(){ return JSON.parse(localStorage.getItem('filters')||'{}'); }
     function saveFilter(k,v){ const f=getStorageFilters(); f[k]=v; localStorage.setItem('filters',JSON.stringify(f)); }
     function loadFilter(k){ return getStorageFilters()[k]||[]; }
-    function getCheckedValues(c){ return Array.from(document.querySelectorAll(`#${c} input:checked`)).map(i=>i.value); }
-    function updateSelectBox(id,vals,ph){ document.getElementById(id).textContent = vals.length? vals.join(', '):ph; }
+    function getCheckedValues(id){ return Array.from(document.querySelectorAll(`#${id} input:checked`)).map(i=>i.value); }
+    function updateSelectBox(id,vals,ph){ const b=document.getElementById(id); b.textContent=vals.length? vals.join(', '):ph; }
     function populateCheckboxes({containerId,boxId,dataList,filterKey,placeholder,onChange}){
       const cont=document.getElementById(containerId); cont.innerHTML='';
-      const btn=document.createElement('button'); btn.type='button'; btn.className='select-all'; btn.textContent='Selecionar tudo';
-      btn.onclick=e=>{e.stopPropagation(); saveFilter(filterKey,dataList.slice()); onChange();}; cont.appendChild(btn);
+      // select all
+      const allBtn=document.createElement('button'); allBtn.type='button'; allBtn.className='select-all'; allBtn.textContent='Selecionar tudo'; allBtn.onclick=e=>{ e.stopPropagation(); saveFilter(filterKey,dataList.slice()); onChange(); };
+      cont.appendChild(allBtn);
       const stored=loadFilter(filterKey);
       dataList.forEach(item=>{
         const lbl=document.createElement('label');
         const cb=document.createElement('input'); cb.type='checkbox'; cb.value=item; cb.checked=stored.includes(item);
         cb.onchange=()=>{ const sel=getCheckedValues(containerId); saveFilter(filterKey,sel); onChange(); };
-        lbl.append(cb, ' '+item); cont.appendChild(lbl);
+        lbl.append(cb,' '+item); cont.appendChild(lbl);
       });
       updateSelectBox(boxId,stored,placeholder);
     }
     function toggleDropdown(id){ document.querySelectorAll('.dropdown-multiselect').forEach(el=>el.id!==id&&el.classList.remove('open')); document.getElementById(id).classList.toggle('open'); }
-    function attachDropdownEvents(){ ['client','clientInfo','program','turma','text'].forEach(k=>{
-      const w=document.getElementById(k+'Wrapper'); w.querySelector('.select-box').onclick=()=>toggleDropdown(k+'Wrapper');
-    }); document.addEventListener('click',e=>{ if(!e.target.closest('.dropdown-multiselect')) document.querySelectorAll('.dropdown-multiselect').forEach(el=>el.classList.remove('open')); }); }
+    function attachDropdownEvents(){ ['client','clientInfo','program','turma','text'].forEach(k=>{ const w=document.getElementById(k+'Wrapper'), b=w.querySelector('.select-box'); b.onclick=()=>toggleDropdown(k+'Wrapper'); }); document.addEventListener('click',e=>{ if(!e.target.closest('.dropdown-multiselect')) document.querySelectorAll('.dropdown-multiselect').forEach(el=>el.classList.remove('open')); }); }
     function populateClients(){ const arr=[...new Set(rawData.map(d=>d.client))].sort(); populateCheckboxes({containerId:'clientChecks',boxId:'clientBox',dataList:arr,filterKey:'clients',placeholder:'Selecionar cliente(s)',onChange:refreshAll}); }
     function populateClientInfos(){ const sel=loadFilter('clients'); const arr=[...new Set(rawData.filter(d=>sel.includes(d.client)).map(d=>d.client_info))].sort(); populateCheckboxes({containerId:'clientInfoChecks',boxId:'clientInfoBox',dataList:arr,filterKey:'clientInfos',placeholder:'Selecionar info(s)',onChange:refreshAll}); }
     function populatePrograms(){ const sel=loadFilter('clients'); const arr=[...new Set(rawData.filter(d=>sel.includes(d.client)).map(d=>d.program))].sort(); populateCheckboxes({containerId:'programChecks',boxId:'programBox',dataList:arr,filterKey:'programs',placeholder:'Selecionar programa(s)',onChange:refreshAll}); }
     function populateTurmas(){ const {clients=[],clientInfos=[],programs=[]}=getStorageFilters(); const arr=[...new Set(rawData.filter(d=>clients.includes(d.client)&&clientInfos.includes(d.client_info)&&programs.includes(d.program)).map(d=>d.turma))].sort(); populateCheckboxes({containerId:'turmaChecks',boxId:'turmaBox',dataList:arr,filterKey:'turmas',placeholder:'Selecionar turma(s)',onChange:refreshAll}); }
     function populateTextQuestions(){ const {clients=[],programs=[],turmas=[]}=getStorageFilters(); const arr=[...new Set(rawData.filter(d=>clients.includes(d.client)&&programs.includes(d.program)&&turmas.includes(d.turma)&&isNaN(+d.value)).map(d=>d.question))].sort(); populateCheckboxes({containerId:'textChecks',boxId:'textBox',dataList:arr,filterKey:'textQuestions',placeholder:'Selecionar perguntas',onChange:refreshAll}); }
-    function renderTrainerInputs(){ const cont=document.getElementById('trainersContainer'); cont.innerHTML=''; const programs=loadFilter('programs'); const saved=getStorageFilters().trainers||{}; programs.forEach(p=>{ const w=document.createElement('div'); w.className='program-trainer'; const lbl=document.createElement('label'); lbl.textContent=`Formador (${p}):`; const inp=document.createElement('input'); inp.type='text'; inp.placeholder=`Nome do formador para ${p}`; inp.value=saved[p]||''; inp.oninput=()=>{ saved[p]=inp.value; localStorage.setItem('filters',JSON.stringify({...getStorageFilters(),trainers:saved})); }; w.append(lbl,inp); cont.appendChild(w); }); }
+    function renderTrainerInputs(){ const cont=document.getElementById('trainersContainer'); cont.innerHTML=''; const progs=loadFilter('programs'); const saved=getStorageFilters().trainers||{}; progs.forEach(p=>{ const w=document.createElement('div'); w.className='program-trainer'; const lbl=document.createElement('label'); lbl.textContent=`Formador (${p}):`; const inp=document.createElement('input'); inp.type='text'; inp.placeholder=`Nome do formador para ${p}`; inp.value=saved[p]||''; inp.oninput=()=>{ saved[p]=inp.value; localStorage.setItem('filters',JSON.stringify({...getStorageFilters(),trainers:saved})); }; w.append(lbl,inp); cont.appendChild(w); }); }
     function refreshAll(){ populateClientInfos(); populatePrograms(); populateTurmas(); populateTextQuestions(); renderTrainerInputs(); }
     function initFilters(){ fetch('data.json').then(r=>r.json()).then(data=>{ rawData=data; populateClients(); attachDropdownEvents(); refreshAll(); const {start,end}=getStorageFilters(); if(start)document.getElementById('startMonth').value=start; if(end)document.getElementById('endMonth').value=end; document.getElementById('startMonth').onchange=e=>saveFilter('start',e.target.value); document.getElementById('endMonth').onchange=e=>saveFilter('end',e.target.value); document.getElementById('viewReport').onclick=()=>navigateToReport(false); document.getElementById('downloadReport').onclick=()=>navigateToReport(true); }); }
     function navigateToReport(download){ const f={...getStorageFilters(),trainers:getStorageFilters().trainers||{}}; localStorage.setItem('reportFilters',JSON.stringify(f)); window.location.href=`report.html${download?'?download=true':''}`; }

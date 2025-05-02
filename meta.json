@@ -1,72 +1,72 @@
 {
   "labels": [
     {
-      "QUESTION ID": "01. No meu contexto de trabalho, consigo produzir de forma focalizada e sem grandes interrupções",
+      "QUESTION ID": "03. \"No meu contexto de trabalho, consigo produzir de forma focalizada e sem grandes interrupções.\"",
       "LABEL": "FOCO",
       "sort order": 1
     },
     {
-      "QUESTION ID": "02. \"O número de assuntos diferentes que tenho de gerir em paralelo é adequado, não excessivo.\"",
+      "QUESTION ID": "04. \"O número de assuntos diferentes que tenho de gerir em paralelo é adequado, não excessivo.\"",
       "LABEL": "DIVERSIDADE",
       "sort order": 2
     },
     {
-      "QUESTION ID": "03. \"Organizo o meu trabalho de forma metódica e eficiente, e sinto ter tudo sob controlo.\"",
+      "QUESTION ID": "05. \"Organizo o meu trabalho de forma metódica e eficiente, e sinto ter tudo sob controlo.\"",
       "LABEL": "CONTROLO",
       "sort order": 3
     },
     {
-      "QUESTION ID": "04. Raramente procrastino. Respeito sempre as prioridades que defini na minha lista de tarefas.",
+      "QUESTION ID": "06. \"Raramente procrastino. Respeito sempre as prioridades que defini na minha lista de tarefas.",
       "LABEL": "PRIORIDADES",
       "sort order": 4
     },
     {
-      "QUESTION ID": "08. A definição das minhas funções é muito clara. Sei precisamente quais as minhas responsabilidades.\"",
+      "QUESTION ID": "08. ... a utilização de emails é eficiente.\"",
       "LABEL": "RESPONSABILIDADES",
       "sort order": 5
     },
     {
-      "QUESTION ID": "09. A estratégia atual da empresa, e a forma como deve ser implementada na minha equipa/unidade/departamento, estão para mim muito claras.\"",
+      "QUESTION ID": "09. ... as reuniões são eficazes.\"",
       "LABEL": "ESTRATÉGIA",
       "sort order": 6
     },
     {
-      "QUESTION ID": "10. Conheço perfeitamente quais os meus objetivos atuais, e não tenho qualquer dúvida sobre as prioridades que devo respeitar.\"",
+      "QUESTION ID": "10. ... há boa agilidade: as decisões tendem a ser céleres e os assuntos resolvem-se com rapidez.\"",
       "LABEL": "OBJETIVOS",
       "sort order": 7
     },
     {
-      "QUESTION ID": "11. \"Quanto aos critérios de sucesso que definem o meu bom desempenho, a minha visão e a visão de quem me avalia e/ou lidera são inteiramente coincidentes.\"",
+      "QUESTION ID": "11. ... os processos internos são simples e eficientes.\"",
       "LABEL": "CRITÉRIOS SUCESSO",
       "sort order": 8
     },
     {
-      "QUESTION ID": "12. ...a utilização de emails é eficiente.\"",
+      "QUESTION ID": "12. ... há poucas dúvidas sobre quem ficou de fazer o quê. Eventuais áreas cinzentas que surjam na divisão de responsabilidades são rapidamente discutidas e clarificadas.\"",
       "LABEL": "EMAILS",
       "sort order": 9
     },
     {
-      "QUESTION ID": "13. ...as reuniões são eficazes.\"",
+      "QUESTION ID": "13. ... há claramente um clima de confiança entre os colaboradores.\"",
       "LABEL": "REUNIÕES",
       "sort order": 10
     },
     {
-      "QUESTION ID": "14 ...há boa agilidade: as decisões tendem a ser céleres e os assuntos resolvem-se com rapidez.\"",
+      "QUESTION ID": "14. A definição das minhas funções é muito clara. Sei precisamente quais as minhas responsabilidades.\"",
       "LABEL": "AGILIDADE",
       "sort order": 11
     },
     {
-      "QUESTION ID": "15. ...os processos internos são simples e eficientes.\"",
+      "QUESTION ID": "15. A estratégia atual da empresa, e a forma como deve ser implementada na minha equipa/unidade/departamento, estão para mim muito claras.\"",
       "LABEL": "PROCESSOS",
       "sort order": 12
     },
     {
-      "QUESTION ID": "16. ... há claramente um clima de confiança entre os colaboradores.\"",
+      "QUESTION ID": "16. Conheço perfeitamente quais os meus objetivos atuais, e não tenho qualquer dúvida sobre as prioridades que devo respeitar.\"",
       "LABEL": "CONFIANÇA",
       "sort order": 13
     },
     {
-      "QUESTION ID": "17. .. há poucas dúvidas sobre quem ficou de fazer o quê. Eventuais áreas cinzentas que surjam na divisão de responsabilidades são rapidamente discutidas e clarificadas.\"",
+      "QUESTION ID": "17. \"Quanto aos critérios de sucesso que definem o meu bom desempenho, a minha visão e a visão de quem me avalia e/ou lidera são inteiramente coincidentes.\"",
       "LABEL": "ÁREAS CINZENTAS",
       "sort order": 14
     },
@@ -263,7 +263,7 @@
   ],
   "titles": [
     {
-      "program_id": "COLAB 365",
+      "program_id": "COLAB365",
       "TÍTULO": "COLAB 365",
       "SUBTÍTULO": "A arte da Eficiência Colaborativa"
     },

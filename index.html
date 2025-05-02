@@ -21,7 +21,7 @@
     form {
       display: grid;
       grid-template-columns: 200px 1fr;
-      gap: 20px 20px;
+      gap: 20px;
       align-items: center;
     }
 
@@ -84,6 +84,20 @@
 
     .checkboxes input {
       margin-right: 8px;
+    }
+
+    /* Select All button */
+    .select-all {
+      background: none;
+      border: none;
+      color: #007c91;
+      cursor: pointer;
+      display: block;
+      margin-bottom: 8px;
+      padding: 0;
+      text-align: left;
+      width: 100%;
+      font-size: 0.9em;
     }
 
     /* Inputs */
@@ -201,7 +215,7 @@
 
     function getCheckedValues(containerId) {
       return Array.from(document.querySelectorAll(`#${containerId} input:checked`))
-        .map(checkbox => checkbox.value);
+        .map(cb => cb.value);
     }
 
     function updateSelectBox(boxId, values, placeholder) {
@@ -220,6 +234,18 @@
       const container = document.getElementById(containerId);
       container.innerHTML = '';
 
+      // Select All button
+      const selectAllBtn = document.createElement('button');
+      selectAllBtn.type = 'button';
+      selectAllBtn.className = 'select-all';
+      selectAllBtn.textContent = 'Selecionar tudo';
+      selectAllBtn.addEventListener('click', e => {
+        e.stopPropagation();
+        saveFilter(filterKey, dataList.slice());
+        onChange();
+      });
+      container.appendChild(selectAllBtn);
+
       const stored = loadFilter(filterKey);
 
       dataList.forEach(item => {
@@ -233,7 +259,6 @@
           saveFilter(filterKey, checked);
           onChange();
         });
-
         label.appendChild(checkbox);
         label.appendChild(document.createTextNode(' ' + item));
         container.appendChild(label);
@@ -253,11 +278,9 @@
     // Attach dropdown click handlers
     function attachDropdownEvents() {
       ['clientWrapper','clientInfoWrapper','programWrapper','turmaWrapper','textWrapper'].forEach(id => {
-        const wrapper = document.getElementById(id);
-        const box = wrapper.querySelector('.select-box');
+        const box = document.querySelector(`#${id} .select-box`);
         box.addEventListener('click', () => toggleDropdown(id));
       });
-      // Close if clicking outside
       document.addEventListener('click', e => {
         if (!e.target.closest('.dropdown-multiselect')) {
           document.querySelectorAll('.dropdown-multiselect').forEach(el => el.classList.remove('open'));
@@ -279,13 +302,10 @@
     }
 
     function populateClientInfos() {
-      const selectedClients = loadFilter('clients');
+      const selected = loadFilter('clients');
       const infos = [...new Set(
-        rawData
-          .filter(d => selectedClients.includes(d.client))
-          .map(d => d.client_info)
+        rawData.filter(d => selected.includes(d.client)).map(d => d.client_info)
       )].sort();
-
       populateCheckboxes({
         containerId: 'clientInfoChecks',
         boxId: 'clientInfoBox',
@@ -297,13 +317,10 @@
     }
 
     function populatePrograms() {
-      const selectedClients = loadFilter('clients');
+      const selected = loadFilter('clients');
       const programs = [...new Set(
-        rawData
-          .filter(d => selectedClients.includes(d.client))
-          .map(d => d.program)
+        rawData.filter(d => selected.includes(d.client)).map(d => d.program)
       )].sort();
-
       populateCheckboxes({
         containerId: 'programChecks',
         boxId: 'programBox',
@@ -315,20 +332,14 @@
     }
 
     function populateTurmas() {
-      const filters = getStorageFilters();
-      const { clients = [], clientInfos = [], programs = [] } = filters;
-
+      const { clients = [], clientInfos = [], programs = [] } = getStorageFilters();
       const turmas = [...new Set(
-        rawData
-          .filter(
-            d =>
-              clients.includes(d.client) &&
-              clientInfos.includes(d.client_info) &&
-              programs.includes(d.program)
-          )
-          .map(d => d.turma)
+        rawData.filter(d =>
+          clients.includes(d.client) &&
+          clientInfos.includes(d.client_info) &&
+          programs.includes(d.program)
+        ).map(d => d.turma)
       )].sort();
-
       populateCheckboxes({
         containerId: 'turmaChecks',
         boxId: 'turmaBox',
@@ -340,21 +351,15 @@
     }
 
     function populateTextQuestions() {
-      const filters = getStorageFilters();
-      const { clients = [], programs = [], turmas = [] } = filters;
-
+      const { clients = [], programs = [], turmas = [] } = getStorageFilters();
       const questions = [...new Set(
-        rawData
-          .filter(
-            d =>
-              clients.includes(d.client) &&
-              programs.includes(d.program) &&
-              turmas.includes(d.turma) &&
-              isNaN(+d.value)
-          )
-          .map(d => d.question)
+        rawData.filter(d =>
+          clients.includes(d.client) &&
+          programs.includes(d.program) &&
+          turmas.includes(d.turma) &&
+          isNaN(+d.value)
+        ).map(d => d.question)
       )].sort();
-
       populateCheckboxes({
         containerId: 'textChecks',
         boxId: 'textBox',
@@ -368,32 +373,21 @@
     function renderTrainerInputs() {
       const container = document.getElementById('trainersContainer');
       container.innerHTML = '';
-
       const programs = loadFilter('programs');
-      const savedTrainers = getStorageFilters().trainers || {};
-
-      programs.forEach(program => {
+      const saved = getStorageFilters().trainers || {};
+      programs.forEach(p => {
         const wrapper = document.createElement('div');
         wrapper.className = 'program-trainer';
-
         const label = document.createElement('label');
-        label.textContent = `Formador (${program}):`;
-
+        label.textContent = `Formador (${p}):`;
         const input = document.createElement('input');
         input.type = 'text';
-        input.placeholder = `Nome do formador para ${program}`;
-        input.value = savedTrainers[program] || '';
+        input.placeholder = `Nome do formador para ${p}`;
+        input.value = saved[p] || '';
         input.addEventListener('input', () => {
-          savedTrainers[program] = input.value;
-          localStorage.setItem(
-            'filters',
-            JSON.stringify({
-              ...getStorageFilters(),
-              trainers: savedTrainers
-            })
-          );
+          saved[p] = input.value;
+          localStorage.setItem('filters', JSON.stringify({ ...getStorageFilters(), trainers: saved }));
         });
-
         wrapper.append(label, input);
         container.appendChild(wrapper);
       });
@@ -409,42 +403,27 @@
 
     function initFilters() {
       fetch('data.json')
-        .then(response => response.json())
+        .then(r => r.json())
         .then(data => {
           rawData = data;
           populateClients();
           attachDropdownEvents();
           refreshAll();
 
-          // Load saved dates
           const { start, end } = getStorageFilters();
           if (start) document.getElementById('startMonth').value = start;
           if (end) document.getElementById('endMonth').value = end;
 
-          document
-            .getElementById('startMonth')
-            .addEventListener('change', e => saveFilter('start', e.target.value));
+          document.getElementById('startMonth').addEventListener('change', e => saveFilter('start', e.target.value));
+          document.getElementById('endMonth').addEventListener('change', e => saveFilter('end', e.target.value));
 
-          document
-            .getElementById('endMonth')
-            .addEventListener('change', e => saveFilter('end', e.target.value));
-
-          document
-            .getElementById('viewReport')
-            .addEventListener('click', () => navigateToReport(false));
-
-          document
-            .getElementById('downloadReport')
-            .addEventListener('click', () => navigateToReport(true));
+          document.getElementById('viewReport').addEventListener('click', () => navigateToReport(false));
+          document.getElementById('downloadReport').addEventListener('click', () => navigateToReport(true));
         });
     }
 
     function navigateToReport(download) {
-      const filters = {
-        ...getStorageFilters(),
-        trainers: getStorageFilters().trainers || {}
-      };
-
+      const filters = { ...getStorageFilters(), trainers: getStorageFilters().trainers || {} };
       localStorage.setItem('reportFilters', JSON.stringify(filters));
       window.location.href = `report.html${download ? '?download=true' : ''}`;
     }

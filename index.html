@@ -107,7 +107,21 @@
     function populateTextQuestions(){ const {clients=[],programs=[],turmas=[]}=getStorageFilters(); const arr=[...new Set(rawData.filter(d=>clients.includes(d.client)&&programs.includes(d.program)&&turmas.includes(d.turma)&&isNaN(+d.value)).map(d=>d.question))].sort(); populateCheckboxes({containerId:'textChecks',boxId:'textBox',dataList:arr,filterKey:'textQuestions',placeholder:'Selecionar perguntas',onChange:refreshAll}); }
     function renderTrainerInputs(){ const cont=document.getElementById('trainersContainer'); cont.innerHTML=''; const progs=loadFilter('programs'); const saved=getStorageFilters().trainers||{}; progs.forEach(p=>{ const w=document.createElement('div'); w.className='program-trainer'; const lbl=document.createElement('label'); lbl.textContent=`Formador (${p}):`; const inp=document.createElement('input'); inp.type='text'; inp.placeholder=`Nome do formador para ${p}`; inp.value=saved[p]||''; inp.oninput=()=>{ saved[p]=inp.value; localStorage.setItem('filters',JSON.stringify({...getStorageFilters(),trainers:saved})); }; w.append(lbl,inp); cont.appendChild(w); }); }
     function refreshAll(){ populateClientInfos(); populatePrograms(); populateTurmas(); populateTextQuestions(); renderTrainerInputs(); }
-    function initFilters(){ fetch('data.json').then(r=>r.json()).then(data=>{ rawData=data; populateClients(); attachDropdownEvents(); refreshAll(); const {start,end}=getStorageFilters(); if(start)document.getElementById('startMonth').value=start; if(end)document.getElementById('endMonth').value=end; document.getElementById('startMonth').onchange=e=>saveFilter('start',e.target.value); document.getElementById('endMonth').onchange=e=>saveFilter('end',e.target.value); document.getElementById('viewReport').onclick=()=>navigateToReport(false); document.getElementById('downloadReport').onclick=()=>navigateToReport(true); }); }
+    function initFilters(){ fetch('data.json').then(r=>r.json()).then(data=>{ rawData=data; populateClients(); attachDropdownEvents(); refreshAll(); const {start,end}=getStorageFilters(); if(start)document.getElementById('startMonth').value=start; if(end)document.getElementById('endMonth').value=end; document.getElementById('startMonth').onchange=e=>saveFilter('start',e.target.value); document.getElementById('endMonth').onchange=e=>saveFilter('end',e.target.value); // Report button events
+          document
+            .getElementById('viewReport')
+            .addEventListener('click', () => {
+              // Ensure textQuestions reflect current UI selection
+              saveFilter('textQuestions', getCheckedValues('textChecks'));
+              navigateToReport(false);
+            });
+
+          document
+            .getElementById('downloadReport')
+            .addEventListener('click', () => {
+              saveFilter('textQuestions', getCheckedValues('textChecks'));
+              navigateToReport(true);
+            }); document.getElementById('downloadReport').onclick=()=>navigateToReport(true); }); }
     function navigateToReport(download){ const f={...getStorageFilters(),trainers:getStorageFilters().trainers||{}}; localStorage.setItem('reportFilters',JSON.stringify(f)); window.location.href=`report.html${download?'?download=true':''}`; }
     document.addEventListener('DOMContentLoaded',initFilters);
   </script>

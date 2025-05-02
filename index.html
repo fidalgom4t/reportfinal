@@ -273,9 +273,9 @@
     }
 
     function populateTurmas() {
-      const cl = getFilter('clients'), pr = getFilter('programs');
+      const cl = getFilter('clients'), ci = getFilter('clientInfos'), pr = getFilter('programs');
       const ts = [...new Set(rawData
-        .filter(d => cl.includes(d.client) && pr.includes(d.program))
+        .filter(d => cl.includes(d.client) && ci.includes(d.client_info) && pr.includes(d.program))
         .map(d => d.turma)
       )].sort();
       fillChecks('turmaChecks', ts, getFilter('turmas'), () => {

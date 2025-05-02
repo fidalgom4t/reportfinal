@@ -7,334 +7,429 @@
     body {
       font-family: 'Segoe UI', sans-serif;
       background: #f5f5f5;
-      padding: 40px;
+      margin: 40px auto;
       max-width: 800px;
-      margin: auto;
+      padding: 0 20px;
     }
-    h2 { margin-bottom: 24px; color: #007c91; }
+
+    h2 {
+      color: #007c91;
+      margin-bottom: 24px;
+      text-align: center;
+    }
+
     form {
       display: grid;
       grid-template-columns: 200px 1fr;
-      row-gap: 20px;
-      column-gap: 20px;
-      align-items: start;
+      gap: 20px 20px;
+      align-items: center;
     }
-    label { font-weight: bold; align-self: center; }
 
-    /* Dropdown‑multiselect */
-    .dropdown-multiselect { position: relative; width: 100%; }
+    label {
+      font-weight: bold;
+    }
+
+    /* Dropdown multi-select */
+    .dropdown-multiselect {
+      position: relative;
+      width: 100%;
+    }
+
     .select-box {
-      border: 1px solid #ccc;
       background: #fff;
-      padding: 8px 12px;
+      border: 1px solid #ccc;
       border-radius: 4px;
       cursor: pointer;
-      user-select: none;
+      padding: 8px 12px;
       position: relative;
+      user-select: none;
     }
+
     .select-box::after {
       content: '▾';
       position: absolute;
       right: 12px;
       top: 50%;
       transform: translateY(-50%);
-      font-size: 12px;
       color: #666;
+      font-size: 12px;
     }
+
     .checkboxes {
-      display: none;
-      position: absolute;
-      top: calc(100% + 4px);
-      width: 100%;
-      max-height: 180px;
-      overflow-y: auto;
       background: #fff;
       border: 1px solid #ccc;
       border-radius: 4px;
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+      display: none;
+      max-height: 180px;
+      overflow-y: auto;
       padding: 8px;
-      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+      position: absolute;
+      top: calc(100% + 4px);
+      width: 100%;
       z-index: 10;
     }
-    .dropdown-multiselect.open .checkboxes { display: block; }
+
+    .dropdown-multiselect.open .checkboxes {
+      display: block;
+    }
+
     .checkboxes label {
-      display: flex; align-items:center;
-      margin-bottom:6px; font-weight:normal;
+      align-items: center;
       cursor: pointer;
-    }
-    .checkboxes label input { margin-right:8px; }
-
-    input[type="month"], input[type="text"] {
-      padding:8px; border:1px solid #ccc; border-radius:4px;
-      width:100%; box-sizing:border-box;
+      display: flex;
+      font-weight: normal;
+      margin-bottom: 6px;
     }
 
+    .checkboxes input {
+      margin-right: 8px;
+    }
+
+    /* Inputs */
+    input[type="month"],
+    input[type="text"] {
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      box-sizing: border-box;
+      padding: 8px;
+      width: 100%;
+    }
+
+    /* Trainer inputs */
     .program-trainer {
       grid-column: span 2;
       display: grid;
       grid-template-columns: 200px 1fr;
-      column-gap: 20px;
+      gap: 0 20px;
       margin-top: 10px;
     }
 
+    /* Submit buttons */
     .submit-row {
       grid-column: span 2;
-      text-align: center;
       margin-top: 30px;
+      text-align: center;
     }
+
     .link-button {
-      display: inline-block;
-      padding: 10px 30px;
       background: #007c91;
-      color: #fff;
-      text-decoration: none;
-      font-weight: bold;
       border-radius: 4px;
+      color: #fff;
+      font-weight: bold;
+      padding: 10px 30px;
+      text-decoration: none;
       margin: 0 10px;
+      display: inline-block;
     }
   </style>
 </head>
 <body>
   <h2>Gerar Relatório Dinâmico</h2>
+
   <form id="filtersForm" onsubmit="return false;">
     <!-- Cliente -->
-    <label>Cliente:</label>
+    <label for="clientWrapper">Cliente:</label>
     <div class="dropdown-multiselect" id="clientWrapper">
-      <div class="select-box" data-placeholder="Selecionar cliente(s)"
-           onclick="toggleDropdown('clientWrapper')">Selecionar cliente(s)</div>
+      <div class="select-box" data-placeholder="Selecionar cliente(s)" id="clientBox"></div>
       <div class="checkboxes" id="clientChecks"></div>
     </div>
 
     <!-- Cliente Info -->
-    <label>Cliente Info:</label>
+    <label for="clientInfoWrapper">Cliente Info:</label>
     <div class="dropdown-multiselect" id="clientInfoWrapper">
-      <div class="select-box" data-placeholder="Selecionar info(s)"
-           onclick="toggleDropdown('clientInfoWrapper')">Selecionar info(s)</div>
+      <div class="select-box" data-placeholder="Selecionar info(s)" id="clientInfoBox"></div>
       <div class="checkboxes" id="clientInfoChecks"></div>
     </div>
 
     <!-- Programas -->
-    <label>Programas:</label>
+    <label for="programWrapper">Programas:</label>
     <div class="dropdown-multiselect" id="programWrapper">
-      <div class="select-box" data-placeholder="Selecionar programa(s)"
-           onclick="toggleDropdown('programWrapper')">Selecionar programa(s)</div>
+      <div class="select-box" data-placeholder="Selecionar programa(s)" id="programBox"></div>
       <div class="checkboxes" id="programChecks"></div>
     </div>
 
     <!-- Turmas -->
-    <label>Turmas:</label>
+    <label for="turmaWrapper">Turmas:</label>
     <div class="dropdown-multiselect" id="turmaWrapper">
-      <div class="select-box" data-placeholder="Selecionar turma(s)"
-           onclick="toggleDropdown('turmaWrapper')">Selecionar turma(s)</div>
+      <div class="select-box" data-placeholder="Selecionar turma(s)" id="turmaBox"></div>
       <div class="checkboxes" id="turmaChecks"></div>
     </div>
 
     <!-- Perguntas Abertas -->
-    <label>Perguntas Abertas:</label>
+    <label for="textWrapper">Perguntas Abertas:</label>
     <div class="dropdown-multiselect" id="textWrapper">
-      <div class="select-box" data-placeholder="Selecionar perguntas"
-           onclick="toggleDropdown('textWrapper')">Selecionar perguntas</div>
-      <div class="checkboxes" id="textQuestionSelect"></div>
+      <div class="select-box" data-placeholder="Selecionar perguntas" id="textBox"></div>
+      <div class="checkboxes" id="textChecks"></div>
     </div>
 
-    <!-- Scope temporal -->
-    <label>Scope temporal - Início:</label>
+    <!-- Período -->
+    <label for="startMonth">Scope temporal - Início:</label>
     <input type="month" id="startMonth" />
-    <label>Scope temporal - Fim:</label>
+
+    <label for="endMonth">Scope temporal - Fim:</label>
     <input type="month" id="endMonth" />
 
-    <!-- Formador per program -->
+    <!-- Formadores -->
     <div id="trainersContainer" class="program-trainer"></div>
 
-    <!-- Buttons -->
+    <!-- Ações -->
     <div class="submit-row">
-      <a class="link-button" onclick="goToReport(false)">Ver Relatório</a>
-      <a class="link-button" onclick="goToReport(true)">Download Relatório</a>
+      <a href="#" class="link-button" id="viewReport">Ver Relatório</a>
+      <a href="#" class="link-button" id="downloadReport">Download Relatório</a>
     </div>
   </form>
 
   <script>
+    // Data store
     let rawData = [];
 
-    fetch('data.json')
-      .then(r => r.json())
-      .then(data => {
-        rawData = data;
-        initFilters();
-      });
-
-    function toggleDropdown(id) {
-      document.querySelectorAll('.dropdown-multiselect').forEach(el => {
-        if (el.id !== id) el.classList.remove('open');
-      });
-      document.getElementById(id).classList.toggle('open');
+    // Utility functions
+    function getStorageFilters() {
+      return JSON.parse(localStorage.getItem('filters') || '{}');
     }
 
-    function fillChecks(id, items, stored, onChange) {
-      const cnt = document.getElementById(id);
-      cnt.innerHTML = '';
-      items.forEach(v => {
-        const lbl = document.createElement('label');
-        const cb  = document.createElement('input');
-        cb.type    = 'checkbox';
-        cb.value   = v;
-        cb.checked = stored.includes(v);
-        cb.onchange = () => {
+    function saveFilter(key, values) {
+      const filters = getStorageFilters();
+      filters[key] = values;
+      localStorage.setItem('filters', JSON.stringify(filters));
+    }
+
+    function loadFilter(key) {
+      return getStorageFilters()[key] || [];
+    }
+
+    function getCheckedValues(containerId) {
+      return Array.from(document.querySelectorAll(`#${containerId} input:checked`))
+        .map(checkbox => checkbox.value);
+    }
+
+    function updateSelectBox(boxId, values, placeholder) {
+      const box = document.getElementById(boxId);
+      box.textContent = values.length ? values.join(', ') : placeholder;
+    }
+
+    function populateCheckboxes({
+      containerId,
+      boxId,
+      dataList,
+      filterKey,
+      placeholder,
+      onChange
+    }) {
+      const container = document.getElementById(containerId);
+      container.innerHTML = '';
+
+      const stored = loadFilter(filterKey);
+
+      dataList.forEach(item => {
+        const label = document.createElement('label');
+        const checkbox = document.createElement('input');
+        checkbox.type = 'checkbox';
+        checkbox.value = item;
+        checkbox.checked = stored.includes(item);
+        checkbox.addEventListener('change', () => {
+          const checked = getCheckedValues(containerId);
+          saveFilter(filterKey, checked);
           onChange();
-          updateSelectText(id);
-          if (id === 'programChecks') renderTrainerInputs();
-        };
-        lbl.appendChild(cb);
-        lbl.appendChild(document.createTextNode(v));
-        cnt.appendChild(lbl);
+        });
+
+        label.appendChild(checkbox);
+        label.append(' ' + item);
+        container.appendChild(label);
       });
-      updateSelectText(id);
+
+      updateSelectBox(boxId, stored, placeholder);
     }
 
-    function updateSelectText(id) {
-      const map = {
-        clientChecks: 'clientWrapper',
-        clientInfoChecks: 'clientInfoWrapper',
-        programChecks: 'programWrapper',
-        turmaChecks: 'turmaWrapper',
-        textQuestionSelect: 'textWrapper'
-      };
-      const wrapper = map[id];
-      const box = document.querySelector(`#${wrapper} .select-box`);
-      const vals = Array.from(document.getElementById(id)
-        .querySelectorAll('input:checked'))
-        .map(i => i.value);
-      box.textContent = vals.length ? vals.join(', ') : box.getAttribute('data-placeholder');
-    }
-
-    function getChecked(id) {
-      return Array.from(document.getElementById(id)
-        .querySelectorAll('input:checked'))
-        .map(i => i.value);
-    }
-
-    function setFilter(k, v) {
-      const s = JSON.parse(localStorage.getItem('filters') || '{}');
-      s[k] = v;
-      localStorage.setItem('filters', JSON.stringify(s));
-    }
-    function getFilter(k) {
-      return JSON.parse(localStorage.getItem('filters') || '{}')[k] || [];
-    }
-
-    function initFilters() {
-      // CLIENTES
+    // Populate functions
+    function populateClients() {
       const clients = [...new Set(rawData.map(d => d.client))].sort();
-      fillChecks('clientChecks', clients, getFilter('clients'), () => {
-        setFilter('clients', getChecked('clientChecks'));
-        populatePrograms();
-        populateClientInfo();
+      populateCheckboxes({
+        containerId: 'clientChecks',
+        boxId: 'clientBox',
+        dataList: clients,
+        filterKey: 'clients',
+        placeholder: 'Selecionar cliente(s)',
+        onChange: refreshAll
       });
-
-      // CLIENTE INFO
-      populateClientInfo();
-
-      // PROGRAMAS / TURMAS / PERGUNTAS
-      populatePrograms();
-      populateTurmas();
-      populateQuestions();
-
-      // SCOPE
-      const f = JSON.parse(localStorage.getItem('filters') || '{}');
-      if (f.start) document.getElementById('startMonth').value = f.start;
-      if (f.end)   document.getElementById('endMonth').value   = f.end;
-      document.getElementById('startMonth').onchange = e => setFilter('start', e.target.value);
-      document.getElementById('endMonth').onchange   = e => setFilter('end',   e.target.value);
-
-      // TRAINERS
-      renderTrainerInputs();
     }
 
-    function populateClientInfo() {
-      const cl = getFilter('clients');
-      const infos = [...new Set(rawData
-        .filter(d => cl.includes(d.client))
-        .map(d => d.client_info)
+    function populateClientInfos() {
+      const selectedClients = loadFilter('clients');
+      const infos = [...new Set(
+        rawData
+          .filter(d => selectedClients.includes(d.client))
+          .map(d => d.client_info)
       )].sort();
-      fillChecks('clientInfoChecks', infos, getFilter('clientInfos'), () => {
-        setFilter('clientInfos', getChecked('clientInfoChecks'));
+
+      populateCheckboxes({
+        containerId: 'clientInfoChecks',
+        boxId: 'clientInfoBox',
+        dataList: infos,
+        filterKey: 'clientInfos',
+        placeholder: 'Selecionar info(s)',
+        onChange: refreshAll
       });
     }
 
     function populatePrograms() {
-      const cl = getFilter('clients');
-      const progs = [...new Set(rawData
-        .filter(d => cl.includes(d.client))
-        .map(d => d.program)
+      const selectedClients = loadFilter('clients');
+      const programs = [...new Set(
+        rawData
+          .filter(d => selectedClients.includes(d.client))
+          .map(d => d.program)
       )].sort();
-      fillChecks('programChecks', progs, getFilter('programs'), () => {
-        setFilter('programs', getChecked('programChecks'));
-        populateTurmas();
+
+      populateCheckboxes({
+        containerId: 'programChecks',
+        boxId: 'programBox',
+        dataList: programs,
+        filterKey: 'programs',
+        placeholder: 'Selecionar programa(s)',
+        onChange: refreshAll
       });
     }
 
     function populateTurmas() {
-      const cl = getFilter('clients'), ci = getFilter('clientInfos'), pr = getFilter('programs');
-      const ts = [...new Set(rawData
-        .filter(d => cl.includes(d.client) && ci.includes(d.client_info) && pr.includes(d.program))
-        .map(d => d.turma)
+      const filters = getStorageFilters();
+      const { clients = [], clientInfos = [], programs = [] } = filters;
+
+      const turmas = [...new Set(
+        rawData
+          .filter(
+            d =>
+              clients.includes(d.client) &&
+              clientInfos.includes(d.client_info) &&
+              programs.includes(d.program)
+          )
+          .map(d => d.turma)
       )].sort();
-      fillChecks('turmaChecks', ts, getFilter('turmas'), () => {
-        setFilter('turmas', getChecked('turmaChecks'));
+
+      populateCheckboxes({
+        containerId: 'turmaChecks',
+        boxId: 'turmaBox',
+        dataList: turmas,
+        filterKey: 'turmas',
+        placeholder: 'Selecionar turma(s)',
+        onChange: refreshAll
       });
     }
 
-    function populateQuestions() {
-      const cl = getFilter('clients'), pr = getFilter('programs'), ts = getFilter('turmas');
-      const qs = [...new Set(rawData
-        .filter(d => cl.includes(d.client) && pr.includes(d.program) && ts.includes(d.turma) && isNaN(+d.value))
-        .map(d => d.question)
+    function populateTextQuestions() {
+      const filters = getStorageFilters();
+      const { clients = [], programs = [], turmas = [] } = filters;
+
+      const questions = [...new Set(
+        rawData
+          .filter(
+            d =>
+              clients.includes(d.client) &&
+              programs.includes(d.program) &&
+              turmas.includes(d.turma) &&
+              isNaN(+d.value)
+          )
+          .map(d => d.question)
       )].sort();
-      fillChecks('textQuestionSelect', qs, getFilter('textQuestions'), () => {
-        setFilter('textQuestions', getChecked('textQuestionSelect'));
+
+      populateCheckboxes({
+        containerId: 'textChecks',
+        boxId: 'textBox',
+        dataList: questions,
+        filterKey: 'textQuestions',
+        placeholder: 'Selecionar perguntas',
+        onChange: () => {},
       });
     }
 
     function renderTrainerInputs() {
-      const cont = document.getElementById('trainersContainer');
-      cont.innerHTML = '';
-      const pr = getFilter('programs');
-      const saved = (JSON.parse(localStorage.getItem('filters') || '{}').trainers) || {};
-      pr.forEach(p => {
-        const div = document.createElement('div');
-        div.className = 'program-trainer';
-        const lbl = document.createElement('label');
-        lbl.textContent = `Formador (${p}):`;
-        const inp = document.createElement('input');
-        inp.type = 'text';
-        inp.value = saved[p] || '';
-        inp.placeholder = `Nome do formador para ${p}`;
-        inp.oninput = () => {
-          saved[p] = inp.value;
-          const f = JSON.parse(localStorage.getItem('filters') || '{}');
-          f.trainers = saved;
-          localStorage.setItem('filters', JSON.stringify(f));
-        };
-        div.appendChild(lbl);
-        div.appendChild(inp);
-        cont.appendChild(div);
+      const container = document.getElementById('trainersContainer');
+      container.innerHTML = '';
+
+      const programs = loadFilter('programs');
+      const savedTrainers = getStorageFilters().trainers || {};
+
+      programs.forEach(program => {
+        const wrapper = document.createElement('div');
+        wrapper.className = 'program-trainer';
+
+        const label = document.createElement('label');
+        label.textContent = `Formador (${program}):`;
+
+        const input = document.createElement('input');
+        input.type = 'text';
+        input.placeholder = `Nome do formador para ${program}`;
+        input.value = savedTrainers[program] || '';
+        input.addEventListener('input', () => {
+          savedTrainers[program] = input.value;
+          localStorage.setItem(
+            'filters',
+            JSON.stringify({
+              ...getStorageFilters(),
+              trainers: savedTrainers
+            })
+          );
+        });
+
+        wrapper.append(label, input);
+        container.appendChild(wrapper);
       });
     }
 
-    function goToReport(download) {
-      const f = {
-        clients: getChecked('clientChecks'),
-        clientInfos: getChecked('clientInfoChecks'),
-        programs: getChecked('programChecks'),
-        turmas: getChecked('turmaChecks'),
-        textQuestions: getChecked('textQuestionSelect'),
-        start: document.getElementById('startMonth').value,
-        end:   document.getElementById('endMonth').value,
-        trainers: (JSON.parse(localStorage.getItem('filters') || '{}').trainers) || {}
-      };
-      localStorage.setItem('reportFilters', JSON.stringify(f));
-      const url = 'report.html' + (download ? '?download=true' : '');
-      window.location.href = url;
+    // Refresh all dependent filters and inputs
+    function refreshAll() {
+      populateClientInfos();
+      populatePrograms();
+      populateTurmas();
+      populateTextQuestions();
+      renderTrainerInputs();
     }
+
+    // Initialize filters on page load
+    function initFilters() {
+      fetch('data.json')
+        .then(response => response.json())
+        .then(data => {
+          rawData = data;
+          populateClients();
+          refreshAll();
+
+          // Load saved date filters
+          const { start, end } = getStorageFilters();
+          if (start) document.getElementById('startMonth').value = start;
+          if (end) document.getElementById('endMonth').value = end;
+
+          document
+            .getElementById('startMonth')
+            .addEventListener('change', e => saveFilter('start', e.target.value));
+
+          document
+            .getElementById('endMonth')
+            .addEventListener('change', e => saveFilter('end', e.target.value));
+
+          // Report button events
+          document
+            .getElementById('viewReport')
+            .addEventListener('click', () => navigateToReport(false));
+
+          document
+            .getElementById('downloadReport')
+            .addEventListener('click', () => navigateToReport(true));
+        });
+    }
+
+    function navigateToReport(download) {
+      const filters = {
+        ...getStorageFilters(),
+        trainers: getStorageFilters().trainers || {}
+      };
+
+      localStorage.setItem('reportFilters', JSON.stringify(filters));
+      window.location.href = `report.html${download ? '?download=true' : ''}`;
+    }
+
+    // Run initialization
+    document.addEventListener('DOMContentLoaded', initFilters);
   </script>
 </body>
 </html>

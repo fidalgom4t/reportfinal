@@ -235,11 +235,34 @@
         });
 
         label.appendChild(checkbox);
-        label.append(' ' + item);
+        label.appendChild(document.createTextNode(' ' + item));
         container.appendChild(label);
       });
 
       updateSelectBox(boxId, stored, placeholder);
+    }
+
+    // Dropdown toggle
+    function toggleDropdown(wrapperId) {
+      document.querySelectorAll('.dropdown-multiselect').forEach(el => {
+        if (el.id !== wrapperId) el.classList.remove('open');
+      });
+      document.getElementById(wrapperId).classList.toggle('open');
+    }
+
+    // Attach dropdown click handlers
+    function attachDropdownEvents() {
+      ['clientWrapper','clientInfoWrapper','programWrapper','turmaWrapper','textWrapper'].forEach(id => {
+        const wrapper = document.getElementById(id);
+        const box = wrapper.querySelector('.select-box');
+        box.addEventListener('click', () => toggleDropdown(id));
+      });
+      // Close if clicking outside
+      document.addEventListener('click', e => {
+        if (!e.target.closest('.dropdown-multiselect')) {
+          document.querySelectorAll('.dropdown-multiselect').forEach(el => el.classList.remove('open'));
+        }
+      });
     }
 
     // Populate functions
@@ -338,7 +361,7 @@
         dataList: questions,
         filterKey: 'textQuestions',
         placeholder: 'Selecionar perguntas',
-        onChange: () => {},
+        onChange: () => {}
       });
     }
 
@@ -376,7 +399,6 @@
       });
     }
 
-    // Refresh all dependent filters and inputs
     function refreshAll() {
       populateClientInfos();
       populatePrograms();
@@ -385,16 +407,16 @@
       renderTrainerInputs();
     }
 
-    // Initialize filters on page load
     function initFilters() {
       fetch('data.json')
         .then(response => response.json())
         .then(data => {
           rawData = data;
           populateClients();
+          attachDropdownEvents();
           refreshAll();
 
-          // Load saved date filters
+          // Load saved dates
           const { start, end } = getStorageFilters();
           if (start) document.getElementById('startMonth').value = start;
           if (end) document.getElementById('endMonth').value = end;
@@ -407,7 +429,6 @@
             .getElementById('endMonth')
             .addEventListener('change', e => saveFilter('end', e.target.value));
 
-          // Report button events
           document
             .getElementById('viewReport')
             .addEventListener('click', () => navigateToReport(false));
@@ -428,7 +449,6 @@
       window.location.href = `report.html${download ? '?download=true' : ''}`;
     }
 
-    // Run initialization
     document.addEventListener('DOMContentLoaded', initFilters);
   </script>
 </body>

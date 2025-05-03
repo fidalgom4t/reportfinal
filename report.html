@@ -132,7 +132,7 @@
     }
     .text-question {
       background: #f9f9f9;
-      border: 1px solid #007c91; border-left: 6px ;
+      border: 1px solid #007c91; border-left: 1px solid #007c91;
       padding: 20px; margin-bottom: 20px; box-sizing: border-box;
       page-break-inside: avoid; break-inside: avoid;
     }
@@ -151,6 +151,14 @@
       padding: 8px 16px; background: #007c91; color: #fff;
       border: none; border-radius: 4px; cursor: pointer;
     }
+    .page.hero > .header,
+.page.hero > .footer {
+  display: none;
+}
+.page.hero > .content {
+  top: 0;
+  bottom: 0;
+}
   </style>
 </head>
 <body>
@@ -282,7 +290,7 @@
           </div>
           <div class="content">
             <div class="banner">
-              <img class="banner-bg" src="hourglass-bg.jpg">
+              <img class="banner-bg" src="assessment-bg.jpg">
               <div class="banner-box">
                 <h1>Detalhes do Programa</h1>
                 <div class="meta">

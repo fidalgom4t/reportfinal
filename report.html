@@ -370,12 +370,14 @@
         images.push(canvas.toDataURL());
       }
       pdfMake.createPdf({
-        pageSize:'A4', pageOrientation:'landscape', pageMargins:[0,0,0,0],
-        content: images.map((img,i)=>({
-          image:img, width:842, pageBreak:i<images.length-1?'after':undefined
-        }))
-      }).download('report.pdf');
-    }
+  pageSize: { width: 960, height: 540 },
+  pageMargins: [ 0, 0, 0, 0 ],
+  content: images.map((img,i) => ({
+    image: img,
+    width: 960,
+    pageBreak: i < images.length - 1 ? 'after' : undefined
+  }))
+}).download('report.pdf');
 
     document.addEventListener('DOMContentLoaded', ()=>{
       document.getElementById('gerar-pdf').addEventListener('click', generatePdf);

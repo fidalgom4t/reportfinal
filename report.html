@@ -120,29 +120,37 @@
   .banner-box h1 { margin: 0 0 16px; font-size: 48px; color: #007c91; }
   .banner-box .meta { display: flex; gap: 40px; font-size: 18px; color: #555; }
 
-  /* Charts */
-  .chart-fullpage {
-    position: relative;
-    width: 100%;
-    height: calc(100% - 140px);
-    display: flex; align-items: center; justify-content: center;
-  }
-  .chart-full {
-    width: 100%; height: 100%;
-  }
-  .chart-grid {
-    position: relative;
-    width: 100%; height: calc(100% - 140px);
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    grid-template-rows: 1fr 1fr;
-    gap: 30px;
-    padding: 20px;
-    box-sizing: border-box;
-  }
-  .chart-box {
-    width: 100%; height: 100%;
-  }
+ /* ---- Replace your existing “Charts” section in <style> with this ---- */
+
+/* Instead of height: 80vh, let it fill between header (80px) and footer (60px) */
+.chart-fullpage {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100vw;
+  height: calc(100vh - 140px);
+}
+
+/* Make the chart itself fill that container */
+.chart-full {
+  width: calc(100% - 60px);   /* subtract side padding if you have any */
+  height: 100%;
+}
+
+/* And reduce the grid padding so each box is larger */
+.chart-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  grid-auto-rows: 1fr;
+  gap: 20px;          /* was 30px, now smaller gap → bigger charts */
+  padding: 40px;      /* was 100px, now less padding → bigger charts */
+  box-sizing: border-box;
+}
+.chart-box {
+  width: 100%;
+  height: 100%;
+}
+
 
   /* Text answers */
   .text-page {

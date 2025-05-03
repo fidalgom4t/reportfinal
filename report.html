@@ -31,7 +31,6 @@
 
     .page {
       position: relative;
-      /* A4‑landscape aspect ratio */
       aspect-ratio: 297 / 210;
       width: 100vw;
       height: auto;
@@ -236,11 +235,16 @@
       }
 
       for(const prog of f.programs || []){
+        // Use program-specific turmas filter key
+        const turmasKey = `turmas_${prog}`;
+        const selectedTurmas = f[turmasKey] || [];
+
         const all = data.filter(d=>
           (f.clients || []).includes(d.client) &&
           d.program === prog &&
-          (f.turmas || []).includes(d.turma)
+          selectedTurmas.includes(d.turma)
         );
+
         const pm = meta.titles.find(t=>t.program_id === prog) || {};
 
         // Hero
@@ -286,105 +290,3 @@
 
           // Global chart
           if(numeric.length){
-            const gl = document.createElement('div');
-            gl.className = 'page chart-fullpage';
-            gl.innerHTML = `
-              <div class="header"><img src="mind4time-logo.png"><div></div></div>
-              <div class="chart-full" id="chart-global-${prog}-${sec}"></div>
-              <div class="footer"><div>www.MIND4TIME.com</div><div>© MIND4TIME ${currentYear}</div></div>
-            `;
-            out.appendChild(gl);
-            createBarChart(
-              gl.querySelector('.chart-full'),
-              `Global (${name})`,
-              computeAverages(numeric, LM, OM),
-              sec==='evaluation'
-            );
-          }
-
-          // Turma grids
-          if(byTurma.length > 1){
-            for(let i = 0; i < byTurma.length; i += 4){
-              const grid = document.createElement('div');
-              grid.className = 'page chart-grid';
-              grid.innerHTML = `<div class="header"><img src="mind4time-logo.png"><div></div></div>`;
-              byTurma.slice(i, i+4).forEach(([, vals], idx)=>{
-                grid.innerHTML += `<div class="chart-box" id="chart-${prog}-${sec}-${i+idx}"></div>`;
-              });
-              grid.innerHTML += `<div class="footer"><div>www.MIND4TIME.com</div><div>© MIND4TIME ${currentYear}</div></div>`;
-              out.appendChild(grid);
-              byTurma.slice(i, i+4).forEach(([, vals], idx)=>{
-                createBarChart(
-                  document.getElementById(`chart-${prog}-${sec}-${i+idx}`),
-                  byTurma[i+idx][0],
-                  computeAverages(vals, LM, OM),
-                  sec==='evaluation'
-                );
-              });
-            }
-          }
-
-          // Text answers with 32-line pagination
-          const textRows = all.filter(d=>
-            String(d.section||'').toLowerCase().includes(sec) &&
-            isNaN(parseFloat(d.value))
-          );
-          const byQ = groupBy(textRows, 'question');
-          Object.entries(byQ).forEach(([q, answers])=>{
-            for(let i = 0; i < answers.length; i += 32){
-              const chunk = answers.slice(i, i + 32);
-              const page = document.createElement('div');
-              page.className = 'page text-page';
-
-              // Title only on first chunk
-              const titleHTML = i === 0
-                ? `<div class="text-question-title">${q}</div>`
-                : '';
-
-              page.innerHTML = `
-                <div class="header"><img src="mind4time-logo.png"><div></div></div>
-                <div class="text-question">
-                  ${titleHTML}
-                  <ul>
-                    ${chunk.map(a=>`<li>${a.value.replace(/\n/g,'</li><li>')}</li>`).join('')}
-                  </ul>
-                </div>
-                <div class="footer"><div>www.MIND4TIME.com</div><div>© MIND4TIME ${currentYear}</div></div>
-              `;
-              out.appendChild(page);
-            }
-          });
-
-        } // end for sec
-      } // end for prog
-    }
-
-    // PDF generation
-    async function generatePdf(){
-      await build();
-      const pages = Array.from(document.querySelectorAll('.page'));
-      const images = [];
-      for(const pg of pages){
-        const canvas = await html2canvas(pg, { backgroundColor:'#fff', scale: 2 });
-        images.push(canvas.toDataURL());
-      }
-      const docDef = {
-        pageSize: 'A4',
-        pageOrientation: 'landscape',
-        pageMargins: [0,0,0,0],
-        content: images.map((img,i)=>({
-          image: img,
-          width: 842,
-          pageBreak: i < images.length - 1 ? 'after' : undefined
-        }))
-      };
-      pdfMake.createPdf(docDef).download('report.pdf');
-    }
-
-    document.addEventListener('DOMContentLoaded', ()=>{
-      build();
-      document.getElementById('gerar-pdf').addEventListener('click', generatePdf);
-    });
-  </script>
-</body>
-</html>

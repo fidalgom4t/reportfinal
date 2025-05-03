@@ -194,7 +194,7 @@
     function countUnique(rows,sec){
       return new Set(
         rows.filter(d=>String(d.section||'').toLowerCase().includes(sec))
-            .map(d=>d.respondent_id||d.id)
+            .map(d=>d.submission_id||d.submissionId)
       ).size;
     }
     function formatMonthYear(v){

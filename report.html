@@ -45,9 +45,10 @@
     /* CONTENT WINDOW (960×400 minus 20px bottom padding) */
     .page > .content {
       position: absolute;
-      top: 80px; bottom: 80px; /* 60px footer + 20px breathing */
+      top: 80px; bottom: 60px; /* 60px footer + 20px breathing */
       left: 0; right: 0;
-      overflow: hidden; box-sizing: border-box;
+      overflow: visible; box-sizing: border-box;
+      padding-bottom: 1px;
     }
 
     /* FILL CONTENT */
@@ -130,6 +131,7 @@
     /* TEXT ANSWERS */
     .text-page {
       padding:20px; box-sizing:border-box;
+      overflow: visible !important;
     }
     .text-question {
       background:#f9f9f9; border:1px solid #007c91; border-left:6px solid #007c91;

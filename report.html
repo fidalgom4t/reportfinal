@@ -56,6 +56,7 @@
     .content > .chart-grid,
     .content > .text-page {
       width: 100%; height: 100%; box-sizing: border-box;
+      position: relative;
     }
 
     /* HERO (full‑bleed, no header/footer) */
@@ -78,24 +79,24 @@
     .hero-content h1 { font-size:3.5rem; margin:0; }
     .hero-content .subtitle { font-size:1.5rem; margin-top:12px; opacity:.85; }
 
-    /* INFO BANNER (second page) */
+    /* SECTION BANNERS */
     .banner {
-      position:relative; width:100%; height:100%; overflow:hidden;
+      position: relative; width:100%; height:100%; overflow:hidden;
     }
     .banner-bg {
       position:absolute; inset:0;
       width:100%; height:100%; object-fit:cover;
-      opacity:.3;
     }
-    .banner-box {
-      position:relative; z-index:1;
-      width:70%; background:rgba(240,248,249,.9);
-      padding:30px 50px; border-left:6px solid #007c91;
-      box-shadow:0 2px 6px rgba(0,0,0,.1);
-      box-sizing:border-box;
+    .banner-text {
+      position:absolute;
+      left:30px;
+      bottom:20px;
+      font-size:1.25rem;
+      font-weight:500;
+      color:#fff;
+      text-shadow:0 0 4px rgba(0,0,0,0.5);
+      z-index:1;
     }
-    .banner-box h1 { font-size:2.5rem; margin-bottom:12px; color:#007c91; }
-    .banner-box .meta { font-size:1rem; color:#333; }
 
     /* GLOBAL CHART */
     .chart-fullpage {
@@ -156,111 +157,81 @@
     const currentYear = new Date().getFullYear();
 
     function createLabelMap(labels) {
-      return labels.reduce((m, l) => {
-        const k = l.questionId || l['QUESTION ID'];
-        m[k] = l.label || l['LABEL'];
+      return labels.reduce((m,l)=>{
+        const k = l.questionId||l['QUESTION ID'];
+        m[k] = l.label||l['LABEL'];
         return m;
       }, {});
     }
-
     function createSortMap(labels) {
-      return labels.reduce((m, l) => {
-        const k = l.questionId || l['QUESTION ID'];
-        m[k] = +(l.sortOrder || l['SORT ORDER'] || l.sort_order);
+      return labels.reduce((m,l)=>{
+        const k = l.questionId||l['QUESTION ID'];
+        m[k] = +(l.sortOrder||l['SORT ORDER']||l.sort_order);
         return m;
       }, {});
     }
-
-    function groupBy(arr, k) {
-      return arr.reduce((o, i) => ((o[i[k]] ||= []).push(i), o), {});
+    function groupBy(arr,k){
+      return arr.reduce((o,i)=>( (o[i[k]]||=(o[i[k]]=[])).push(i), o ),{});
     }
-
-    function computeAverages(rows, LM, OM) {
-      const g = {};
-      rows.forEach(r => (g[r.question] ||= []).push(+r.value));
-      return Object.entries(g)
-        .map(([q, vals]) => ({
-          question: q,
-          label: LM[q] || q,
-          avg: +(vals.reduce((a,b)=>a+b,0)/vals.length).toFixed(1)
-        }))
-        .sort((a,b) => (OM[a.question]||0) - (OM[b.question]||0));
+    function computeAverages(rows,LM,OM){
+      const g={};
+      rows.forEach(r=>(g[r.question]||(g[r.question]=[])).push(+r.value));
+      return Object.entries(g).map(([q,vals])=>({
+        question:q,
+        label:LM[q]||q,
+        avg:+(vals.reduce((a,b)=>a+b,0)/vals.length).toFixed(1)
+      })).sort((a,b)=>(OM[a.question]||0)-(OM[b.question]||0));
     }
-
-    function countUnique(rows, sec) {
+    function countUnique(rows,sec){
       return new Set(
-        rows.filter(d => String(d.section||'').toLowerCase().includes(sec))
-            .map(d => d.respondent_id || d.id)
+        rows.filter(d=>String(d.section||'').toLowerCase().includes(sec))
+            .map(d=>d.respondent_id||d.id)
       ).size;
     }
-
-    function formatMonthYear(val) {
-      const names = {
-        '01':'janeiro','02':'fevereiro','03':'março','04':'abril',
-        '05':'maio','06':'junho','07':'julho','08':'agosto',
-        '09':'setembro','10':'outubro','11':'novembro','12':'dezembro'
-      };
-      const [y,m] = val.split('-');
-      return { month: names[m], year: y };
+    function formatMonthYear(v){
+      const n={'01':'janeiro','02':'fevereiro','03':'março','04':'abril',
+               '05':'maio','06':'junho','07':'julho','08':'agosto',
+               '09':'setembro','10':'outubro','11':'novembro','12':'dezembro'};
+      const [y,m]=v.split('-'); return {month:n[m],year:y};
     }
-
-    function createBarChart(container, title, data, uniform) {
-      const chart = echarts.init(container);
+    function createBarChart(container,title,data,uniform){
+      const chart=echarts.init(container);
       chart.setOption({
-        title:{ text: title, left:'center', textStyle:{ fontSize:20 } },
-        grid:{ top:80, left:'10%', right:'10%', bottom:120 },
+        title:{text:title,left:'center',textStyle:{fontSize:20}},
+        grid:{top:80,left:'10%',right:'10%',bottom:120},
         tooltip:{},
-        xAxis:{
-          type:'category', data:data.map(d=>d.label),
-          axisLabel:{ rotate:30, interval:0, margin:10 }
-        },
-        yAxis:{
-          type:'value', min:1, max:5,
-          splitLine:{ show:false },
-          axisLine:{ show:false },
-          axisTick:{ show:false },
-          axisLabel:{ show:false }
-        },
-        series:[{
-          type:'bar', data:data.map(d=>d.avg),
-          label:{ show:true, position:'top', formatter:'{c}' },
+        xAxis:{type:'category',data:data.map(d=>d.label),axisLabel:{rotate:30,interval:0,margin:10}},
+        yAxis:{type:'value',min:1,max:5,splitLine:{show:false},axisLine:{show:false},axisTick:{show:false},axisLabel:{show:false}},
+        series:[{type:'bar',data:data.map(d=>d.avg),
+          label:{show:true,position:'top',formatter:'{c}'},
           itemStyle: uniform
-            ? { color:'#6A99D0' }
-            : { color: p => p.value<3?'#EA3323':p.value<4?'#6A99D0':'#9FCE63' }
+            ? {color:'#6A99D0'}
+            : {color:p=>p.value<3?'#EA3323':p.value<4?'#6A99D0':'#9FCE63'}
         }]
       });
       chart.resize();
     }
 
-    async function build() {
-      const f = JSON.parse(localStorage.getItem('reportFilters')||'{}');
-      const [data, meta] = await Promise.all([
-        fetch('data.json').then(r=>r.json()),
-        fetch('meta.json').then(r=>r.json())
-      ]);
-      const LM = createLabelMap(meta.labels),
-            OM = createSortMap(meta.labels);
-      const root = document.getElementById('report');
-      root.innerHTML = '';
+    async function build(){
+      const f=JSON.parse(localStorage.getItem('reportFilters')||'{}');
+      const [data,meta]=await Promise.all([fetch('data.json').then(r=>r.json()),fetch('meta.json').then(r=>r.json())]);
+      const LM=createLabelMap(meta.labels), OM=createSortMap(meta.labels);
+      const root=document.getElementById('report'); root.innerHTML='';
 
-      let timeScope = '';
-      if (f.start && f.end) {
-        const s = formatMonthYear(f.start), e = formatMonthYear(f.end);
-        timeScope = `${s.month} – ${e.month} ${e.year}`;
+      let timeScope='';
+      if(f.start&&f.end){
+        const s=formatMonthYear(f.start), e=formatMonthYear(f.end);
+        timeScope=`${s.month} – ${e.month} ${e.year}`;
       }
 
-      for (const prog of f.programs||[]) {
-        const selTur = f[`turmas_${prog}`]||[];
-        const rows = data.filter(d =>
-          (f.clients||[]).includes(d.client) &&
-          d.program===prog &&
-          selTur.includes(d.turma)
-        );
+      for(const prog of f.programs||[]){
+        const selTur=f[`turmas_${prog}`]||[];
+        const rows=data.filter(d=>(f.clients||[]).includes(d.client)&&d.program===prog&&selTur.includes(d.turma));
         const pm = meta.titles.find(t=>t.program_id===prog)||{};
 
         // Hero page
-        const hero = document.createElement('div'); hero.className='page hero';
-        hero.innerHTML = `
+        const hero=document.createElement('div'); hero.className='page hero';
+        hero.innerHTML=`
           <div class="hero">
             <img class="bg" src="hourglass-bg.jpg">
             <div class="hero-content">
@@ -270,21 +241,17 @@
           </div>`;
         root.appendChild(hero);
 
-        // Info banner
-        const info = document.createElement('div'); info.className='page';
-        info.innerHTML = `
+        // Info banner (assessment total)
+        const info=document.createElement('div'); info.className='page';
+        info.innerHTML=`
           <div class="header">
             <img src="mind4time-logo.png"><div></div>
           </div>
           <div class="content">
             <div class="banner">
               <img class="banner-bg" src="assessment-bg.jpg">
-              <div class="banner-box">
-                <h1>Detalhes do Programa</h1>
-                <div class="meta">
-                  <div><span>Total de respostas (Assessment):</span><strong>${countUnique(rows,'assessment')}</strong></div>
-                  <div><span>Time Scope:</span><strong>${timeScope}</strong></div>
-                </div>
+              <div class="banner-text">
+                Total de respostas: ${countUnique(rows,'assessment')}
               </div>
             </div>
           </div>
@@ -295,18 +262,15 @@
         root.appendChild(info);
 
         // Sections
-        for (const sec of ['assessment','evaluation']) {
-          const name = sec==='assessment'?'Assessment':'Evaluation';
-          const total = countUnique(rows, sec);
-          const numeric = rows.filter(d =>
-            String(d.section||'').toLowerCase().includes(sec) &&
-            /^\d+(\.\d+)?$/.test(String(d.value).trim())
-          );
-          const byT = Object.entries(groupBy(numeric,'turma'));
+        for(const sec of ['assessment','evaluation']){
+          const name=sec==='assessment'?'Assessment':'Evaluation';
+          const total=countUnique(rows,sec);
+          const numeric=rows.filter(d=>String(d.section||'').toLowerCase().includes(sec)&&/^\d+(\.\d+)?$/.test(String(d.value).trim()));
+          const byT=Object.entries(groupBy(numeric,'turma'));
 
           // Section banner
-          const ban = document.createElement('div'); ban.className='page';
-          ban.innerHTML = `
+          const ban=document.createElement('div'); ban.className='page';
+          ban.innerHTML=`
             <div class="header">
               <img src="mind4time-logo.png">
               <div class="section-title">${name}</div>
@@ -314,11 +278,8 @@
             <div class="content">
               <div class="banner">
                 <img class="banner-bg" src="${sec}-bg.jpg">
-                <div class="banner-box">
-                  <h1>${name}</h1>
-                  <div class="meta">
-                    <div><span>Total de respostas:</span><strong>${total}</strong></div>
-                  </div>
+                <div class="banner-text">
+                  Total de respostas: ${total}
                 </div>
               </div>
             </div>
@@ -329,9 +290,9 @@
           root.appendChild(ban);
 
           // Global chart
-          if (numeric.length) {
-            const gp = document.createElement('div'); gp.className='page';
-            gp.innerHTML = `
+          if(numeric.length){
+            const gp=document.createElement('div'); gp.className='page';
+            gp.innerHTML=`
               <div class="header">
                 <img src="mind4time-logo.png">
                 <div class="section-title">${name}</div>
@@ -346,22 +307,15 @@
                 <div>© MIND4TIME ${currentYear}</div>
               </div>`;
             root.appendChild(gp);
-            createBarChart(
-              gp.querySelector('.chart-full'),
-              `Global (${name})`,
-              computeAverages(numeric, LM, OM),
-              sec==='evaluation'
-            );
+            createBarChart(gp.querySelector('.chart-full'), `Global (${name})`, computeAverages(numeric,LM,OM), sec==='evaluation');
           }
 
           // 2‑chart grid
-          if (byT.length > 1) {
-            for (let i=0; i<byT.length; i+=2) {
-              const gp2 = document.createElement('div'); gp2.className='page';
-              const boxes = byT.slice(i,i+2)
-                .map(([,v],j) => `<div class="chart-box" id="chart-${prog}-grid-${i+j}"></div>`)
-                .join('');
-              gp2.innerHTML = `
+          if(byT.length>1){
+            for(let i=0;i<byT.length;i+=2){
+              const gp2=document.createElement('div'); gp2.className='page';
+              const boxes=byT.slice(i,i+2).map(([,v],j)=>`<div class="chart-box" id="chart-${prog}-grid-${i+j}"></div>`).join('');
+              gp2.innerHTML=`
                 <div class="header">
                   <img src="mind4time-logo.png">
                   <div class="section-title">${name}</div>
@@ -374,31 +328,22 @@
                   <div>© MIND4TIME ${currentYear}</div>
                 </div>`;
               root.appendChild(gp2);
-              byT.slice(i,i+2).forEach(([,v],j) => {
-                createBarChart(
-                  document.getElementById(`chart-${prog}-grid-${i+j}`),
-                  byT[i+j][0],
-                  computeAverages(v, LM, OM),
-                  sec==='evaluation'
-                );
-              });
+              byT.slice(i,i+2).forEach(([,v],j)=>createBarChart(
+                document.getElementById(`chart-${prog}-grid-${i+j}`),
+                byT[i+j][0], computeAverages(v,LM,OM), sec==='evaluation'
+              ));
             }
           }
 
           // Text answers (8 per page)
-          const selQs = f.textQuestions||[];
-          selQs.forEach(qid => {
-            const ans = rows.filter(d =>
-              String(d.section||'').toLowerCase().includes(sec) &&
-              d.question===qid && isNaN(+d.value)
-            );
-            if (!ans.length) return;
-            for (let i=0; i<ans.length; i+=8) {
-              const chunk = ans.slice(i,i+8)
-                .map(a => `<li>${a.value.replace(/\n/g,'</li><li>')}</li>`)
-                .join('');
-              const tp = document.createElement('div'); tp.className='page';
-              tp.innerHTML = `
+          const selQs=f.textQuestions||[];
+          selQs.forEach(qid=>{
+            const ans=rows.filter(d=>String(d.section||'').toLowerCase().includes(sec)&&d.question===qid&&isNaN(+d.value));
+            if(!ans.length) return;
+            for(let i=0;i<ans.length;i+=8){
+              const chunk=ans.slice(i,i+8).map(a=>`<li>${a.value.replace(/\n/g,'</li><li>')}</li>`).join('');
+              const tp=document.createElement('div'); tp.className='page';
+              tp.innerHTML=`
                 <div class="header">
                   <img src="mind4time-logo.png">
                   <div class="section-title">${name}</div>
@@ -422,42 +367,37 @@
       }
     }
 
-    async function generatePdf() {
+    async function generatePdf(){
       await build();
 
-      // Replace each chart with its own PNG
-      document.querySelectorAll('.chart-full, .chart-box').forEach(el => {
-        const chart = echarts.getInstanceByDom(el);
-        if (!chart) return;
-        const imgURL = chart.getDataURL({ pixelRatio: 1, backgroundColor: '#fff' });
-        el.innerHTML = `<img src="${imgURL}" style="width:100%;height:100%;" />`;
+      // replace charts with PNGs to avoid blur
+      document.querySelectorAll('.chart-full, .chart-box').forEach(el=>{
+        const chart=echarts.getInstanceByDom(el);
+        if(chart){
+          const uri=chart.getDataURL({ pixelRatio: 1, backgroundColor:'#fff' });
+          el.innerHTML=`<img src="${uri}" style="width:100%;height:100%;" />`;
+        }
       });
+      await new Promise(r=>setTimeout(r,50));
 
-      // Allow DOM to update
-      await new Promise(r => setTimeout(r, 100));
+      const pages=Array.from(document.querySelectorAll('.page'));
+      const images=await Promise.all(pages.map(pg=>
+        html2canvas(pg,{ backgroundColor:'#fff', scale:1, useCORS:true })
+          .then(c=>c.toDataURL('image/png',1.0))
+      ));
 
-      // Snapshot pages at scale=1
-      const pages = Array.from(document.querySelectorAll('.page'));
-      const images = await Promise.all(
-        pages.map(pg =>
-          html2canvas(pg, { backgroundColor: '#fff', scale: 2, useCORS: true })
-            .then(c => c.toDataURL('image/png', 1.0))
-        )
-      );
-
-      // Build PDF
       pdfMake.createPdf({
-        pageSize: { width: 960, height: 540 },
-        pageMargins: [0,0,0,0],
-        content: images.map((img,i) => ({
-          image: img,
-          width: 960,
-          pageBreak: i < images.length-1 ? 'after' : undefined
+        pageSize:{ width:960, height:540 },
+        pageMargins:[0,0,0,0],
+        content: images.map((img,i)=>({
+          image:img,
+          width:960,
+          pageBreak: i<images.length-1?'after':undefined
         }))
       }).download('report.pdf');
     }
 
-    document.addEventListener('DOMContentLoaded', () => {
+    document.addEventListener('DOMContentLoaded',()=>{
       document.getElementById('gerar-pdf').addEventListener('click', generatePdf);
       build();
     });

@@ -367,35 +367,37 @@
       }
     }
 
-    async function generatePdf(){
-      await build();
+    async function generatePdf() {
+  await build();
 
-      // replace charts with PNGs to avoid blur
-      document.querySelectorAll('.chart-full, .chart-box').forEach(el=>{
-        const chart=echarts.getInstanceByDom(el);
-        if(chart){
-          const uri=chart.getDataURL({ pixelRatio: 1, backgroundColor:'#fff' });
-          el.innerHTML=`<img src="${uri}" style="width:100%;height:100%;" />`;
-        }
-      });
-      await new Promise(r=>setTimeout(r,50));
+  // give charts a moment to re‑render at the new size
+  document.querySelectorAll('.chart-full, .chart-box').forEach(el => {
+    const chart = echarts.getInstanceByDom(el);
+    if (chart) chart.resize();
+  });
+  await new Promise(r => setTimeout(r, 100));
 
-      const pages=Array.from(document.querySelectorAll('.page'));
-      const images=await Promise.all(pages.map(pg=>
-        html2canvas(pg,{ backgroundColor:'#fff', scale:1, useCORS:true })
-          .then(c=>c.toDataURL('image/png',1.0))
-      ));
+  const pages = Array.from(document.querySelectorAll('.page'));
+  const images = await Promise.all(pages.map(pg =>
+    html2canvas(pg, {
+      backgroundColor: '#fff',
+      useCORS: true,
+      scale: 3    // ← bump this up for 3× resolution
+    }).then(canvas => canvas.toDataURL('image/png', 1.0))
+  ));
 
-      pdfMake.createPdf({
-        pageSize:{ width:960, height:540 },
-        pageMargins:[0,0,0,0],
-        content: images.map((img,i)=>({
-          image:img,
-          width:960,
-          pageBreak: i<images.length-1?'after':undefined
-        }))
-      }).download('report.pdf');
-    }
+  const docDefinition = {
+    pageSize: { width: 960, height: 540 },
+    pageMargins: [0, 0, 0, 0],
+    content: images.map((img, i) => ({
+      image: img,
+      width: 960,
+      pageBreak: i < images.length - 1 ? 'after' : undefined
+    }))
+  };
+
+  pdfMake.createPdf(docDefinition).download('report.pdf');
+}
 
     document.addEventListener('DOMContentLoaded',()=>{
       document.getElementById('gerar-pdf').addEventListener('click', generatePdf);

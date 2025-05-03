@@ -20,14 +20,13 @@
     .checkboxes input { margin-right:8px; }
     .select-all { background:none; border:none; color:#007c91; cursor:pointer; display:block; margin-bottom:8px; padding:0; text-align:left; width:100%; font-size:0.9em; }
 
-    /* Inputs */
-    input[type="month"], input[type="text"] { padding:8px; border:1px solid #ccc; border-radius:4px; width:100%; box-sizing:border-box; }
-
-    /* Trainer fields */
-    .program-trainer { grid-column:span 2; display:grid; grid-template-columns:200px 1fr; gap:0 20px; margin-top:10px; }
+    /* Program-specific fields */
+    .program-block { grid-column: span 2; border:1px solid #ddd; padding:16px; border-radius:4px; background:#fff; margin-bottom:20px; }
+    .program-header { font-size:1.1em; margin-bottom:12px; color:#007c91; }
+    .program-grid { display:grid; grid-template-columns:200px 1fr; gap:10px 20px; align-items:center; }
 
     /* Buttons */
-    .submit-row { grid-column:span 2; text-align:center; margin-top:30px; }
+    .submit-row { grid-column:span 2; text-align:center; margin-top:20px; }
     .link-button { background:#007c91; color:#fff; padding:10px 30px; border-radius:4px; text-decoration:none; font-weight:bold; margin:0 10px; display:inline-block; }
   </style>
 </head>
@@ -52,24 +51,7 @@
       <div class="checkboxes" id="programChecks"></div>
     </div>
 
-    <label>Turmas:</label>
-    <div class="dropdown-multiselect" id="turmaWrapper">
-      <div class="select-box" id="turmaBox" data-placeholder="Selecionar turma(s)">Selecionar turma(s)</div>
-      <div class="checkboxes" id="turmaChecks"></div>
-    </div>
-
-    <label>Perguntas Abertas:</label>
-    <div class="dropdown-multiselect" id="textWrapper">
-      <div class="select-box" id="textBox" data-placeholder="Selecionar perguntas">Selecionar perguntas</div>
-      <div class="checkboxes" id="textChecks"></div>
-    </div>
-
-    <label>Scope temporal - Início:</label>
-    <input type="month" id="startMonth" />
-    <label>Scope temporal - Fim:</label>
-    <input type="month" id="endMonth" />
-
-    <div id="trainersContainer" class="program-trainer"></div>
+    <div id="programsContainer"></div>
 
     <div class="submit-row">
       <a href="#" class="link-button" id="viewReport">Ver Relatório</a>
@@ -88,7 +70,6 @@
     function populateCheckboxes({containerId,boxId,dataList,filterKey,placeholder,onChange}){
       const cont = document.getElementById(containerId);
       cont.innerHTML = '';
-      // select all / none
       const allBtn = document.createElement('button'); allBtn.type='button'; allBtn.className='select-all'; allBtn.textContent='Selecionar tudo'; allBtn.onclick=e=>{e.stopPropagation(); saveFilter(filterKey,dataList.slice()); onChange();}; cont.appendChild(allBtn);
       const noneBtn = document.createElement('button'); noneBtn.type='button'; noneBtn.className='select-all'; noneBtn.textContent='Desmarcar tudo'; noneBtn.onclick=e=>{e.stopPropagation(); saveFilter(filterKey,[]); onChange();}; cont.appendChild(noneBtn);
       const stored = loadFilter(filterKey);
@@ -103,21 +84,94 @@
     }
 
     function toggleDropdown(id){ document.querySelectorAll('.dropdown-multiselect').forEach(el=>el.id!==id&&el.classList.remove('open')); document.getElementById(id).classList.toggle('open'); }
-    function attachDropdownEvents(){ ['client','clientInfo','program','turma','text'].forEach(k=>{ const w=document.getElementById(k+'Wrapper'), b=w.querySelector('.select-box'); b.onclick=e=>{e.stopPropagation(); toggleDropdown(k+'Wrapper');}; }); document.addEventListener('click', e=>{ if(!e.target.closest('.dropdown-multiselect')) document.querySelectorAll('.dropdown-multiselect').forEach(el=>el.classList.remove('open')); }); }
+    function attachDropdownEvents(){ ['client','clientInfo','program'].forEach(k=>{ const w=document.getElementById(k+'Wrapper'), b=w.querySelector('.select-box'); b.onclick=e=>{e.stopPropagation(); toggleDropdown(k+'Wrapper');}; }); document.addEventListener('click', e=>{ if(!e.target.closest('.dropdown-multiselect')) document.querySelectorAll('.dropdown-multiselect').forEach(el=>el.classList.remove('open')); }); }
 
     function populateClients(){ const arr=[...new Set(rawData.map(d=>d.client))].sort(); populateCheckboxes({containerId:'clientChecks',boxId:'clientBox',dataList:arr,filterKey:'clients',placeholder:'Selecionar cliente(s)',onChange:refreshAll}); }
     function populateClientInfos(){ const sel=loadFilter('clients'); const arr=[...new Set(rawData.filter(d=>sel.includes(d.client)).map(d=>d.client_info))].sort(); populateCheckboxes({containerId:'clientInfoChecks',boxId:'clientInfoBox',dataList:arr,filterKey:'clientInfos',placeholder:'Selecionar info(s)',onChange:refreshAll}); }
     function populatePrograms(){ const sel=loadFilter('clients'); const arr=[...new Set(rawData.filter(d=>sel.includes(d.client)).map(d=>d.program))].sort(); populateCheckboxes({containerId:'programChecks',boxId:'programBox',dataList:arr,filterKey:'programs',placeholder:'Selecionar programa(s)',onChange:refreshAll}); }
-    function populateTurmas(){ const {clients=[],clientInfos=[],programs=[]}=getStorageFilters(); const arr=[...new Set(rawData.filter(d=>clients.includes(d.client)&&clientInfos.includes(d.client_info)&&programs.includes(d.program)).map(d=>d.turma))].sort(); populateCheckboxes({containerId:'turmaChecks',boxId:'turmaBox',dataList:arr,filterKey:'turmas',placeholder:'Selecionar turma(s)',onChange:refreshAll}); }
-    function populateTextQuestions(){ const {clients=[],programs=[],turmas=[]}=getStorageFilters(); const qMap={}; rawData.forEach(d=>{ if(clients.includes(d.client)&&programs.includes(d.program)&&turmas.includes(d.turma)&&isNaN(+d.value)){ const sec=(d.section||'').toLowerCase(); const pr=sec.includes('assessment')?0:sec.includes('evaluation')?1:2; if(!qMap[d.question]||qMap[d.question]>pr) qMap[d.question]=pr; }}); const arr=Object.keys(qMap).sort((a,b)=>qMap[a]-qMap[b]||a.localeCompare(b,'pt')); populateCheckboxes({containerId:'textChecks',boxId:'textBox',dataList:arr,filterKey:'textQuestions',placeholder:'Selecionar perguntas',onChange:refreshAll}); }
 
-    function renderTrainerInputs(){ const cont=document.getElementById('trainersContainer'); cont.innerHTML=''; const progs=loadFilter('programs'); const saved=getStorageFilters().trainers||{}; progs.forEach(p=>{ const w=document.createElement('div'); w.className='program-trainer'; const lbl=document.createElement('label'); lbl.textContent=`Formador (${p}):`; const inp=document.createElement('input'); inp.type='text'; inp.placeholder=`Nome do formador para ${p}`; inp.value=saved[p]||''; inp.oninput=()=>{ saved[p]=inp.value; localStorage.setItem('filters',JSON.stringify({...getStorageFilters(),trainers:saved})); }; w.append(lbl,inp); cont.appendChild(w); }); }
+    function renderProgramBlocks(){
+      const container = document.getElementById('programsContainer');
+      container.innerHTML = '';
+      const progs = loadFilter('programs');
+      const saved = getStorageFilters();
+      progs.forEach(p=>{
+        const block = document.createElement('div'); block.className='program-block';
+        block.innerHTML = `<div class="program-header">Programa: ${p}</div>`;
+        const grid = document.createElement('div'); grid.className='program-grid';
 
-    function refreshAll(){ populateClientInfos(); populatePrograms(); populateTurmas(); populateTextQuestions(); renderTrainerInputs(); }
+        // Trainer input
+        const tLabel = document.createElement('label'); tLabel.textContent = `Formador (${p}):`;
+        const tInput = document.createElement('input'); tInput.type='text'; tInput.placeholder=`Nome do formador para ${p}`;
+        tInput.value = (saved.trainers||{})[p]||'';
+        tInput.oninput = ()=>{
+          const f = getStorageFilters(); f.trainers = f.trainers||{}; f.trainers[p] = tInput.value;
+          localStorage.setItem('filters',JSON.stringify(f));
+        };
+        grid.append(tLabel, tInput);
 
-    function initFilters(){ fetch('data.json').then(r=>r.json()).then(data=>{ rawData=data; populateClients(); attachDropdownEvents(); refreshAll(); const {start,end}=getStorageFilters(); if(start)document.getElementById('startMonth').value=start; if(end)document.getElementById('endMonth').value=end; document.getElementById('startMonth').onchange=e=>saveFilter('start',e.target.value); document.getElementById('endMonth').onchange=e=>saveFilter('end',e.target.value); document.getElementById('viewReport').onclick=()=>{ saveFilter('textQuestions', getCheckedValues('textChecks')); navigateToReport(false); }; document.getElementById('downloadReport').onclick=()=>{ saveFilter('textQuestions', getCheckedValues('textChecks')); navigateToReport(true); }; }); }
+        // Start month
+        const sLabel = document.createElement('label'); sLabel.textContent = `Início (${p}):`;
+        const sInput = document.createElement('input'); sInput.type='month';
+        sInput.value = (saved.starts||{})[p]||'';
+        sInput.onchange = ()=>{
+          const f = getStorageFilters(); f.starts = f.starts||{}; f.starts[p] = sInput.value;
+          localStorage.setItem('filters',JSON.stringify(f));
+        };
+        grid.append(sLabel, sInput);
 
-    function navigateToReport(download){ const f={...getStorageFilters(),trainers: getStorageFilters().trainers||{}}; localStorage.setItem('reportFilters',JSON.stringify(f)); window.location.href=`report.html${download?'?download=true':''}`; }
+        // End month
+        const eLabel = document.createElement('label'); eLabel.textContent = `Fim (${p}):`;
+        const eInput = document.createElement('input'); eInput.type='month';
+        eInput.value = (saved.ends||{})[p]||'';
+        eInput.onchange = ()=>{
+          const f = getStorageFilters(); f.ends = f.ends||{}; f.ends[p] = eInput.value;
+          localStorage.setItem('filters',JSON.stringify(f));
+        };
+        grid.append(eLabel, eInput);
+
+        // Turmas dropdown
+        const turmaWrapperId = `turmaWrapper_${p}`;
+        const turmaBoxId = `turmaBox_${p}`;
+        const turmaChecksId = `turmaChecks_${p}`;
+        const tdLabel = document.createElement('label'); tdLabel.textContent = `Turmas (${p}):`;
+        const tdWrapper = document.createElement('div'); tdWrapper.className='dropdown-multiselect'; tdWrapper.id=turmaWrapperId;
+        tdWrapper.innerHTML = `<div class="select-box" id="${turmaBoxId}" data-placeholder="Selecionar turma(s)">Selecionar turma(s)</div><div class="checkboxes" id="${turmaChecksId}"></div>`;
+        grid.append(tdLabel, tdWrapper);
+
+        block.appendChild(grid);
+        container.appendChild(block);
+
+        // Populate turmas for this program
+        const availableTurmas = [...new Set(rawData.filter(d=>d.program===p).map(d=>d.turma))].sort();
+        populateCheckboxes({
+          containerId: turmaChecksId,
+          boxId: turmaBoxId,
+          dataList: availableTurmas,
+          filterKey: `turmas_${p}`,
+          placeholder: 'Selecionar turma(s)',
+          onChange: ()=>{}
+        });
+        // Attach dropdown toggle
+        const boxEl = tdWrapper.querySelector('.select-box');
+        boxEl.onclick = e=>{ e.stopPropagation(); toggleDropdown(turmaWrapperId); };
+      });
+    }
+
+    function refreshAll(){ populateClientInfos(); populatePrograms(); renderProgramBlocks(); }
+
+    function initFilters(){
+      fetch('data.json').then(r=>r.json()).then(data=>{
+        rawData=data;
+        populateClients();
+        attachDropdownEvents();
+        refreshAll();
+
+        document.getElementById('viewReport').onclick=()=>{ window.location.href='report.html'; };
+        document.getElementById('downloadReport').onclick=()=>{ window.location.href='report.html?download=true'; };
+      });
+    }
+
     document.addEventListener('DOMContentLoaded',initFilters);
   </script>
 </body>

@@ -442,18 +442,27 @@
             let listEl = page.querySelector('.answer-list');
             root.appendChild(page);
 
-            ans.forEach(a => {
-              const li = document.createElement('li');
-              li.textContent = a.value;
-              listEl.appendChild(li);
+           ans.forEach(a => {
+  const li = document.createElement('li');
+  li.textContent = a.value;
+  listEl.appendChild(li);
 
-              // if this list now exceeds the max height, overflow to a new page
-              if (listEl.scrollHeight > TEXT_PAGE_MAX_HEIGHT) {
-                listEl.removeChild(li);
-                page = createTextPage(prog, sec, qid, false);
-                root.appendChild(page);
-                listEl = page.querySelector('.answer-list');
-                listEl.appendChild(li);
+  // measure how tall the content box really is
+  const contentEl = page.querySelector('.content');
+  const availableH = contentEl.clientHeight;
+
+  // if we've grown taller than that, spill to new page
+  if (listEl.scrollHeight > availableH) {
+    // remove the last item from this page
+    listEl.removeChild(li);
+
+    // start a fresh page (no title)
+    page = createTextPage(prog, sec, qid, false);
+    root.appendChild(page);
+    listEl = page.querySelector('.answer-list');
+
+    // re‑append that item into the new page
+    listEl.appendChild(li);
               }
             });
           });

@@ -24,12 +24,9 @@
     /* PAGE CONTAINER */
     .page {
       position: relative;
-      width: 960px;
-      height: 540px;
-      margin: 20px auto;
-      background: #fff;
-      overflow: hidden;
-      box-sizing: border-box;
+      width: 960px; height: 540px;
+      margin: 20px auto; background: #fff;
+      overflow: hidden; box-sizing: border-box;
     }
 
     /* HEADER & FOOTER */
@@ -38,9 +35,7 @@
       display: flex; justify-content: space-between; align-items: center;
       padding: 0 30px; background: #fff; z-index: 10;
     }
-    .header {
-      top: 0; height: 80px; border-bottom: 1px solid #40a3a3;
-    }
+    .header { top: 0; height: 80px; border-bottom: 1px solid #40a3a3; }
     .header img { height: 60px; }
     .footer {
       bottom: 0; height: 60px; border-top: 1px solid #40a3a3;
@@ -71,94 +66,85 @@
     }
     .page.hero .bg {
       position: absolute; inset: 0;
-      width: 100%; height: 100%; object-fit: cover;
+      width:100%; height:100%; object-fit:cover;
     }
     .hero-content {
-      position: relative; z-index: 1;
-      display: flex; flex-direction: column;
-      align-items: center; justify-content: center;
-      color: #fff; text-align: center;
-      padding: 0 30px; box-sizing: border-box;
+      position: relative; z-index:1;
+      display:flex; flex-direction:column;
+      align-items:center; justify-content:center;
+      color:#fff; text-align:center;
+      padding:0 30px; box-sizing:border-box;
     }
-    .hero-content h1 { font-size: 3.5rem; margin: 0; }
-    .hero-content .subtitle { font-size: 1.5rem; margin-top: 12px; opacity: .85; }
+    .hero-content h1 { font-size:3.5rem; margin:0; }
+    .hero-content .subtitle { font-size:1.5rem; margin-top:12px; opacity:.85; }
 
     /* INFO BANNER (second page) */
     .banner {
-      position: relative; width: 100%; height: 100%; overflow: hidden;
+      position:relative; width:100%; height:100%; overflow:hidden;
     }
     .banner-bg {
-      position: absolute; inset: 0;
-      width: 100%; height: 100%; object-fit: cover;
-      opacity: .3;
+      position:absolute; inset:0;
+      width:100%; height:100%; object-fit:cover;
+      opacity:.3;
     }
     .banner-box {
-      position: relative; z-index: 1;
-      width: 70%; background: rgba(240,248,249, .9);
-      padding: 30px 50px; border-left: 6px solid #007c91;
-      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
-      box-sizing: border-box;
+      position:relative; z-index:1;
+      width:70%; background:rgba(240,248,249,.9);
+      padding:30px 50px; border-left:6px solid #007c91;
+      box-shadow:0 2px 6px rgba(0,0,0,.1);
+      box-sizing:border-box;
     }
-    .banner-box h1 {
-      font-size: 2.5rem; margin-bottom: 12px; color: #007c91;
-    }
-    .banner-box .meta { font-size: 1rem; color: #333; }
+    .banner-box h1 { font-size:2.5rem; margin-bottom:12px; color:#007c91; }
+    .banner-box .meta { font-size:1rem; color:#333; }
 
-    /* SINGLE GLOBAL CHART */
+    /* GLOBAL CHART */
     .chart-fullpage {
-      display: flex; align-items: center; justify-content: center;
-      padding: 20px; box-sizing: border-box;
+      display:flex; align-items:center; justify-content:center;
+      padding:20px; box-sizing:border-box;
     }
-    .chart-full { width: 100%; height: 100%; }
+    .chart-full { width:100%; height:100%; }
 
     /* 2‑CHART GRID */
     .chart-grid {
-      display: grid; grid-template-columns: 1fr 1fr;
-      gap: 20px; padding: 20px; box-sizing: border-box;
+      display:grid; grid-template-columns:1fr 1fr;
+      gap:20px; padding:20px; box-sizing:border-box;
     }
-    .chart-box { width: 100%; height: 100%; }
+    .chart-box { width:100%; height:100%; }
 
     /* TEXT ANSWERS */
     .text-page {
-      overflow-y: auto; padding: 20px; box-sizing: border-box;
+      overflow-y:auto; padding:20px; box-sizing:border-box;
     }
     .text-question {
-      background: #f9f9f9;
-      border: 1px solid #007c91; border-left: 6px solid #007c91;
-      padding: 20px; margin-bottom: 20px; box-sizing: border-box;
-      page-break-inside: avoid; break-inside: avoid;
+      background:#f9f9f9; border:1px solid #007c91; border-left:6px solid #007c91;
+      padding:20px; margin-bottom:20px; box-sizing:border-box;
+      page-break-inside:avoid; break-inside:avoid;
     }
     .text-question-title {
-      font-size: 1.2rem; font-weight: bold;
-      margin-bottom: 12px; color: #007c91;
+      font-size:1.2rem; font-weight:bold; margin-bottom:12px; color:#007c91;
     }
     .text-question ul {
-      padding-left: 16px; font-size: 0.75rem; line-height: 1.6;
+      padding-left:16px; font-size:0.75rem; line-height:1.6;
     }
-    .text-question li { margin-bottom: 8px; }
+    .text-question li { margin-bottom:8px; }
 
     /* SECTION TITLE IN HEADER */
     .header .section-title {
-      text-transform: uppercase;
-      color: #007c91; font-weight: 600;
-      letter-spacing: 0.05em; font-size: 1rem;
-      font-style: italic;
-    }
-
-    /* PDF button */
-    #gerar-pdf {
-      position: fixed; top: 10px; right: 10px; z-index: 1000;
-      padding: 8px 16px; background: #007c91; color: #fff;
-      border: none; border-radius: 4px; cursor: pointer;
+      text-transform:uppercase; color:#007c91;
+      font-weight:600; letter-spacing:.05em;
+      font-size:1rem; font-style:italic;
     }
 
     /* hide header/footer on hero */
     .page.hero > .header,
-    .page.hero > .footer {
-      display: none;
-    }
-    .page.hero > .content {
-      top: 0; bottom: 0;
+    .page.hero > .footer { display:none; }
+    .page.hero > .content { top:0; bottom:0; }
+
+    /* PDF button */
+    #gerar-pdf {
+      position:fixed; top:10px; right:10px; z-index:1000;
+      padding:8px 16px; background:#007c91; color:#fff;
+      border:none; border-radius:4px; cursor:pointer;
     }
   </style>
 </head>
@@ -196,16 +182,15 @@
         .map(([q, vals]) => ({
           question: q,
           label: LM[q] || q,
-          avg: +
-            (vals.reduce((a, b) => a + b, 0) / vals.length).toFixed(1)
+          avg: +(vals.reduce((a,b)=>a+b,0)/vals.length).toFixed(1)
         }))
-        .sort((a, b) => (OM[a.question] || 0) - (OM[b.question] || 0));
+        .sort((a,b) => (OM[a.question]||0) - (OM[b.question]||0));
     }
 
     function countUnique(rows, sec) {
       return new Set(
-        rows.filter(d => String(d.section || '').toLowerCase().includes(sec))
-          .map(d => d.respondent_id || d.id)
+        rows.filter(d => String(d.section||'').toLowerCase().includes(sec))
+            .map(d => d.respondent_id || d.id)
       ).size;
     }
 
@@ -215,7 +200,7 @@
         '05':'maio','06':'junho','07':'julho','08':'agosto',
         '09':'setembro','10':'outubro','11':'novembro','12':'dezembro'
       };
-      const [y, m] = val.split('-');
+      const [y,m] = val.split('-');
       return { month: names[m], year: y };
     }
 
@@ -229,17 +214,22 @@
           type:'category', data:data.map(d=>d.label),
           axisLabel:{ rotate:30, interval:0, margin:10 }
         },
-        yAxis:{ type:'value', min:1, max:5,
-          splitLine:{ show:false }, axisLine:{ show:false }, axisTick:{ show:false }, axisLabel:{ show:false }
+        yAxis:{
+          type:'value', min:1, max:5,
+          splitLine:{ show:false },
+          axisLine:{ show:false },
+          axisTick:{ show:false },
+          axisLabel:{ show:false }
         },
-        series:[{ type:'bar', data:data.map(d=>d.avg),
+        series:[{
+          type:'bar', data:data.map(d=>d.avg),
           label:{ show:true, position:'top', formatter:'{c}' },
           itemStyle: uniform
             ? { color:'#6A99D0' }
             : { color: p => p.value<3?'#EA3323':p.value<4?'#6A99D0':'#9FCE63' }
         }]
       });
-      chart.resize(); setTimeout(()=>chart.resize(),300);
+      chart.resize();
     }
 
     async function build() {
@@ -248,8 +238,10 @@
         fetch('data.json').then(r=>r.json()),
         fetch('meta.json').then(r=>r.json())
       ]);
-      const LM = createLabelMap(meta.labels), OM = createSortMap(meta.labels);
-      const root = document.getElementById('report'); root.innerHTML = '';
+      const LM = createLabelMap(meta.labels),
+            OM = createSortMap(meta.labels);
+      const root = document.getElementById('report');
+      root.innerHTML = '';
 
       let timeScope = '';
       if (f.start && f.end) {
@@ -260,9 +252,9 @@
       for (const prog of f.programs||[]) {
         const selTur = f[`turmas_${prog}`]||[];
         const rows = data.filter(d =>
-          (f.clients||[]).includes(d.client)
-          && d.program===prog
-          && selTur.includes(d.turma)
+          (f.clients||[]).includes(d.client) &&
+          d.program===prog &&
+          selTur.includes(d.turma)
         );
         const pm = meta.titles.find(t=>t.program_id===prog)||{};
 
@@ -290,7 +282,7 @@
               <div class="banner-box">
                 <h1>Detalhes do Programa</h1>
                 <div class="meta">
-                  <div><span>Total de respostas:</span><strong>${countUnique(rows,'assessment')}</strong></div>
+                  <div><span>Total de respostas (Assessment):</span><strong>${countUnique(rows,'assessment')}</strong></div>
                   <div><span>Time Scope:</span><strong>${timeScope}</strong></div>
                 </div>
               </div>
@@ -305,10 +297,10 @@
         // Sections
         for (const sec of ['assessment','evaluation']) {
           const name = sec==='assessment'?'Assessment':'Evaluation';
-          const total = countUnique(rows,sec);
+          const total = countUnique(rows, sec);
           const numeric = rows.filter(d =>
-            String(d.section||'').toLowerCase().includes(sec)
-            && /^\d+(\.\d+)?$/.test(String(d.value).trim())
+            String(d.section||'').toLowerCase().includes(sec) &&
+            /^\d+(\.\d+)?$/.test(String(d.value).trim())
           );
           const byT = Object.entries(groupBy(numeric,'turma'));
 
@@ -324,7 +316,9 @@
                 <img class="banner-bg" src="${sec}-bg.jpg">
                 <div class="banner-box">
                   <h1>${name}</h1>
-                  <div class="meta"><div><span>Total de respostas:</span><strong>${total}</strong></div></div>
+                  <div class="meta">
+                    <div><span>Total de respostas:</span><strong>${total}</strong></div>
+                  </div>
                 </div>
               </div>
             </div>
@@ -361,11 +355,11 @@
           }
 
           // 2‑chart grid
-          if (byT.length>1) {
+          if (byT.length > 1) {
             for (let i=0; i<byT.length; i+=2) {
               const gp2 = document.createElement('div'); gp2.className='page';
               const boxes = byT.slice(i,i+2)
-                .map(([,v],j)=>`<div class="chart-box" id="chart-${prog}-grid-${i+j}"></div>`)
+                .map(([,v],j) => `<div class="chart-box" id="chart-${prog}-grid-${i+j}"></div>`)
                 .join('');
               gp2.innerHTML = `
                 <div class="header">
@@ -380,7 +374,7 @@
                   <div>© MIND4TIME ${currentYear}</div>
                 </div>`;
               root.appendChild(gp2);
-              byT.slice(i,i+2).forEach(([,v],j)=>{
+              byT.slice(i,i+2).forEach(([,v],j) => {
                 createBarChart(
                   document.getElementById(`chart-${prog}-grid-${i+j}`),
                   byT[i+j][0],
@@ -391,18 +385,17 @@
             }
           }
 
-          // Text answers
+          // Text answers (8 per page)
           const selQs = f.textQuestions||[];
-          selQs.forEach(qid=>{
-            const ans = rows.filter(d=>
-              String(d.section||'').toLowerCase().includes(sec)
-              && d.question===qid
-              && isNaN(+d.value)
+          selQs.forEach(qid => {
+            const ans = rows.filter(d =>
+              String(d.section||'').toLowerCase().includes(sec) &&
+              d.question===qid && isNaN(+d.value)
             );
             if (!ans.length) return;
             for (let i=0; i<ans.length; i+=8) {
               const chunk = ans.slice(i,i+8)
-                .map(a=>`<li>${a.value.replace(/\n/g,'</li><li>')}</li>`)
+                .map(a => `<li>${a.value.replace(/\n/g,'</li><li>')}</li>`)
                 .join('');
               const tp = document.createElement('div'); tp.className='page';
               tp.innerHTML = `
@@ -431,26 +424,40 @@
 
     async function generatePdf() {
       await build();
-      document.querySelectorAll('.chart-full, .chart-box').forEach(el=>{
-        const c = echarts.getInstanceByDom(el);
-        if (c) { c.resize(); c.refresh(); }
+
+      // Replace each chart with its own PNG
+      document.querySelectorAll('.chart-full, .chart-box').forEach(el => {
+        const chart = echarts.getInstanceByDom(el);
+        if (!chart) return;
+        const imgURL = chart.getDataURL({ pixelRatio: 1, backgroundColor: '#fff' });
+        el.innerHTML = `<img src="${imgURL}" style="width:100%;height:100%;" />`;
       });
-      await new Promise(r=>setTimeout(r,100));
 
+      // Allow DOM to update
+      await new Promise(r => setTimeout(r, 100));
+
+      // Snapshot pages at scale=1
       const pages = Array.from(document.querySelectorAll('.page'));
-      const images = [];
-      for (const pg of pages) {
-        const cnv = await html2canvas(pg, { backgroundColor:'#fff', scale:1, useCORS:true });
-        images.push(cnv.toDataURL('image/png',1.0));
-      }
+      const images = await Promise.all(
+        pages.map(pg =>
+          html2canvas(pg, { backgroundColor: '#fff', scale: 1, useCORS: true })
+            .then(c => c.toDataURL('image/png', 1.0))
+        )
+      );
 
+      // Build PDF
       pdfMake.createPdf({
-        pageSize:{ width:960, height:540 }, pageMargins:[0,0,0,0],
-        content: images.map((img,i)=>({ image:img, width:960, pageBreak:i<images.length-1?'after':undefined }))
+        pageSize: { width: 960, height: 540 },
+        pageMargins: [0,0,0,0],
+        content: images.map((img,i) => ({
+          image: img,
+          width: 960,
+          pageBreak: i < images.length-1 ? 'after' : undefined
+        }))
       }).download('report.pdf');
     }
 
-    document.addEventListener('DOMContentLoaded',()=>{
+    document.addEventListener('DOMContentLoaded', () => {
       document.getElementById('gerar-pdf').addEventListener('click', generatePdf);
       build();
     });

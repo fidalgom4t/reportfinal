@@ -446,30 +446,36 @@
       }
     }
 
-    async function generatePdf() {
+   async function generatePdf() {
+  // 1) rebuild your 960×540 pages
   await build();
-  const pages = Array.from(document.querySelectorAll('.page'));
-  const images = [];
-  for (const pg of pages) {
-    const canvas = await html2canvas(pg, {
-      backgroundColor: '#fff',
-      // bump scale if you need extra detail (e.g. 2 or window.devicePixelRatio)
-      scale: 2
-    });
-    images.push(canvas.toDataURL());
-  }
 
-  pdfMake.createPdf({
-    // custom page size exactly your .page dimensions:
+  const pages = Array.from(document.querySelectorAll('.page'));
+  const images = await Promise.all(
+    pages.map(pg =>
+      html2canvas(pg, {
+        backgroundColor: '#fff',
+        // capture at 2× resolution (so our 960px width ⇒ 1920px image)
+        scale: 2
+      }).then(canvas => canvas.toDataURL('image/png', 1.0))
+    )
+  );
+
+  // 2) assemble PDF with custom pageSize = 960×540
+  const docDefinition = {
     pageSize: { width: 960, height: 540 },
     pageMargins: [0, 0, 0, 0],
     content: images.map((img, i) => ({
       image: img,
-      width: 960,                   // draw at full 960px width
+      width: 960,                         // exactly CSS width
       pageBreak: i < images.length - 1 ? 'after' : undefined
     }))
-  }).download('report.pdf');
+  };
+
+  // 3) download
+  pdfMake.createPdf(docDefinition).download('report.pdf');
 }
+
     document.addEventListener('DOMContentLoaded', ()=>{
       document.getElementById('gerar-pdf').addEventListener('click', generatePdf);
       build();

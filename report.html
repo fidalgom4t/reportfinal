@@ -201,8 +201,12 @@
           // Turma grids omitted for brevity...
 
           // Text questions filtered
+          // Only include selected open‑ended questions
           const textRows = all.filter(d =>
             String(d.section||'').toLowerCase().includes(sec) &&
+            isNaN(parseFloat(d.value)) &&
+            (f.textQuestions || []).includes(d.question)
+          ).toLowerCase().includes(sec) &&
             isNaN(parseFloat(d.value)) &&
             (f.textQuestions||[]).includes(d.question)
           );

@@ -362,9 +362,9 @@
               );
               if (!answers.length) return;
 
-              // Paginate 12 answers per page
-              for (let i = 0; i < answers.length; i += 12) {
-                const chunk = answers.slice(i, i+12);
+              // Paginate 10 answers per page
+              for (let i = 0; i < answers.length; i += 10) {
+                const chunk = answers.slice(i, i+10);
                 const textPage = document.createElement('div');
                 textPage.className = 'page text-page';
                 const titleHTML = i===0

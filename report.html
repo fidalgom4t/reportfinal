@@ -242,25 +242,29 @@
         root.appendChild(hero);
 
         // Info banner (assessment total)
-        const info=document.createElement('div'); info.className='page';
-        info.innerHTML=`
-          <div class="header">
-            <img src="mind4time-logo.png"><div></div>
-          </div>
-          <div class="content">
-            <div class="banner">
-              <img class="banner-bg" src="assessment-bg.jpg">
-              <div class="banner-text">
-                Total de respostas: ${countUnique(rows,'assessment')}
-              </div>
-            </div>
-          </div>
-          <div class="footer">
-            <div>www.MIND4TIME.com</div>
-            <div>© MIND4TIME ${currentYear}</div>
-          </div>`;
-        root.appendChild(info);
-
+        const info = document.createElement('div');
+info.className = 'page';
+info.innerHTML = `
+  <div class="header">
+    <img src="mind4time-logo.png"><div></div>
+  </div>
+  <div class="content">
+    <div class="banner">
+      <img class="banner-bg" src="assessment-bg.jpg">
+      <div class="banner-box">
+        <h1>Detalhes do Programa</h1>
+        <div class="meta">
+          <div><span>Time Scope:</span><strong>${timeScope}</strong></div>
+          <div><span>Trainers:</span><strong>${(f.trainers||{})[prog]||'N/A'}</strong></div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="footer">
+    <div>www.MIND4TIME.com</div>
+    <div>© MIND4TIME ${currentYear}</div>
+  </div>`;
+root.appendChild(info);
         // Sections
         for(const sec of ['assessment','evaluation']){
           const name=sec==='assessment'?'Assessment':'Evaluation';

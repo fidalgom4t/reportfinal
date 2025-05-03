@@ -196,15 +196,15 @@
         .map(([q, vals]) => ({
           question: q,
           label: LM[q] || q,
-          avg: +(vals.reduce((a, b) => a + b, 0) / vals.length).toFixed(1)
+          avg: +
+            (vals.reduce((a, b) => a + b, 0) / vals.length).toFixed(1)
         }))
         .sort((a, b) => (OM[a.question] || 0) - (OM[b.question] || 0));
     }
 
     function countUnique(rows, sec) {
       return new Set(
-        rows
-          .filter(d => String(d.section || '').toLowerCase().includes(sec))
+        rows.filter(d => String(d.section || '').toLowerCase().includes(sec))
           .map(d => d.respondent_id || d.id)
       ).size;
     }
@@ -222,70 +222,52 @@
     function createBarChart(container, title, data, uniform) {
       const chart = echarts.init(container);
       chart.setOption({
-        title: { text: title, left: 'center', textStyle:{ fontSize:20 } },
-        grid: { top:80, left:'10%', right:'10%', bottom:120 },
-        tooltip: {},
-        xAxis: {
-          type: 'category',
-          data: data.map(d => d.label),
-          axisLabel: { rotate:30, interval:0, margin:10 }
+        title:{ text: title, left:'center', textStyle:{ fontSize:20 } },
+        grid:{ top:80, left:'10%', right:'10%', bottom:120 },
+        tooltip:{},
+        xAxis:{
+          type:'category', data:data.map(d=>d.label),
+          axisLabel:{ rotate:30, interval:0, margin:10 }
         },
-        yAxis: {
-          type:'value', min:1, max:5,
-          splitLine:{ show:false },
-          axisLine:{ show:false },
-          axisTick:{ show:false },
-          axisLabel:{ show:false }
+        yAxis:{ type:'value', min:1, max:5,
+          splitLine:{ show:false }, axisLine:{ show:false }, axisTick:{ show:false }, axisLabel:{ show:false }
         },
-        series: [{
-          type:'bar',
-          data: data.map(d => d.avg),
+        series:[{ type:'bar', data:data.map(d=>d.avg),
           label:{ show:true, position:'top', formatter:'{c}' },
           itemStyle: uniform
             ? { color:'#6A99D0' }
-            : {
-                color: p => p.value<3
-                  ? '#EA3323'
-                  : p.value<4
-                  ? '#6A99D0'
-                  : '#9FCE63'
-              }
+            : { color: p => p.value<3?'#EA3323':p.value<4?'#6A99D0':'#9FCE63' }
         }]
       });
-      chart.resize();
-      setTimeout(() => chart.resize(), 300);
+      chart.resize(); setTimeout(()=>chart.resize(),300);
     }
 
     async function build() {
-      const f = JSON.parse(localStorage.getItem('reportFilters') || '{}');
+      const f = JSON.parse(localStorage.getItem('reportFilters')||'{}');
       const [data, meta] = await Promise.all([
-        fetch('data.json').then(r => r.json()),
-        fetch('meta.json').then(r => r.json())
+        fetch('data.json').then(r=>r.json()),
+        fetch('meta.json').then(r=>r.json())
       ]);
-      const LM = createLabelMap(meta.labels),
-            OM = createSortMap(meta.labels);
-      const root = document.getElementById('report');
-      root.innerHTML = '';
+      const LM = createLabelMap(meta.labels), OM = createSortMap(meta.labels);
+      const root = document.getElementById('report'); root.innerHTML = '';
 
       let timeScope = '';
       if (f.start && f.end) {
-        const s = formatMonthYear(f.start),
-              e = formatMonthYear(f.end);
+        const s = formatMonthYear(f.start), e = formatMonthYear(f.end);
         timeScope = `${s.month} – ${e.month} ${e.year}`;
       }
 
-      for (const prog of f.programs || []) {
-        const selTur = f[`turmas_${prog}`] || [];
+      for (const prog of f.programs||[]) {
+        const selTur = f[`turmas_${prog}`]||[];
         const rows = data.filter(d =>
-          (f.clients || []).includes(d.client) &&
-          d.program === prog &&
-          selTur.includes(d.turma)
+          (f.clients||[]).includes(d.client)
+          && d.program===prog
+          && selTur.includes(d.turma)
         );
-        const pm = meta.titles.find(t => t.program_id === prog) || {};
+        const pm = meta.titles.find(t=>t.program_id===prog)||{};
 
-        // Hero
-        const hero = document.createElement('div');
-        hero.className = 'page hero';
+        // Hero page
+        const hero = document.createElement('div'); hero.className='page hero';
         hero.innerHTML = `
           <div class="hero">
             <img class="bg" src="hourglass-bg.jpg">
@@ -296,9 +278,8 @@
           </div>`;
         root.appendChild(hero);
 
-        // Info Banner
-        const info = document.createElement('div');
-        info.className = 'page';
+        // Info banner
+        const info = document.createElement('div'); info.className='page';
         info.innerHTML = `
           <div class="header">
             <img src="mind4time-logo.png"><div></div>
@@ -323,17 +304,16 @@
 
         // Sections
         for (const sec of ['assessment','evaluation']) {
-          const name = sec === 'assessment' ? 'Assessment' : 'Evaluation';
-          const total = countUnique(rows, sec);
+          const name = sec==='assessment'?'Assessment':'Evaluation';
+          const total = countUnique(rows,sec);
           const numeric = rows.filter(d =>
-            String(d.section || '').toLowerCase().includes(sec) &&
-            /^\d+(\.\d+)?$/.test(String(d.value).trim())
+            String(d.section||'').toLowerCase().includes(sec)
+            && /^\d+(\.\d+)?$/.test(String(d.value).trim())
           );
           const byT = Object.entries(groupBy(numeric,'turma'));
 
-          // Section Banner
-          const ban = document.createElement('div');
-          ban.className = 'page';
+          // Section banner
+          const ban = document.createElement('div'); ban.className='page';
           ban.innerHTML = `
             <div class="header">
               <img src="mind4time-logo.png">
@@ -344,9 +324,7 @@
                 <img class="banner-bg" src="${sec}-bg.jpg">
                 <div class="banner-box">
                   <h1>${name}</h1>
-                  <div class="meta">
-                    <div><span>Total de respostas:</span><strong>${total}</strong></div>
-                  </div>
+                  <div class="meta"><div><span>Total de respostas:</span><strong>${total}</strong></div></div>
                 </div>
               </div>
             </div>
@@ -356,10 +334,9 @@
             </div>`;
           root.appendChild(ban);
 
-          // Global Chart
+          // Global chart
           if (numeric.length) {
-            const gp = document.createElement('div');
-            gp.className = 'page';
+            const gp = document.createElement('div'); gp.className='page';
             gp.innerHTML = `
               <div class="header">
                 <img src="mind4time-logo.png">
@@ -379,19 +356,17 @@
               gp.querySelector('.chart-full'),
               `Global (${name})`,
               computeAverages(numeric, LM, OM),
-              sec === 'evaluation'
+              sec==='evaluation'
             );
           }
 
-          // 2‑Chart Grid
-          if (byT.length > 1) {
-            for (let i = 0; i < byT.length; i += 2) {
-              const gp2 = document.createElement('div');
-              gp2.className = 'page';
-              const boxes = byT.slice(i, i+2)
-                .map(([,vals], j) =>
-                  `<div class="chart-box" id="chart-${prog}-grid-${i+j}"></div>`
-                ).join('');
+          // 2‑chart grid
+          if (byT.length>1) {
+            for (let i=0; i<byT.length; i+=2) {
+              const gp2 = document.createElement('div'); gp2.className='page';
+              const boxes = byT.slice(i,i+2)
+                .map(([,v],j)=>`<div class="chart-box" id="chart-${prog}-grid-${i+j}"></div>`)
+                .join('');
               gp2.innerHTML = `
                 <div class="header">
                   <img src="mind4time-logo.png">
@@ -405,31 +380,31 @@
                   <div>© MIND4TIME ${currentYear}</div>
                 </div>`;
               root.appendChild(gp2);
-              byT.slice(i, i+2).forEach(([,vals], j) => {
+              byT.slice(i,i+2).forEach(([,v],j)=>{
                 createBarChart(
                   document.getElementById(`chart-${prog}-grid-${i+j}`),
                   byT[i+j][0],
-                  computeAverages(vals, LM, OM),
-                  sec === 'evaluation'
+                  computeAverages(v, LM, OM),
+                  sec==='evaluation'
                 );
               });
             }
           }
 
-          // Text Answers
-          const selQs = f.textQuestions || [];
-          selQs.forEach(qid => {
-            const ans = rows.filter(d =>
-              String(d.section || '').toLowerCase().includes(sec) &&
-              d.question === qid && isNaN(+d.value)
+          // Text answers
+          const selQs = f.textQuestions||[];
+          selQs.forEach(qid=>{
+            const ans = rows.filter(d=>
+              String(d.section||'').toLowerCase().includes(sec)
+              && d.question===qid
+              && isNaN(+d.value)
             );
             if (!ans.length) return;
-            for (let i = 0; i < ans.length; i += 8) {
-              const chunk = ans.slice(i, i+8)
-                .map(a => `<li>${a.value.replace(/\n/g,'</li><li>')}</li>`)
+            for (let i=0; i<ans.length; i+=8) {
+              const chunk = ans.slice(i,i+8)
+                .map(a=>`<li>${a.value.replace(/\n/g,'</li><li>')}</li>`)
                 .join('');
-              const tp = document.createElement('div');
-              tp.className = 'page';
+              const tp = document.createElement('div'); tp.className='page';
               tp.innerHTML = `
                 <div class="header">
                   <img src="mind4time-logo.png">
@@ -455,47 +430,28 @@
     }
 
     async function generatePdf() {
-      // rebuild pages
       await build();
-
-      // refresh all echarts instances
-      document.querySelectorAll('.chart-full, .chart-box').forEach(el => {
+      document.querySelectorAll('.chart-full, .chart-box').forEach(el=>{
         const c = echarts.getInstanceByDom(el);
         if (c) { c.resize(); c.refresh(); }
       });
+      await new Promise(r=>setTimeout(r,100));
 
-      // give browser a moment to paint
-      await new Promise(r => setTimeout(r, 100));
-
-      // snapshot each page
       const pages = Array.from(document.querySelectorAll('.page'));
       const images = [];
       for (const pg of pages) {
-        const canvas = await html2canvas(pg, {
-          backgroundColor: '#fff',
-          scale: 2,
-          useCORS: true
-        });
-        images.push(canvas.toDataURL('image/png', 1.0));
+        const cnv = await html2canvas(pg, { backgroundColor:'#fff', scale:2, useCORS:true });
+        images.push(cnv.toDataURL('image/png',1.0));
       }
 
-      // build PDF
-      const docDefinition = {
-        pageSize: { width: 960, height: 540 },
-        pageMargins: [0,0,0,0],
-        content: images.map((img, i) => ({
-          image: img,
-          width: 960,
-          pageBreak: i < images.length - 1 ? 'after' : undefined
-        }))
-      };
-
-      pdfMake.createPdf(docDefinition).download('report.pdf');
+      pdfMake.createPdf({
+        pageSize:{ width:960, height:540 }, pageMargins:[0,0,0,0],
+        content: images.map((img,i)=>({ image:img, width:960, pageBreak:i<images.length-1?'after':undefined }))
+      }).download('report.pdf');
     }
 
-    document.addEventListener('DOMContentLoaded', () => {
-      document.getElementById('gerar-pdf')
-              .addEventListener('click', generatePdf);
+    document.addEventListener('DOMContentLoaded',()=>{
+      document.getElementById('gerar-pdf').addEventListener('click', generatePdf);
       build();
     });
   </script>

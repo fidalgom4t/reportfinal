@@ -231,30 +231,24 @@
         const pm = meta.titles.find(t=>t.program_id===prog)||{};
 
         // Hero page
-        const hero = document.createElement('div'); hero.className='page';
-        hero.innerHTML = `
-          <div class="header">
-            <img src="mind4time-logo.png"><div></div>
-          </div>
-          <div class="content">
-            <div class="hero">
-              <img class="bg" src="hourglass-bg.jpg">
-              <div class="hero-content">
-                <small>${pm.SUBTÍTULO||''}</small>
-                <h1>${pm.TÍTULO||prog}</h1>
-                <div class="subtitle">${pm.TAGLINE||''}</div>
-                <div class="meta">
-                  <div><span>time scope</span><strong>${timeScope}</strong></div>
-                  <div><span>trainers</span><strong>${(f.trainers||{})[prog]||'N/A'}</strong></div>
-                </div>
-              </div>
-            </div>
-          </div>
-          <div class="footer">
-            <div>www.MIND4TIME.com</div>
-            <div>© MIND4TIME ${currentYear}</div>
-          </div>`;
-        root.appendChild(hero);
+       const hero = document.createElement('div');
+hero.className = 'page';
+hero.innerHTML = `
+  <div class="content">
+    <div class="hero">
+      <img class="bg" src="hourglass-bg.jpg">
+      <div class="hero-content">
+        <small>${pm.SUBTÍTULO||''}</small>
+        <h1>${pm.TÍTULO||prog}</h1>
+        <div class="subtitle">${pm.TAGLINE||''}</div>
+        <div class="meta">
+          <div><span>time scope</span><strong>${timeScope}</strong></div>
+          <div><span>trainers</span><strong>${(f.trainers||{})[prog]||'N/A'}</strong></div>
+        </div>
+      </div>
+    </div>
+  </div>`;
+root.appendChild(hero);
 
         for (const sec of ['assessment','evaluation']) {
           const name = sec==='assessment'?'Assessment':'Avaliação do Programa';

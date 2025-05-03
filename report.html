@@ -21,20 +21,34 @@
     font-family: 'Roboto', sans-serif;
     background: #333;
   }
-
-  /* PDF page size */
-  @page { size: 960px 540px; margin: 0; }
-  @media print { .page { page-break-after: always; } }
-
-  /* The page container */
-  .page {
-    position: relative;
-    width: 960px;
-    aspect-ratio: 16/9;       /* 960×540 */
-    margin: 20px auto;
-    background: #fff;
-    overflow: hidden;         /* no bleed outside */
+  
+ /* >>> add this AFTER your existing <style> block <<< */
+@media print {
+  /* Ensure the HTML & BODY aren’t being scaled or adding extra margins */
+  html, body {
+    width: 960px !important;
+    height: 540px !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    overflow: visible !important;
   }
+
+  /* Tell the browser exactly what size pages to create */
+  @page {
+    size: 960px 540px;
+    margin: 0;
+  }
+
+  /* Finally, pin each .page to that frame when printing */
+  .page {
+    width: 960px !important;
+    height: 540px !important;
+    margin: 0 auto !important;
+    page-break-after: always;
+    overflow: visible !important;
+  }
+}
+
 
   /* Header & footer bars */
   .header,

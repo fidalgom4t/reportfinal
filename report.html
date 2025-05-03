@@ -21,33 +21,6 @@
     font-family: 'Roboto', sans-serif;
     background: #333;
   }
-  
- /* >>> add this AFTER your existing <style> block <<< */
-@media print {
-  /* Ensure the HTML & BODY aren’t being scaled or adding extra margins */
-  html, body {
-    width: 960px !important;
-    height: 540px !important;
-    margin: 0 !important;
-    padding: 0 !important;
-    overflow: visible !important;
-  }
-
-  /* Tell the browser exactly what size pages to create */
-  @page {
-    size: 960px 540px;
-    margin: 0;
-  }
-
-  /* Finally, pin each .page to that frame when printing */
-  .page {
-    width: 960px !important;
-    height: 540px !important;
-    margin: 0 auto !important;
-    page-break-after: always;
-    overflow: visible !important;
-  }
-}
 
 
   /* Header & footer bars */
@@ -201,6 +174,26 @@
     border: none;
     border-radius: 4px;
     cursor: pointer;
+  }
+  @media print {
+    html, body {
+      width: 960px !important;
+      height: 540px !important;
+      margin: 0 !important;
+      padding: 0 !important;
+      overflow: visible !important;
+    }
+    @page {
+      size: 960px 540px;
+      margin: 0;
+    }
+    .page {
+      width: 960px !important;
+      height: 540px !important;
+      margin: 0 auto !important;
+      page-break-after: always;
+      overflow: visible !important;
+    }
   }
 </style>
 

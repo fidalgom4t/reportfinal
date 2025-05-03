@@ -447,24 +447,29 @@
     }
 
     async function generatePdf() {
-      await build();
-      const pages = Array.from(document.querySelectorAll('.page'));
-      const images = [];
-      for (const pg of pages) {
-        const canvas = await html2canvas(pg, { backgroundColor:'#fff', scale:2 });
-        images.push(canvas.toDataURL());
-      }
-      pdfMake.createPdf({
-        pageSize:{ width:960, height:540 },
-        pageMargins:[0,0,0,0],
-        content: images.map((img,i)=>({
-          image: img,
-          width: 960,
-          pageBreak: i < pages.length - 1 ? 'after' : undefined
-        }))
-      }).download('report.pdf');
-    }
+  await build();
+  const pages = Array.from(document.querySelectorAll('.page'));
+  const images = [];
+  for (const pg of pages) {
+    const canvas = await html2canvas(pg, {
+      backgroundColor: '#fff',
+      // bump scale if you need extra detail (e.g. 2 or window.devicePixelRatio)
+      scale: 2
+    });
+    images.push(canvas.toDataURL());
+  }
 
+  pdfMake.createPdf({
+    // custom page size exactly your .page dimensions:
+    pageSize: { width: 960, height: 540 },
+    pageMargins: [0, 0, 0, 0],
+    content: images.map((img, i) => ({
+      image: img,
+      width: 960,                   // draw at full 960px width
+      pageBreak: i < images.length - 1 ? 'after' : undefined
+    }))
+  }).download('report.pdf');
+}
     document.addEventListener('DOMContentLoaded', ()=>{
       document.getElementById('gerar-pdf').addEventListener('click', generatePdf);
       build();

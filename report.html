@@ -13,160 +13,137 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.7/pdfmake.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.7/vfs_fonts.js"></script>
-<style>
-  /* Base reset & background so you can see the page frames */
-  html, body {
-    margin: 0; padding: 0;
-    background: #333;
-    font-family: 'Roboto', sans-serif;
-  }
 
-  /* Define print page size exactly */
-  @page { size: 960px 540px; margin: 0; }
-  @media print { .page { page-break-after: always; } }
+  <style>
+    /* Base reset & background */
+    html, body {
+      margin: 0; padding: 0;
+      background: #333;
+      font-family: 'Roboto', sans-serif;
+    }
 
-  /* The page container */
-  .page {
-    position: relative;
-    width: 960px;
-    height: 540px;
-    margin: 20px auto;
-    background: #fff;
-    box-sizing: border-box;
-    overflow: hidden;
-  }
+    /* Print page size */
+    @page { size: 960px 540px; margin: 0; }
+    @media print { .page { page-break-after: always; } }
 
-  /* Header & footer bars */
-  .header, .footer {
-    position: absolute; left: 0; right: 0;
-    display: flex; justify-content: space-between; align-items: center;
-    background: #fff; padding: 0 30px; z-index: 10;
-  }
-  .header {
-    top: 0; height: 80px; border-bottom: 1px solid #40a3a3;
-  }
-  .header img {
-    height: 60px;
-  }
-  .footer {
-    bottom: 0; height: 60px; border-top: 1px solid #40a3a3;
-    color: #007c91; font-size: 14px;
-  }
+    /* Page container */
+    .page {
+      position: relative;
+      width: 960px;
+      height: 540px;
+      margin: 20px auto;
+      background: #fff;
+      box-sizing: border-box;
+      overflow: hidden;
+    }
 
-  /* Content area: exactly 960×400px between header & footer */
-  .page > .content {
-    position: absolute;
-    top: 80px; bottom: 60px; left: 0; right: 0;
-    overflow: hidden;
-    box-sizing: border-box;
-  }
+    /* Header & footer */
+    .header, .footer {
+      position: absolute; left: 0; right: 0;
+      display: flex; justify-content: space-between; align-items: center;
+      background: #fff; padding: 0 30px; z-index: 10;
+    }
+    .header {
+      top: 0; height: 80px; border-bottom: 1px solid #40a3a3;
+    }
+    .header img { height: 60px; }
+    .footer {
+      bottom: 0; height: 60px; border-top: 1px solid #40a3a3;
+      color: #007c91; font-size: 14px;
+    }
 
-  /* Hero, Banner, Chart, Text all live inside .content */
-  .hero, .banner, .chart-fullpage, .chart-grid, .text-page {
-    width: 100%; height: 100%;
-    box-sizing: border-box;
-  }
+    /* Content area: exactly 960×400px between header & footer */
+    .page > .content {
+      position: absolute;
+      top: 80px; bottom: 60px; left: 0; right: 0;
+      overflow: hidden;
+      box-sizing: border-box;
+    }
 
-  /* Hero */
-  .hero .bg {
-    width: 100%; height: 100%; object-fit: cover;
-  }
-  .hero-content {
-    position: absolute; top: 0; left: 0; right: 0; bottom: 0;
-    display: flex; flex-direction: column; align-items: center; justify-content: center;
-    color: #fff; text-align: center; padding: 0 30px;
-  }
-  .hero-content small { font-size: 1.2rem; margin-bottom: 8px; opacity: .8; }
-  .hero-content h1  { font-size: 3rem; margin: 0; }
-  .hero-content .subtitle { font-size: 1.4rem; margin-top: 12px; }
-  .hero-content .meta { margin-top: 20px; display: flex; gap: 30px; font-size: 1rem; }
-  .hero-content .meta span { opacity: .8; }
+    /* Hero, Banner, Chart, Text all fill .content */
+    .content > .hero,
+    .content > .banner,
+    .content > .chart-fullpage,
+    .content > .chart-grid,
+    .content > .text-page {
+      width: 100%;
+      height: 100%;
+      box-sizing: border-box;
+    }
 
-  .banner {
-  width: 100%;
-  /* full height of .page (540px) minus header(80px) & footer(60px) = 400px */
-  height: calc(100% - 140px);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  box-sizing: border-box;
-}
+    /* Hero */
+    .hero .bg {
+      width: 100%; height: 100%; object-fit: cover;
+    }
+    .hero-content {
+      position: absolute; inset: 0;
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
+      color: #fff; text-align: center; padding: 0 30px;
+      box-sizing: border-box;
+    }
+    .hero-content small { font-size: 1.2rem; margin-bottom: 8px; opacity: .8; }
+    .hero-content h1  { font-size: 3rem; margin: 0; }
+    .hero-content .subtitle { font-size: 1.4rem; margin-top: 12px; }
+    .hero-content .meta {
+      margin-top: 20px; display: flex; gap: 30px; font-size: 1rem;
+    }
+    .hero-content .meta span { opacity: .8; }
 
-.banner-box {
-  background: #f0f8f9;
-  padding: 30px 50px;
-  border-left: 6px solid #007c91;
-  box-shadow: 0 2px 6px rgba(0,0,0,0.1);
-  width: 70%;
-  box-sizing: border-box;
-}
+    /* Banner */
+    .banner {
+      display: flex; align-items: center; justify-content: center;
+    }
+    .banner-box {
+      background: #f0f8f9; padding: 30px 50px;
+      border-left: 6px solid #007c91; box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+      width: 70%; box-sizing: border-box;
+    }
+    .banner-box h1 { font-size: 2.5rem; margin-bottom: 12px; }
+    .banner-box .meta { font-size: 1rem; }
 
-.banner-box h1 {
-  font-size: 2.5rem;
-  margin-bottom: 12px;
-}
+    /* Single global chart */
+    .chart-fullpage {
+      display: flex; align-items: center; justify-content: center;
+      padding: 20px; /* optional */
+      box-sizing: border-box;
+    }
+    .chart-full {
+      width: 100%; height: 100%;
+    }
 
-.banner-box .meta {
-  font-size: 1rem;
-}
+    /* 2‑chart grid (selector fixed) */
+    .chart-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      grid-template-rows: 1fr;
+      gap: 20px;
+      padding: 20px;
+      box-sizing: border-box;
+    }
+    .chart-box {
+      width: 100%; height: 100%;
+    }
 
-  /* Single global chart */
-  .chart-fullpage {
-  display: flex;
-  align-items: center;
-  justify-content: center;
+    /* Text answers */
+    .text-page {
+      overflow-y: auto; padding: 20px; box-sizing: border-box;
+    }
+    .text-question {
+      border: 1px solid #007c91; border-left: 6px solid #007c91;
+      background: #f9f9f9; padding: 20px; margin-bottom: 20px;
+      box-sizing: border-box; page-break-inside: avoid; break-inside: avoid;
+    }
+    .text-question-title { font-size: 1.2rem; margin-bottom: 8px; }
+    .text-question ul { padding-left: 16px; font-size: 1rem; line-height: 1.6; }
+    .text-question li { margin-bottom: 8px; }
 
-  /* If your .page is 540px tall with an 80px header & 60px footer: */
-  height: calc(100% - 140px);
-  width: 100%;
-  box-sizing: border-box;
-  padding: 20px; /* optional padding around the chart */
-}
- .chart-full {
-  width: 100%;
-  height: 100%;
-}
-
-chart-grid {
-  /* fill the 400px content band: 540 total − 80 header − 60 footer = 400 */
-  width: 100%;
-  height: 400px;
-
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  grid-template-rows: 1fr;
-  gap: 20px;
-  padding: 20px;
-  box-sizing: border-box; /* include padding in that 400px */
-}
-
-.chart-box {
-  width: 100%;
-  height: 100%;
-}
-
-  /* Text answers */
-  .text-page {
-    overflow-y: auto; padding: 20px;
-  }
-  .text-question {
-    border: 1px solid #007c91; border-left: 6px solid #007c91;
-    background: #f9f9f9; padding: 20px;
-    margin-bottom: 20px; box-sizing: border-box;
-  }
-  .text-question-title { font-size: 1.2rem; margin-bottom: 8px; }
-  .text-question ul { padding-left: 16px; font-size: 1rem; line-height: 1.6; }
-  .text-question li { margin-bottom: 8px; }
-
-  /* PDF button */
-  #gerar-pdf {
-    position: fixed; top: 10px; right: 10px; z-index: 1000;
-    padding: 8px 16px; background: #007c91; color: #fff;
-    border: none; border-radius: 4px; cursor: pointer;
-  }
-</style>
-
-
+    /* PDF button */
+    #gerar-pdf {
+      position: fixed; top: 10px; right: 10px; z-index: 1000;
+      padding: 8px 16px; background: #007c91; color: #fff;
+      border: none; border-radius: 4px; cursor: pointer;
+    }
+  </style>
 </head>
 <body>
   <button id="gerar-pdf">Gerar Relatório (PDF)</button>
@@ -221,7 +198,8 @@ chart-grid {
       chart.setOption({
         title:{text:title,left:'center',textStyle:{fontSize:20}},
         grid:{top:80,left:'10%',right:'10%',bottom:100},
-        tooltip:{}, xAxis:{type:'category',data:data.map(d=>d.label),axisLabel:{rotate:30,interval:0}},
+        tooltip:{},
+        xAxis:{type:'category',data:data.map(d=>d.label),axisLabel:{rotate:30,interval:0}},
         yAxis:{type:'value',min:0,max:5,splitLine:{show:false},axisLine:{show:false},axisTick:{show:false},axisLabel:{show:false}},
         series:[{type:'bar',data:data.map(d=>d.avg),label:{show:true,position:'top',formatter:'{c}'},itemStyle:uniform?{color:'#6A99D0'}:{color:p=>{const v=p.value;return v<3?'#EA3323':v<4?'#6A99D0':'#9FCE63';}}}]
       });
@@ -231,31 +209,44 @@ chart-grid {
     // Build report
     async function build(){
       const f=JSON.parse(localStorage.getItem('reportFilters')||'{}');
-      const [data,meta]=await Promise.all([fetch('data.json').then(r=>r.json()),fetch('meta.json').then(r=>r.json())]);
+      const [data,meta]=await Promise.all([
+        fetch('data.json').then(r=>r.json()),
+        fetch('meta.json').then(r=>r.json())
+      ]);
       const LM=createLabelMap(meta.labels), OM=createSortMap(meta.labels);
-      const root=document.getElementById('report');root.innerHTML='';
+      const root=document.getElementById('report'); root.innerHTML='';
       let timeScope='';
-      if(f.start&&f.end){const s=formatMonthYear(f.start),e=formatMonthYear(f.end);timeScope=`${s.month} – ${e.month} ${e.year}`;}
+      if(f.start&&f.end){
+        const s=formatMonthYear(f.start), e=formatMonthYear(f.end);
+        timeScope=`${s.month} – ${e.month} ${e.year}`;
+      }
+
       for(const prog of f.programs||[]){
         const turKey=`turmas_${prog}`, selTur=f[turKey]||[];
         const rows=data.filter(d=>(f.clients||[]).includes(d.client)&&d.program===prog&&selTur.includes(d.turma));
         const pm=meta.titles.find(t=>t.program_id===prog)||{};
+
         // Hero
-        const hero=document.createElement('div');hero.className='page hero';
-        hero.innerHTML=`
+        const heroPage=document.createElement('div');
+        heroPage.className='page';
+        heroPage.innerHTML=`
           <div class="header"><img src="mind4time-logo.png"><div></div></div>
-          <img class="bg" src="hourglass-bg.jpg">
-          <div class="hero-content">
-            <small>${pm.SUBTÍTULO||''}</small>
-            <h1>${pm.TÍTULO||prog}</h1>
-            <div class="subtitle">${pm.TAGLINE||''}</div>
-            <div class="meta">
-              <div><span>time scope</span><strong>${timeScope}</strong></div>
-              <div><span>trainers</span><strong>${(f.trainers||{})[prog]||'N/A'}</strong></div>
+          <div class="content">
+            <div class="hero">
+              <img class="bg" src="hourglass-bg.jpg">
+              <div class="hero-content">
+                <small>${pm.SUBTÍTULO||''}</small>
+                <h1>${pm.TÍTULO||prog}</h1>
+                <div class="subtitle">${pm.TAGLINE||''}</div>
+                <div class="meta">
+                  <div><span>time scope</span><strong>${timeScope}</strong></div>
+                  <div><span>trainers</span><strong>${(f.trainers||{})[prog]||'N/A'}</strong></div>
+                </div>
+              </div>
             </div>
           </div>
           <div class="footer"><div>www.MIND4TIME.com</div><div>© MIND4TIME ${currentYear}</div></div>`;
-        root.appendChild(hero);
+        root.appendChild(heroPage);
 
         // Sections
         for(const sec of['assessment','evaluation']){
@@ -265,32 +256,51 @@ chart-grid {
           const byT=Object.entries(groupBy(numeric,'turma'));
 
           // Banner
-          const ban=document.createElement('div');ban.className='page banner';
-          ban.innerHTML=`
+          const bannerPage=document.createElement('div');
+          bannerPage.className='page';
+          bannerPage.innerHTML=`
             <div class="header"><img src="mind4time-logo.png"><div></div></div>
-            <div class="banner-box"><h1>${name}</h1><div class="meta"><div><span>Total de respostas:</span><strong>${total}</strong></div></div></div>
+            <div class="content">
+              <div class="banner">
+                <div class="banner-box">
+                  <h1>${name}</h1>
+                  <div class="meta"><div><span>Total de respostas:</span><strong>${total}</strong></div></div>
+                </div>
+              </div>
+            </div>
             <div class="footer"><div>www.MIND4TIME.com</div><div>© MIND4TIME ${currentYear}</div></div>`;
-          root.appendChild(ban);
+          root.appendChild(bannerPage);
 
-          // Global
+          // Global chart
           if(numeric.length){
-            const gp=document.createElement('div');gp.className='page chart-fullpage';
-            gp.innerHTML=`
+            const chartPage=document.createElement('div');
+            chartPage.className='page';
+            chartPage.innerHTML=`
               <div class="header"><img src="mind4time-logo.png"><div></div></div>
-              <div class="chart-full" id="chart-global-${prog}-${sec}"></div>
+              <div class="content">
+                <div class="chart-fullpage">
+                  <div class="chart-full" id="chart-global-${prog}-${sec}"></div>
+                </div>
+              </div>
               <div class="footer"><div>www.MIND4TIME.com</div><div>© MIND4TIME ${currentYear}</div></div>`;
-            root.appendChild(gp);
-            createBarChart(gp.querySelector('.chart-full'),`Global (${name})`,computeAverages(numeric,LM,OM),sec==='evaluation');
+            root.appendChild(chartPage);
+            createBarChart(chartPage.querySelector('.chart-full'),`Global (${name})`,computeAverages(numeric,LM,OM),sec==='evaluation');
           }
 
           // 2‑chart grid
           if(byT.length>1){
             for(let i=0;i<byT.length;i+=2){
-              const gp2=document.createElement('div');gp2.className='page chart-grid';
-              gp2.innerHTML=`<div class="header"><img src="mind4time-logo.png"><div></div></div>`;
-              byT.slice(i,i+2).forEach(([,vals],j)=>gp2.innerHTML+=`<div class="chart-box" id="chart-${prog}-grid-${i+j}"></div>`);
-              gp2.innerHTML+=`<div class="footer"><div>www.MIND4TIME.com</div><div>© MIND4TIME ${currentYear}</div></div>`;
-              root.appendChild(gp2);
+              const gridPage=document.createElement('div');
+              gridPage.className='page';
+              gridPage.innerHTML=`
+                <div class="header"><img src="mind4time-logo.png"><div></div></div>
+                <div class="content">
+                  <div class="chart-grid">
+                    ${byT.slice(i,i+2).map(([,vals],j)=>`<div class="chart-box" id="chart-${prog}-grid-${i+j}"></div>`).join('')}
+                  </div>
+                </div>
+                <div class="footer"><div>www.MIND4TIME.com</div><div>© MIND4TIME ${currentYear}</div></div>`;
+              root.appendChild(gridPage);
               byT.slice(i,i+2).forEach(([,vals],j)=>{
                 createBarChart(
                   document.getElementById(`chart-${prog}-grid-${i+j}`),
@@ -302,22 +312,25 @@ chart-grid {
             }
           }
 
-          // Text answers (12/page)
+          // Text answers
           const selQs=f.textQuestions||[];
           selQs.forEach(q=>{
-            const ans=rows.filter(d=>String(d.section||'').toLowerCase().includes(sec)&&d.question===q&&isNaN(+d.value));
+            const ans=rows.filter(d=>String(d.section||'').toLowerCase().includes(sec)&&d.question===q&&!/^\d/.test(d.value));
             if(!ans.length) return;
             for(let i=0;i<ans.length;i+=12){
               const chunk=ans.slice(i,i+12);
-              const tp=document.createElement('div');tp.className='page text-page';
-              tp.innerHTML=`
+              const textPage=document.createElement('div');
+              textPage.className='page';
+              textPage.innerHTML=`
                 <div class="header"><img src="mind4time-logo.png"><div></div></div>
-                <div class="text-question">
-                  ${i===0?`<div class="text-question-title">${q}</div>`:``}
-                  <ul>${chunk.map(a=>`<li>${a.value.replace(/\\n/g,'</li><li>')}</li>`).join('')}</ul>
+                <div class="content">
+                  <div class="text-page">
+                    ${i===0?`<div class="text-question-title">${q}</div>`:``}
+                    <ul>${chunk.map(a=>`<li>${a.value.replace(/\n/g,'</li><li>')}</li>`).join('')}</ul>
+                  </div>
                 </div>
                 <div class="footer"><div>www.MIND4TIME.com</div><div>© MIND4TIME ${currentYear}</div></div>`;
-              root.appendChild(tp);
+              root.appendChild(textPage);
             }
           });
         }
@@ -327,20 +340,19 @@ chart-grid {
     // PDF
     async function generatePdf(){
       await build();
-      const pages=Array.from(document.querySelectorAll('.page')), images=[];
+      const pages=Array.from(document.querySelectorAll('.page')), images=[]
       for(const pg of pages){
-        const c=await html2canvas(pg,{backgroundColor:'#fff',scale:2});
-        images.push(c.toDataURL());
+        images.push((await html2canvas(pg,{backgroundColor:'#fff',scale:2})).toDataURL());
       }
       pdfMake.createPdf({
         pageSize:'A4', pageOrientation:'landscape', pageMargins:[0,0,0,0],
-        content: images.map((img,i)=>({ image:img, width:842, pageBreak: i<images.length-1?'after':undefined }))
+        content: images.map((img,i)=>({image:img,width:842,pageBreak:i<images.length-1?'after':undefined}))
       }).download('report.pdf');
     }
 
-    document.addEventListener('DOMContentLoaded', ()=>{
+    document.addEventListener('DOMContentLoaded',()=>{
       build();
-      document.getElementById('gerar-pdf').addEventListener('click', generatePdf);
+      document.getElementById('gerar-pdf').addEventListener('click',generatePdf);
     });
   </script>
 </body>

@@ -15,88 +15,99 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.7/vfs_fonts.js"></script>
 
 <style>
-  /* Base reset */
+  /* Reset & font */
   html, body {
     margin: 0;
     padding: 0;
+    height: 100%;
     font-family: 'Roboto', sans-serif;
-    background: #333;           /* helps you see the page frame */
+    background: #333; /* grey page behind pages, so you can see the 960×540 frames */
   }
 
-  /* Define our page size exactly */
+  /* Print dimensions */
   @page { size: 960px 540px; margin: 0; }
   @media print { .page { page-break-after: always; } }
 
-  /* Page container: fixed 16:9 at 960×540 */
+  /* Page container */
   .page {
     position: relative;
     width: 960px;
     aspect-ratio: 16/9;
     margin: 20px auto;
-    padding: 80px 30px 60px;    /* top / sides / bottom */
+    padding: 80px 30px 60px;
     box-sizing: border-box;
     background: #fff;
-    overflow: hidden;           /* clip any overflow */
+    overflow: hidden;       /* clip anything outside */
   }
 
-  /* Header & footer bars */
+  /* Header & footer */
   .header, .footer {
     position: absolute;
     left: 0; right: 0;
     display: flex;
-    align-items: center;
     justify-content: space-between;
+    align-items: center;
     padding: 0 30px;
-    background: #fff;
     z-index: 10;
   }
   .header {
     top: 0;
     height: 80px;
+    background: #fff;       /* cover hero bg */
     border-bottom: 1px solid #40a3a3;
   }
   .header img { height: 60px; }
   .footer {
     bottom: 0;
     height: 60px;
+    background: #fff;       /* cover chart/text overflow */
     border-top: 1px solid #40a3a3;
     color: #007c91;
     font-size: 14px;
   }
 
-  /* Hero section: fills between header & footer */
+  /* Hero */
   .hero {
-    position: absolute;
-    top: 80px; bottom: 60px;    /* anchor below header, above footer */
-    left: 0; right: 0;
+    position: relative;
+    width: 100%;
+    height: calc(100% - 140px); /* total page height minus header(80) and footer(60) */
     overflow: hidden;
   }
   .hero .bg {
-    width: 100%;
-    height: 100%;
+    position: absolute;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
     object-fit: cover;
   }
   .hero-content {
     position: absolute;
-    top: 0; left: 0; right: 0; bottom: 0;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
     color: #fff;
     text-align: center;
     padding: 0 30px;
     box-sizing: border-box;
   }
+  .hero-content small {
+    font-style: italic; font-size: 1.2rem; margin-bottom: 8px; opacity: 0.8;
+  }
+  .hero-content h1 { font-size: 4rem; margin: 0; font-weight: 600; }
+  .hero-content .subtitle { font-size: 1.8rem; margin-top: 12px; }
+  .hero-content .meta {
+    margin-top: 24px; display: flex; gap: 40px;
+    justify-content: center; font-size: 1.2rem;
+  }
+  .hero-content .meta span { opacity: 0.8; font-style: italic; }
+  .hero-content .meta strong { font-weight: 600; }
 
-  /* Banner: same vertical slot as hero */
+  /* Banner */
   .banner {
-    position: absolute;
-    top: 80px; bottom: 60px;
-    left: 0; right: 0;
-    display: flex;
-    align-items: center;
-    justify-content: center;
+    position: relative;
+    width: 100%;
+    height: calc(100% - 140px);
+    display: flex; align-items: center; justify-content: center;
   }
   .banner-box {
     background: #f0f8f9;
@@ -106,46 +117,38 @@
     width: 70%;
     box-sizing: border-box;
   }
+  .banner-box h1 { margin: 0 0 16px; font-size: 48px; color: #007c91; }
+  .banner-box .meta { display: flex; gap: 40px; font-size: 18px; color: #555; }
 
-  /* Global chart: same slot as hero/banner */
+  /* Charts */
   .chart-fullpage {
-    position: absolute;
-    top: 80px; bottom: 60px;
-    left: 0; right: 0;
-    display: flex;
-    align-items: center;
-    justify-content: center;
+    position: relative;
+    width: 100%;
+    height: calc(100% - 140px);
+    display: flex; align-items: center; justify-content: center;
   }
   .chart-full {
-    width: calc(100% - 60px);   /* subtract side padding if needed */
-    height: 100%;
+    width: 100%; height: 100%;
   }
-
-  /* 2‑chart grid: one row, two columns */
   .chart-grid {
-    position: absolute;
-    top: 80px; bottom: 60px;
-    left: 0; right: 0;
+    position: relative;
+    width: 100%; height: calc(100% - 140px);
     display: grid;
     grid-template-columns: 1fr 1fr;
-    grid-template-rows: 1fr;
+    grid-template-rows: 1fr 1fr;
     gap: 30px;
-    padding: 0 30px;
+    padding: 20px;
     box-sizing: border-box;
   }
   .chart-box {
-    width: 100%;
-    height: 100%;
+    width: 100%; height: 100%;
   }
 
-  /* Text pages: flows below header until footer covers overflow */
+  /* Text answers */
   .text-page {
-    position: absolute;
-    top: 80px; bottom: 60px;
-    left: 0; right: 0;
-    overflow-y: auto;
-    padding: 0 30px;
-    box-sizing: border-box;
+    position: relative;
+    width: 100%;
+    /* let height auto grow, footer will cover any extra */
   }
   .text-question {
     border: 1px solid #007c91;
@@ -153,39 +156,27 @@
     background: #f9f9f9;
     padding: 24px 32px;
     width: 80%;
-    margin: 0 auto 40px;
+    margin: 80px auto;
     box-sizing: border-box;
     page-break-inside: avoid;
+    break-inside: avoid;
   }
   .text-question-title {
-    font-size: 18px;
-    font-weight: bold;
-    margin-bottom: 12px;
-    color: #007c91;
+    font-size: 18px; font-weight: bold;
+    margin-bottom: 12px; color: #007c91;
   }
   .text-question ul {
-    padding-left: 20px;
-    font-size: 16px;
-    line-height: 1.8;
+    padding-left: 20px; font-size: 16px; line-height: 1.8;
   }
-  .text-question li {
-    margin-bottom: 12px;
-  }
+  .text-question li { margin-bottom: 12px; }
 
   /* PDF button */
   #gerar-pdf {
-    position: fixed;
-    top: 10px; right: 10px;
-    z-index: 1000;
-    padding: 10px 20px;
-    background: #007c91;
-    color: #fff;
-    border: none;
-    border-radius: 4px;
-    cursor: pointer;
+    position: fixed; top: 10px; right: 10px; z-index: 1000;
+    padding: 10px 20px; background: #007c91; color: #fff;
+    border: none; border-radius: 4px; cursor: pointer;
   }
 </style>
-
 </head>
 <body>
   <button id="gerar-pdf">Gerar Relatório (PDF)</button>

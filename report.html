@@ -24,8 +24,8 @@
 
     .page {
       position: relative;
-      aspect-ratio: 297/210;
-      width: 100vw;
+      aspect-ratio: 16/9;
+      width: 960px;
       box-sizing: border-box;
       padding: 80px 0 60px;
       background: #fff;
@@ -87,7 +87,7 @@
     .chart-fullpage {
       display: flex; align-items: center; justify-content: center;
     }
-    .chart-full { width: 90vw; height: 80vh; }
+    .chart-full { width: 100%; height: calc(100%-200px); }
     .chart-grid {
       display: grid;
       grid-template-columns: 1fr 1fr;
@@ -103,7 +103,7 @@
     .text-question {
       border: 1px solid #007c91; border-left: 6px solid #007c91;
       background: #f9f9f9; padding: 24px 32px;
-      width: 80vw; margin: 80px auto;
+      width: 80%; margin: 80px auto;
       page-break-inside: avoid; break-inside: avoid;
     }
     .text-question-title { font-size: 18px; font-weight: bold; margin-bottom: 12px; color: #007c91; }

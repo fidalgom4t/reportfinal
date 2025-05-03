@@ -163,6 +163,15 @@
   top: 0;
   bottom: 0;
 }
+.header .section-title {
+  text-transform: uppercase;    /* ALL CAPS */
+  color: #007c91;               /* your new color */
+  font-weight: 600;             /* semi‑bold */
+  letter-spacing: 0.05em;       /* a bit of extra tracking */
+  font-size: 1rem;              /* tweak as you need */
+  font-style: italic;
+}
+    
   </style>
 </head>
 <body>
@@ -312,7 +321,7 @@
 
         // — Sections —
         for (const sec of ['assessment','evaluation']) {
-          const name = sec === 'assessment' ? 'Assessment' : 'Avaliação do Programa';
+          const name = sec === 'assessment' ? 'Assessment' : 'Evaluation';
           const total = countUnique(rows, sec);
           const numeric = rows.filter(d =>
             String(d.section||'').toLowerCase().includes(sec)
@@ -325,7 +334,7 @@
           ban.innerHTML = `
             <div class="header">
               <img src="mind4time-logo.png">
-              <div>${name}</div>
+              <div class="section-title">${name}</div>
             </div>
             <div class="content">
               <div class="banner">
@@ -347,7 +356,7 @@
             gp.innerHTML = `
               <div class="header">
                 <img src="mind4time-logo.png">
-                <div>${name}</div>
+                <div class="section-title">${name}</div>
               </div>
               <div class="content">
                 <div class="chart-fullpage">
@@ -378,7 +387,7 @@
               gp2.innerHTML = `
                 <div class="header">
                   <img src="mind4time-logo.png">
-                  <div>${name}</div>
+                  <div class="section-title">${name}</div>
                 </div>
                 <div class="content">
                   <div class="chart-grid">${boxes}</div>
@@ -416,7 +425,7 @@
               tp.innerHTML = `
                 <div class="header">
                   <img src="mind4time-logo.png">
-                  <div>${name}</div>
+                  <div class="section-title">${name}</div>
                 </div>
                 <div class="content">
                   <div class="text-page">

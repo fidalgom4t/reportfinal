@@ -214,16 +214,19 @@
         }]
       });
       chart.resize();
-      setTimeout(() => chart.resize(), 300);
+      // in case container changes size
+      setTimeout(()=>chart.resize(), 300);
     }
 
     // 3) Build the report DOM ----------------------------------------------
     async function build() {
+      // Load filters + data + meta
       const filters = JSON.parse(localStorage.getItem('reportFilters') || '{}');
       const [data, meta] = await Promise.all([
         fetch('data.json').then(r=>r.json()),
         fetch('meta.json').then(r=>r.json())
       ]);
+
       const labelMap = createLabelMap(meta.labels);
       const orderMap = createSortMap(meta.labels);
       const reportRoot = document.getElementById('report');
@@ -237,9 +240,13 @@
         timeScope = `${s.month} – ${e.month} ${e.year}`;
       }
 
+      // Loop each selected program
       for (const prog of filters.programs || []) {
+        // Determine which turmas to include for this program
         const turKey = `turmas_${prog}`;
         const selTurmas = filters[turKey] || [];
+
+        // Filter data rows
         const rows = data.filter(d =>
           (filters.clients||[]).includes(d.client) &&
           d.program === prog &&
@@ -247,7 +254,7 @@
         );
         const progMeta = meta.titles.find(t=>t.program_id===prog) || {};
 
-        // Hero page
+        // --- Hero page
         const hero = document.createElement('div');
         hero.className = 'page hero';
         hero.innerHTML = `
@@ -274,91 +281,108 @@
         // Two sections: assessment & evaluation
         for (const sectionKey of ['assessment','evaluation']) {
           const sectionName = sectionKey==='assessment' ? 'Assessment' : 'Avaliação do Programa';
+
+          // Count unique respondents
           const totalResponses = countUnique(rows, sectionKey);
+
+          // Numeric rows
           const numericRows = rows.filter(d =>
             String(d.section||'').toLowerCase().includes(sectionKey) &&
             /^\d+(\.\d+)?$/.test(String(d.value).trim())
           );
           const byTurma = Object.entries(groupBy(numericRows, 'turma'));
 
-          // Banner
+          // --- Banner page
           const banner = document.createElement('div');
           banner.className = 'page banner';
           banner.innerHTML = `
-            <div class="header"><img src="mind4time-logo.png"><div></div></div>
+            <div class="header">
+              <img src="mind4time-logo.png"><div></div>
+            </div>
             <div class="banner-box">
               <h1>${sectionName}</h1>
               <div class="meta">
                 <div><span>Total de respostas:</span><strong>${totalResponses}</strong></div>
               </div>
             </div>
-            <div class="footer"><div>www.MIND4TIME.com</div><div>© MIND4TIME ${currentYear}</div></div>`;
+            <div class="footer">
+              <div>www.MIND4TIME.com</div>
+              <div>© MIND4TIME ${currentYear}</div>
+            </div>`;
           reportRoot.appendChild(banner);
 
-          // Global chart
+          // --- Global chart page
           if (numericRows.length) {
-            const gl = document.createElement('div');
-            gl.className = 'page chart-fullpage';
-            gl.innerHTML = `
+            const globalPage = document.createElement('div');
+            globalPage.className = 'page chart-fullpage';
+            globalPage.innerHTML = `
               <div class="header"><img src="mind4time-logo.png"><div></div></div>
               <div class="chart-full" id="chart-global-${prog}-${sectionKey}"></div>
               <div class="footer"><div>www.MIND4TIME.com</div><div>© MIND4TIME ${currentYear}</div></div>`;
-            reportRoot.appendChild(gl);
+            reportRoot.appendChild(globalPage);
             createBarChart(
-              gl.querySelector('.chart-full'),
+              globalPage.querySelector('.chart-full'),
               `Global (${sectionName})`,
-              computeAverages(numericRows,labelMap,orderMap),
+              computeAverages(numericRows, labelMap, orderMap),
               sectionKey==='evaluation'
             );
           }
 
-          // Per-turma charts
+          // --- Per-turma grid pages
           if (byTurma.length > 1) {
             for (let i = 0; i < byTurma.length; i += 4) {
-              const gp = document.createElement('div');
-              gp.className = 'page chart-grid';
-              gp.innerHTML = `<div class="header"><img src="mind4time-logo.png"><div></div></div>`;
-              byTurma.slice(i,i+4).forEach(([,vals],j)=>{
-                gp.innerHTML += `<div class="chart-box" id="chart-${prog}-${sectionKey}-${i+j}"></div>`;
+              const gridPage = document.createElement('div');
+              gridPage.className = 'page chart-grid';
+              gridPage.innerHTML = `<div class="header"><img src="mind4time-logo.png"><div></div></div>`;
+              byTurma.slice(i, i+4).forEach(([, vals], idx) => {
+                gridPage.innerHTML += `<div class="chart-box" id="chart-${prog}-${sectionKey}-${i+idx}"></div>`;
               });
-              gp.innerHTML += `<div class="footer"><div>www.MIND4TIME.com</div><div>© MIND4TIME ${currentYear}</div></div>`;
-              reportRoot.appendChild(gp);
-              byTurma.slice(i,i+4).forEach(([,vals],j)=>{
+              gridPage.innerHTML += `<div class="footer"><div>www.MIND4TIME.com</div><div>© MIND4TIME ${currentYear}</div></div>`;
+              reportRoot.appendChild(gridPage);
+
+              byTurma.slice(i, i+4).forEach(([, vals], idx) => {
                 createBarChart(
-                  document.getElementById(`chart-${prog}-${sectionKey}-${i+j}`),
-                  byTurma[i+j][0],
-                  computeAverages(vals,labelMap,orderMap),
+                  document.getElementById(`chart-${prog}-${sectionKey}-${i+idx}`),
+                  byTurma[i+idx][0],
+                  computeAverages(vals, labelMap, orderMap),
                   sectionKey==='evaluation'
                 );
               });
             }
           }
 
-          // Text answers — **12 per page** now
+          // --- Text answers (only selected questions)
           const selectedQs = filters.textQuestions || [];
-          selectedQs.forEach(qid => {
-            const answers = rows.filter(d=>
-              String(d.section||'').toLowerCase().includes(sectionKey) &&
-              d.question===qid && isNaN(+d.value)
-            );
-            if (!answers.length) return;
+          if (selectedQs.length) {
+            selectedQs.forEach(questionId => {
+              const answers = rows.filter(d =>
+                String(d.section||'').toLowerCase().includes(sectionKey) &&
+                d.question === questionId &&
+                isNaN(+d.value)
+              );
+              if (!answers.length) return;
 
-            for (let i = 0; i < answers.length; i += 12) {
-              const chunk = answers.slice(i, i + 12);
-              const tp = document.createElement('div');
-              tp.className = 'page text-page';
-              tp.innerHTML = `
-                <div class="header"><img src="mind4time-logo.png"><div></div></div>
-                <div class="text-question">
-                  ${i===0?`<div class="text-question-title">${qid}</div>`:''}
-                  <ul>
-                    ${chunk.map(a=>`<li>${a.value.replace(/\n/g,'</li><li>')}</li>`).join('')}
-                  </ul>
-                </div>
-                <div class="footer"><div>www.MIND4TIME.com</div><div>© MIND4TIME ${currentYear}</div></div>`;
-              reportRoot.appendChild(tp);
-            }
-          });
+              // Paginate 12 answers per page
+              for (let i = 0; i < answers.length; i += 12) {
+                const chunk = answers.slice(i, i+12);
+                const textPage = document.createElement('div');
+                textPage.className = 'page text-page';
+                const titleHTML = i===0
+                  ? `<div class="text-question-title">${questionId}</div>`
+                  : '';
+                textPage.innerHTML = `
+                  <div class="header"><img src="mind4time-logo.png"><div></div></div>
+                  <div class="text-question">
+                    ${titleHTML}
+                    <ul>
+                      ${chunk.map(a => `<li>${a.value.replace(/\n/g,'</li><li>')}</li>`).join('')}
+                    </ul>
+                  </div>
+                  <div class="footer"><div>www.MIND4TIME.com</div><div>© MIND4TIME ${currentYear}</div></div>`;
+                reportRoot.appendChild(textPage);
+              }
+            });
+          }
 
         } // end section loop
       } // end program loop
@@ -370,23 +394,24 @@
       const pages = Array.from(document.querySelectorAll('.page'));
       const images = [];
       for (const pg of pages) {
-        const canvas = await html2canvas(pg,{backgroundColor:'#fff',scale:2});
+        const canvas = await html2canvas(pg, { backgroundColor: '#fff', scale: 2 });
         images.push(canvas.toDataURL());
       }
-      pdfMake.createPdf({
-        pageSize:'A4',
-        pageOrientation:'landscape',
-        pageMargins:[0,0,0,0],
-        content: images.map((img,idx)=>({
+      const docDefinition = {
+        pageSize: 'A4',
+        pageOrientation: 'landscape',
+        pageMargins: [0,0,0,0],
+        content: images.map((img, idx) => ({
           image: img,
           width: 842,
-          pageBreak: idx<images.length-1?'after':undefined
+          pageBreak: idx < images.length - 1 ? 'after' : undefined
         }))
-      }).download('report.pdf');
+      };
+      pdfMake.createPdf(docDefinition).download('report.pdf');
     }
 
-    // 5) Init ---------------------------------------------------------------
-    document.addEventListener('DOMContentLoaded',()=>{
+    // 5) Init ----------------------------------------------------------------
+    document.addEventListener('DOMContentLoaded', () => {
       build();
       document.getElementById('gerar-pdf').addEventListener('click', generatePdf);
     });

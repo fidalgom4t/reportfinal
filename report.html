@@ -13,126 +13,129 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.7/pdfmake.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.7/vfs_fonts.js"></script>
- <style>
-    html, body {
-      margin: 0; padding: 0; height: 100%;
-      font-family: 'Roboto', sans-serif;
-    }
-    @page { size: 960px 540px; margin: 0; }
-    @media print { .page { page-break-after: always; } }
+<style>
+  /* Base reset & background so you can see the page frames */
+  html, body {
+    margin: 0; padding: 0;
+    background: #333;
+    font-family: 'Roboto', sans-serif;
+  }
 
-    /* 960×540 pages */
-    .page {
-      position: relative;
-      width: 960px;
-      aspect-ratio: 16/9;
-      margin: 20px auto;
-      padding: 80px 0 60px;
-      box-sizing: border-box;
-      background: #fff;
-      overflow: visible;
-    }
+  /* Define print page size exactly */
+  @page { size: 960px 540px; margin: 0; }
+  @media print { .page { page-break-after: always; } }
 
-    /* Header & footer */
-    .header, .footer {
-      position: absolute;
-      left: 0; right: 0;
-      display: flex; justify-content: space-between; align-items: center;
-      background: #fff; padding: 0 30px; z-index: 2;
-    }
-    .header {
-      top: 0; height: 80px; border-bottom: 1px solid #40a3a3;
-    }
-    .header img { height: 60px; }
-    .footer {
-      bottom: 0; height: 60px;
-      border-top: 1px solid #40a3a3;
-      color: #007c91; font-size: 14px;
-    }
+  /* The page container */
+  .page {
+    position: relative;
+    width: 960px;
+    height: 540px;
+    margin: 20px auto;
+    background: #fff;
+    box-sizing: border-box;
+    overflow: hidden;
+  }
 
-    /* Hero */
-    .hero {
-      position: relative;
-      width: 100%; height: calc(100% - 140px);
-      display: flex; align-items: center; justify-content: center; text-align: center;
-      color: #fff;
-      overflow: hidden;
-    }
-    .hero .bg {
-      position: absolute; top: 0; left: 0;
-      width: 100%; height: 100%; object-fit: cover; z-index: 0;
-    }
-    .hero-content {
-      position: relative; z-index: 1;
-      max-width: 80%; display: flex; flex-direction: column; align-items: center;
-    }
-    .hero-content small {
-      font-style: italic; color: #e0f2f3; font-size: 1.2rem; margin-bottom: 8px;
-    }
-    .hero-content h1 { font-size: 4rem; margin: 0; font-weight: 600; }
-    .hero-content .subtitle { font-size: 1.8rem; margin-top: 12px; }
-    .hero-content .meta {
-      margin-top: 24px; display: flex; gap: 40px; justify-content: center; font-size: 1.2rem;
-    }
-    .hero-content .meta span { font-style: italic; color: #e0f2f3; }
-    .hero-content .meta strong { color: #fff; font-weight: 600; }
+  /* Header & footer bars */
+  .header, .footer {
+    position: absolute; left: 0; right: 0;
+    display: flex; justify-content: space-between; align-items: center;
+    background: #fff; padding: 0 30px; z-index: 10;
+  }
+  .header {
+    top: 0; height: 80px; border-bottom: 1px solid #40a3a3;
+  }
+  .header img {
+    height: 60px;
+  }
+  .footer {
+    bottom: 0; height: 60px; border-top: 1px solid #40a3a3;
+    color: #007c91; font-size: 14px;
+  }
 
-    /* Banner */
-    .banner {
-      position: relative;
-      width: 100%; height: calc(100% - 140px);
-      display: flex; align-items: center; justify-content: center;
-    }
-    .banner-box {
-      background: #f0f8f9; padding: 40px 60px;
-      border-left: 6px solid #007c91; box-shadow: 0 2px 6px rgba(0,0,0,0.1);
-      width: 70%; box-sizing: border-box;
-    }
-    .banner-box h1 { margin: 0 0 16px; font-size: 48px; color: #007c91; }
-    .banner-box .meta { display: flex; gap: 40px; font-size: 18px; color: #555; }
+  /* Content area: exactly 960×400px between header & footer */
+  .page > .content {
+    position: absolute;
+    top: 80px; bottom: 60px; left: 0; right: 0;
+    overflow: hidden;
+    box-sizing: border-box;
+  }
 
-    /* Global chart */
-    .chart-fullpage {
-      position: relative;
-      width: 100%; height: calc(100% - 140px);
-      display: flex; align-items: center; justify-content: center;
-    }
-    .chart-full { width: 100%; height: 100%; }
+  /* Hero, Banner, Chart, Text all live inside .content */
+  .hero, .banner, .chart-fullpage, .chart-grid, .text-page {
+    width: 100%; height: 100%;
+    box-sizing: border-box;
+  }
 
-    /* 2‑chart grid */
-    .chart-grid {
-      position: relative;
-      width: 100%; height: calc(100% - 140px);
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      grid-template-rows: auto;
-      gap: 30px;
-      padding: 0 30px;
-      box-sizing: border-box;
-    }
-    .chart-box { width: 100%; height: 100%; }
+  /* Hero */
+  .hero .bg {
+    width: 100%; height: 100%; object-fit: cover;
+  }
+  .hero-content {
+    position: absolute; top: 0; left: 0; right: 0; bottom: 0;
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    color: #fff; text-align: center; padding: 0 30px;
+  }
+  .hero-content small { font-size: 1.2rem; margin-bottom: 8px; opacity: .8; }
+  .hero-content h1  { font-size: 3rem; margin: 0; }
+  .hero-content .subtitle { font-size: 1.4rem; margin-top: 12px; }
+  .hero-content .meta { margin-top: 20px; display: flex; gap: 30px; font-size: 1rem; }
+  .hero-content .meta span { opacity: .8; }
 
-    /* Text answers */
-    .text-page { overflow: visible; }
-    .text-question {
-      border: 1px solid #007c91; border-left: 6px solid #007c91;
-      background: #f9f9f9; padding: 24px 32px;
-      width: 80%; margin: 80px auto; box-sizing: border-box;
-      page-break-inside: avoid; break-inside: avoid;
-    }
-    .text-question-title {
-      font-size: 18px; font-weight: bold; margin-bottom: 12px; color: #007c91;
-    }
-    .text-question ul { padding-left: 20px; font-size: 16px; line-height: 1.8; }
-    .text-question li { margin-bottom: 12px; }
+  /* Banner */
+  .banner {
+    display: flex; align-items: center; justify-content: center;
+  }
+  .banner-box {
+    background: #f0f8f9; padding: 30px 50px;
+    border-left: 6px solid #007c91; box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+    width: 70%;
+  }
+  .banner-box h1 { font-size: 2.5rem; margin-bottom: 12px; }
+  .banner-box .meta { font-size: 1rem; }
 
-    /* PDF button */
-    #gerar-pdf {
-      position: fixed; top: 10px; right: 10px; z-index: 1000;
-      padding: 10px 20px; background: #007c91; color: #fff;
-      border: none; border-radius: 4px; cursor: pointer;
-    }
-  </style>
+  /* Single global chart */
+  .chart-fullpage {
+    display: flex; align-items: center; justify-content: center;
+  }
+  .chart-full {
+    width: calc(100% - 40px);   /* leave some padding if desired */
+    height: calc(100% - 40px);
+  }
+
+  /* 2‑chart grid */
+  .chart-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    grid-template-rows: 1fr;
+    gap: 20px;
+    padding: 20px;
+  }
+  .chart-box {
+    width: 100%; height: 100%;
+  }
+
+  /* Text answers */
+  .text-page {
+    overflow-y: auto; padding: 20px;
+  }
+  .text-question {
+    border: 1px solid #007c91; border-left: 6px solid #007c91;
+    background: #f9f9f9; padding: 20px;
+    margin-bottom: 20px; box-sizing: border-box;
+  }
+  .text-question-title { font-size: 1.2rem; margin-bottom: 8px; }
+  .text-question ul { padding-left: 16px; font-size: 1rem; line-height: 1.6; }
+  .text-question li { margin-bottom: 8px; }
+
+  /* PDF button */
+  #gerar-pdf {
+    position: fixed; top: 10px; right: 10px; z-index: 1000;
+    padding: 8px 16px; background: #007c91; color: #fff;
+    border: none; border-radius: 4px; cursor: pointer;
+  }
+</style>
+
 
 </head>
 <body>

@@ -79,50 +79,45 @@
 
   <script>
     let rawData = [];
-    function getStorageFilters(){ return JSON.parse(localStorage.getItem('filters')||'{}'); }
-    function saveFilter(k,v){ const f=getStorageFilters(); f[k]=v; localStorage.setItem('filters',JSON.stringify(f)); }
-    function loadFilter(k){ return getStorageFilters()[k]||[]; }
-    function getCheckedValues(id){ return Array.from(document.querySelectorAll(`#${id} input:checked`)).map(i=>i.value); }
-    function updateSelectBox(id,vals,ph){ const b=document.getElementById(id); b.textContent=vals.length? vals.join(', '):ph; }
+    const getStorageFilters = () => JSON.parse(localStorage.getItem('filters')||'{}');
+    const saveFilter = (k,v)=>{ const f=getStorageFilters(); f[k]=v; localStorage.setItem('filters',JSON.stringify(f)); };
+    const loadFilter = k=>getStorageFilters()[k]||[];
+    const getCheckedValues = id=>Array.from(document.querySelectorAll(`#${id} input:checked`)).map(i=>i.value);
+    const updateSelectBox = (id,vals,ph)=>{ const b=document.getElementById(id); b.textContent = vals.length? vals.join(', '): ph; };
+
     function populateCheckboxes({containerId,boxId,dataList,filterKey,placeholder,onChange}){
-      const cont=document.getElementById(containerId); cont.innerHTML='';
-      // select all
-      const allBtn=document.createElement('button'); allBtn.type='button'; allBtn.className='select-all'; allBtn.textContent='Selecionar tudo'; allBtn.onclick=e=>{ e.stopPropagation(); saveFilter(filterKey,dataList.slice()); onChange(); };
-      cont.appendChild(allBtn);
-      const stored=loadFilter(filterKey);
+      const cont = document.getElementById(containerId);
+      cont.innerHTML = '';
+      // select all / none
+      const allBtn = document.createElement('button'); allBtn.type='button'; allBtn.className='select-all'; allBtn.textContent='Selecionar tudo'; allBtn.onclick=e=>{e.stopPropagation(); saveFilter(filterKey,dataList.slice()); onChange();}; cont.appendChild(allBtn);
+      const noneBtn = document.createElement('button'); noneBtn.type='button'; noneBtn.className='select-all'; noneBtn.textContent='Desmarcar tudo'; noneBtn.onclick=e=>{e.stopPropagation(); saveFilter(filterKey,[]); onChange();}; cont.appendChild(noneBtn);
+      const stored = loadFilter(filterKey);
       dataList.forEach(item=>{
-        const lbl=document.createElement('label');
-        const cb=document.createElement('input'); cb.type='checkbox'; cb.value=item; cb.checked=stored.includes(item);
-        cb.onchange=()=>{ const sel=getCheckedValues(containerId); saveFilter(filterKey,sel); onChange(); };
-        lbl.append(cb,' '+item); cont.appendChild(lbl);
+        const lbl = document.createElement('label');
+        const cb = document.createElement('input'); cb.type='checkbox'; cb.value=item; cb.checked=stored.includes(item);
+        cb.onchange = ()=>{ const sel = getCheckedValues(containerId); saveFilter(filterKey,sel); onChange(); };
+        lbl.append(cb, ' '+item);
+        cont.appendChild(lbl);
       });
       updateSelectBox(boxId,stored,placeholder);
     }
+
     function toggleDropdown(id){ document.querySelectorAll('.dropdown-multiselect').forEach(el=>el.id!==id&&el.classList.remove('open')); document.getElementById(id).classList.toggle('open'); }
-    function attachDropdownEvents(){ ['client','clientInfo','program','turma','text'].forEach(k=>{ const w=document.getElementById(k+'Wrapper'), b=w.querySelector('.select-box'); b.onclick=()=>toggleDropdown(k+'Wrapper'); }); document.addEventListener('click',e=>{ if(!e.target.closest('.dropdown-multiselect')) document.querySelectorAll('.dropdown-multiselect').forEach(el=>el.classList.remove('open')); }); }
+    function attachDropdownEvents(){ ['client','clientInfo','program','turma','text'].forEach(k=>{ const w=document.getElementById(k+'Wrapper'), b=w.querySelector('.select-box'); b.onclick=e=>{e.stopPropagation(); toggleDropdown(k+'Wrapper');}; }); document.addEventListener('click', e=>{ if(!e.target.closest('.dropdown-multiselect')) document.querySelectorAll('.dropdown-multiselect').forEach(el=>el.classList.remove('open')); }); }
+
     function populateClients(){ const arr=[...new Set(rawData.map(d=>d.client))].sort(); populateCheckboxes({containerId:'clientChecks',boxId:'clientBox',dataList:arr,filterKey:'clients',placeholder:'Selecionar cliente(s)',onChange:refreshAll}); }
     function populateClientInfos(){ const sel=loadFilter('clients'); const arr=[...new Set(rawData.filter(d=>sel.includes(d.client)).map(d=>d.client_info))].sort(); populateCheckboxes({containerId:'clientInfoChecks',boxId:'clientInfoBox',dataList:arr,filterKey:'clientInfos',placeholder:'Selecionar info(s)',onChange:refreshAll}); }
     function populatePrograms(){ const sel=loadFilter('clients'); const arr=[...new Set(rawData.filter(d=>sel.includes(d.client)).map(d=>d.program))].sort(); populateCheckboxes({containerId:'programChecks',boxId:'programBox',dataList:arr,filterKey:'programs',placeholder:'Selecionar programa(s)',onChange:refreshAll}); }
     function populateTurmas(){ const {clients=[],clientInfos=[],programs=[]}=getStorageFilters(); const arr=[...new Set(rawData.filter(d=>clients.includes(d.client)&&clientInfos.includes(d.client_info)&&programs.includes(d.program)).map(d=>d.turma))].sort(); populateCheckboxes({containerId:'turmaChecks',boxId:'turmaBox',dataList:arr,filterKey:'turmas',placeholder:'Selecionar turma(s)',onChange:refreshAll}); }
-    function populateTextQuestions(){ const {clients=[],programs=[],turmas=[]}=getStorageFilters(); const arr=[...new Set(rawData.filter(d=>clients.includes(d.client)&&programs.includes(d.program)&&turmas.includes(d.turma)&&isNaN(+d.value)).map(d=>d.question))].sort(); populateCheckboxes({containerId:'textChecks',boxId:'textBox',dataList:arr,filterKey:'textQuestions',placeholder:'Selecionar perguntas',onChange:refreshAll}); }
-    function renderTrainerInputs(){ const cont=document.getElementById('trainersContainer'); cont.innerHTML=''; const progs=loadFilter('programs'); const saved=getStorageFilters().trainers||{}; progs.forEach(p=>{ const w=document.createElement('div'); w.className='program-trainer'; const lbl=document.createElement('label'); lbl.textContent=`Formador (${p}):`; const inp=document.createElement('input'); inp.type='text'; inp.placeholder=`Nome do formador para ${p}`; inp.value=saved[p]||''; inp.oninput=()=>{ saved[p]=inp.value; localStorage.setItem('filters',JSON.stringify({...getStorageFilters(),trainers:saved})); }; w.append(lbl,inp); cont.appendChild(w); }); }
-    function refreshAll(){ populateClientInfos(); populatePrograms(); populateTurmas(); populateTextQuestions(); renderTrainerInputs(); }
-    function initFilters(){ fetch('data.json').then(r=>r.json()).then(data=>{ rawData=data; populateClients(); attachDropdownEvents(); refreshAll(); const {start,end}=getStorageFilters(); if(start)document.getElementById('startMonth').value=start; if(end)document.getElementById('endMonth').value=end; document.getElementById('startMonth').onchange=e=>saveFilter('start',e.target.value); document.getElementById('endMonth').onchange=e=>saveFilter('end',e.target.value); // Report button events
-          document
-            .getElementById('viewReport')
-            .addEventListener('click', () => {
-              // Ensure textQuestions reflect current UI selection
-              saveFilter('textQuestions', getCheckedValues('textChecks'));
-              navigateToReport(false);
-            });
+    function populateTextQuestions(){ const {clients=[],programs=[],turmas=[]}=getStorageFilters(); const qMap={}; rawData.forEach(d=>{ if(clients.includes(d.client)&&programs.includes(d.program)&&turmas.includes(d.turma)&&isNaN(+d.value)){ const sec=(d.section||'').toLowerCase(); const pr=sec.includes('assessment')?0:sec.includes('evaluation')?1:2; if(!qMap[d.question]||qMap[d.question]>pr) qMap[d.question]=pr; }}); const arr=Object.keys(qMap).sort((a,b)=>qMap[a]-qMap[b]||a.localeCompare(b,'pt')); populateCheckboxes({containerId:'textChecks',boxId:'textBox',dataList:arr,filterKey:'textQuestions',placeholder:'Selecionar perguntas',onChange:refreshAll}); }
 
-          document
-            .getElementById('downloadReport')
-            .addEventListener('click', () => {
-              saveFilter('textQuestions', getCheckedValues('textChecks'));
-              navigateToReport(true);
-            }); document.getElementById('downloadReport').onclick=()=>navigateToReport(true); }); }
-    function navigateToReport(download){ const f={...getStorageFilters(),trainers:getStorageFilters().trainers||{}}; localStorage.setItem('reportFilters',JSON.stringify(f)); window.location.href=`report.html${download?'?download=true':''}`; }
+    function renderTrainerInputs(){ const cont=document.getElementById('trainersContainer'); cont.innerHTML=''; const progs=loadFilter('programs'); const saved=getStorageFilters().trainers||{}; progs.forEach(p=>{ const w=document.createElement('div'); w.className='program-trainer'; const lbl=document.createElement('label'); lbl.textContent=`Formador (${p}):`; const inp=document.createElement('input'); inp.type='text'; inp.placeholder=`Nome do formador para ${p}`; inp.value=saved[p]||''; inp.oninput=()=>{ saved[p]=inp.value; localStorage.setItem('filters',JSON.stringify({...getStorageFilters(),trainers:saved})); }; w.append(lbl,inp); cont.appendChild(w); }); }
+
+    function refreshAll(){ populateClientInfos(); populatePrograms(); populateTurmas(); populateTextQuestions(); renderTrainerInputs(); }
+
+    function initFilters(){ fetch('data.json').then(r=>r.json()).then(data=>{ rawData=data; populateClients(); attachDropdownEvents(); refreshAll(); const {start,end}=getStorageFilters(); if(start)document.getElementById('startMonth').value=start; if(end)document.getElementById('endMonth').value=end; document.getElementById('startMonth').onchange=e=>saveFilter('start',e.target.value); document.getElementById('endMonth').onchange=e=>saveFilter('end',e.target.value); document.getElementById('viewReport').onclick=()=>{ saveFilter('textQuestions', getCheckedValues('textChecks')); navigateToReport(false); }; document.getElementById('downloadReport').onclick=()=>{ saveFilter('textQuestions', getCheckedValues('textChecks')); navigateToReport(true); }; }); }
+
+    function navigateToReport(download){ const f={...getStorageFilters(),trainers: getStorageFilters().trainers||{}}; localStorage.setItem('reportFilters',JSON.stringify(f)); window.location.href=`report.html${download?'?download=true':''}`; }
     document.addEventListener('DOMContentLoaded',initFilters);
   </script>
 </body>

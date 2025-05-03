@@ -1,0 +1,420 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+  <meta charset="UTF-8"/>
+  <title>Training Report</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+
+  <!-- Roboto & ECharts -->
+  <link href="https://fonts.googleapis.com/css?family=Roboto:400,500,700&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/echarts@5/dist/echarts.min.js"></script>
+
+  <!-- html2canvas & pdfMake -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.7/pdfmake.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.7/vfs_fonts.js"></script>
+
+  <style>
+    html, body {
+      margin: 0; padding: 0; height: 100%;
+      font-family: 'Roboto', sans-serif;
+    }
+    @page { size: 11in 8.5in; margin: 0; }
+    @media print { .page { page-break-after: always; } }
+
+    .page {
+      position: relative;
+      aspect-ratio: 297/210;
+      width: 100vw;
+      box-sizing: border-box;
+      padding: 80px 0 60px;
+      background: #fff;
+      overflow: visible;
+    }
+    .header, .footer {
+      position: absolute;
+      left: 0; right: 0;
+      display: flex; justify-content: space-between; align-items: center;
+      background: #fff; padding: 0 30px; z-index: 2;
+    }
+    .header {
+      top: 0; height: 80px; border-bottom: 1px solid #40a3a3;
+    }
+    .header img { height: 60px; }
+    .footer {
+      bottom: 0; height: 60px;
+      border-top: 1px solid #40a3a3;
+      color: #007c91; font-size: 14px;
+    }
+
+    /* Hero */
+    .hero {
+      position: relative;
+      display: flex; align-items: center; justify-content: center; text-align: center;
+      color: #fff;
+    }
+    .hero .bg {
+      position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+      object-fit: cover; z-index: 0;
+    }
+    .hero-content {
+      position: relative; z-index: 1;
+      max-width: 80%; display: flex; flex-direction: column; align-items: center;
+    }
+    .hero-content small {
+      font-style: italic; color: #e0f2f3; font-size: 1.2rem; margin-bottom: 8px;
+    }
+    .hero-content h1 { font-size: 4rem; margin: 0; font-weight: 600; }
+    .hero-content .subtitle { font-size: 1.8rem; margin-top: 12px; }
+    .hero-content .meta {
+      margin-top: 24px; display: flex; gap: 40px; justify-content: center; font-size: 1.2rem;
+    }
+    .hero-content .meta span { font-style: italic; color: #e0f2f3; }
+    .hero-content .meta strong { color: #fff; font-weight: 600; }
+
+    /* Banner */
+    .banner { display: flex; align-items: center; justify-content: center; }
+    .banner-box {
+      background: #f0f8f9; padding: 40px 60px;
+      border-left: 6px solid #007c91;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+      width: 70%;
+    }
+    .banner-box h1 { margin: 0 0 16px; font-size: 48px; color: #007c91; }
+    .banner-box .meta { display: flex; gap: 40px; font-size: 18px; color: #555; }
+
+    /* Charts */
+    .chart-fullpage {
+      display: flex; align-items: center; justify-content: center;
+    }
+    .chart-full { width: 90vw; height: 80vh; }
+    .chart-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      grid-template-rows: repeat(2, auto);
+      gap: 30px;
+      padding: 100px;
+      box-sizing: border-box;
+    }
+    .chart-box { width: 100%; height: 100%; }
+
+    /* Text answers */
+    .text-page { overflow: visible; }
+    .text-question {
+      border: 1px solid #007c91; border-left: 6px solid #007c91;
+      background: #f9f9f9; padding: 24px 32px;
+      width: 80vw; margin: 80px auto;
+      page-break-inside: avoid; break-inside: avoid;
+    }
+    .text-question-title { font-size: 18px; font-weight: bold; margin-bottom: 12px; color: #007c91; }
+    .text-question ul { padding-left: 20px; font-size: 16px; line-height: 1.8; }
+    .text-question li { margin-bottom: 12px; }
+
+    /* PDF button */
+    #gerar-pdf {
+      position: fixed; top: 10px; right: 10px; z-index: 1000;
+      padding: 10px 20px; background: #007c91; color: #fff;
+      border: none; border-radius: 4px; cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+  <button id="gerar-pdf">Gerar Relatório (PDF)</button>
+  <div id="report"></div>
+
+  <script>
+    const currentYear = new Date().getFullYear();
+
+    // 1) Data helpers --------------------------------------------------------
+    function createLabelMap(labels) {
+      const map = {};
+      labels.forEach(l => {
+        const key = l.questionId || l['QUESTION ID'];
+        map[key] = l.label || l['LABEL'];
+      });
+      return map;
+    }
+    function createSortMap(labels) {
+      const map = {};
+      labels.forEach(l => {
+        const key = l.questionId || l['QUESTION ID'];
+        map[key] = +(l.sortOrder || l['SORT ORDER'] || l.sort_order);
+      });
+      return map;
+    }
+    function groupBy(array, prop) {
+      return array.reduce((acc, item) => {
+        (acc[item[prop]] ||= []).push(item);
+        return acc;
+      }, {});
+    }
+    function computeAverages(rows, labelMap, orderMap) {
+      const grouped = {};
+      rows.forEach(r => {
+        (grouped[r.question] ||= []).push(+r.value);
+      });
+      return Object.entries(grouped)
+        .map(([q, vals]) => ({
+          question: q,
+          label: labelMap[q] || q,
+          avg: +(vals.reduce((a,b)=>a+b)/vals.length).toFixed(1)
+        }))
+        .sort((a,b) => (orderMap[a.question]||0) - (orderMap[b.question]||0));
+    }
+    function countUnique(rows, sectionKey) {
+      return new Set(
+        rows
+          .filter(r => String(r.section||'').toLowerCase().includes(sectionKey))
+          .map(r => r.respondent_id || r.id)
+      ).size;
+    }
+    function formatMonthYear(value) {
+      const names = {
+        '01':'janeiro','02':'fevereiro','03':'março','04':'abril',
+        '05':'maio','06':'junho','07':'julho','08':'agosto',
+        '09':'setembro','10':'outubro','11':'novembro','12':'dezembro'
+      };
+      const [y,m] = value.split('-');
+      return { month: names[m], year: y };
+    }
+
+    // 2) Chart builder ------------------------------------------------------
+    function createBarChart(container, title, data, uniform) {
+      const chart = echarts.init(container);
+      chart.setOption({
+        title: { text: title, left: 'center', textStyle: { fontSize: 20 } },
+        grid: { top: 80, left: '10%', right: '10%', bottom: 100 },
+        tooltip: {},
+        xAxis: {
+          type: 'category',
+          data: data.map(d => d.label),
+          axisLabel: { rotate: 30, interval: 0 }
+        },
+        yAxis: {
+          type: 'value', min: 0, max: 5,
+          splitLine: { show: false },
+          axisLine: { show: false },
+          axisTick: { show: false },
+          axisLabel: { show: false }
+        },
+        series: [{
+          type: 'bar',
+          data: data.map(d => d.avg),
+          label: { show: true, position: 'top', formatter: '{c}' },
+          itemStyle: uniform
+            ? { color: '#6A99D0' }
+            : {
+                color: params => {
+                  const v = params.value;
+                  if (v < 3) return '#EA3323';
+                  if (v < 4) return '#6A99D0';
+                  return '#9FCE63';
+                }
+              }
+        }]
+      });
+      chart.resize();
+      // in case container changes size
+      setTimeout(()=>chart.resize(), 300);
+    }
+
+    // 3) Build the report DOM ----------------------------------------------
+    async function build() {
+      // Load filters + data + meta
+      const filters = JSON.parse(localStorage.getItem('reportFilters') || '{}');
+      const [data, meta] = await Promise.all([
+        fetch('data.json').then(r=>r.json()),
+        fetch('meta.json').then(r=>r.json())
+      ]);
+
+      const labelMap = createLabelMap(meta.labels);
+      const orderMap = createSortMap(meta.labels);
+      const reportRoot = document.getElementById('report');
+      reportRoot.innerHTML = '';
+
+      // Format time scope
+      let timeScope = '';
+      if (filters.start && filters.end) {
+        const s = formatMonthYear(filters.start);
+        const e = formatMonthYear(filters.end);
+        timeScope = `${s.month} – ${e.month} ${e.year}`;
+      }
+
+      // Loop each selected program
+      for (const prog of filters.programs || []) {
+        // Determine which turmas to include for this program
+        const turKey = `turmas_${prog}`;
+        const selTurmas = filters[turKey] || [];
+
+        // Filter data rows
+        const rows = data.filter(d =>
+          (filters.clients||[]).includes(d.client) &&
+          d.program === prog &&
+          selTurmas.includes(d.turma)
+        );
+        const progMeta = meta.titles.find(t=>t.program_id===prog) || {};
+
+        // --- Hero page
+        const hero = document.createElement('div');
+        hero.className = 'page hero';
+        hero.innerHTML = `
+          <div class="header">
+            <img src="mind4time-logo.png">
+            <div></div>
+          </div>
+          <img class="bg" src="hourglass-bg.jpg">
+          <div class="hero-content">
+            <small>${progMeta.SUBTÍTULO||''}</small>
+            <h1>${progMeta.TÍTULO||prog}</h1>
+            <div class="subtitle">${progMeta.TAGLINE||''}</div>
+            <div class="meta">
+              <div><span>time scope</span><strong>${timeScope}</strong></div>
+              <div><span>trainers</span><strong>${(filters.trainers||{})[prog]||'N/A'}</strong></div>
+            </div>
+          </div>
+          <div class="footer">
+            <div>www.MIND4TIME.com</div>
+            <div>© MIND4TIME ${currentYear}</div>
+          </div>`;
+        reportRoot.appendChild(hero);
+
+        // Two sections: assessment & evaluation
+        for (const sectionKey of ['assessment','evaluation']) {
+          const sectionName = sectionKey==='assessment' ? 'Assessment' : 'Avaliação do Programa';
+
+          // Count unique respondents
+          const totalResponses = countUnique(rows, sectionKey);
+
+          // Numeric rows
+          const numericRows = rows.filter(d =>
+            String(d.section||'').toLowerCase().includes(sectionKey) &&
+            /^\d+(\.\d+)?$/.test(String(d.value).trim())
+          );
+          const byTurma = Object.entries(groupBy(numericRows, 'turma'));
+
+          // --- Banner page
+          const banner = document.createElement('div');
+          banner.className = 'page banner';
+          banner.innerHTML = `
+            <div class="header">
+              <img src="mind4time-logo.png"><div></div>
+            </div>
+            <div class="banner-box">
+              <h1>${sectionName}</h1>
+              <div class="meta">
+                <div><span>Total de respostas:</span><strong>${totalResponses}</strong></div>
+              </div>
+            </div>
+            <div class="footer">
+              <div>www.MIND4TIME.com</div>
+              <div>© MIND4TIME ${currentYear}</div>
+            </div>`;
+          reportRoot.appendChild(banner);
+
+          // --- Global chart page
+          if (numericRows.length) {
+            const globalPage = document.createElement('div');
+            globalPage.className = 'page chart-fullpage';
+            globalPage.innerHTML = `
+              <div class="header"><img src="mind4time-logo.png"><div></div></div>
+              <div class="chart-full" id="chart-global-${prog}-${sectionKey}"></div>
+              <div class="footer"><div>www.MIND4TIME.com</div><div>© MIND4TIME ${currentYear}</div></div>`;
+            reportRoot.appendChild(globalPage);
+            createBarChart(
+              globalPage.querySelector('.chart-full'),
+              `Global (${sectionName})`,
+              computeAverages(numericRows, labelMap, orderMap),
+              sectionKey==='evaluation'
+            );
+          }
+
+          // --- Per-turma grid pages
+          if (byTurma.length > 1) {
+            for (let i = 0; i < byTurma.length; i += 4) {
+              const gridPage = document.createElement('div');
+              gridPage.className = 'page chart-grid';
+              gridPage.innerHTML = `<div class="header"><img src="mind4time-logo.png"><div></div></div>`;
+              byTurma.slice(i, i+4).forEach(([, vals], idx) => {
+                gridPage.innerHTML += `<div class="chart-box" id="chart-${prog}-${sectionKey}-${i+idx}"></div>`;
+              });
+              gridPage.innerHTML += `<div class="footer"><div>www.MIND4TIME.com</div><div>© MIND4TIME ${currentYear}</div></div>`;
+              reportRoot.appendChild(gridPage);
+
+              byTurma.slice(i, i+4).forEach(([, vals], idx) => {
+                createBarChart(
+                  document.getElementById(`chart-${prog}-${sectionKey}-${i+idx}`),
+                  byTurma[i+idx][0],
+                  computeAverages(vals, labelMap, orderMap),
+                  sectionKey==='evaluation'
+                );
+              });
+            }
+          }
+
+          // --- Text answers (only selected questions)
+          const selectedQs = filters.textQuestions || [];
+          if (selectedQs.length) {
+            selectedQs.forEach(questionId => {
+              const answers = rows.filter(d =>
+                String(d.section||'').toLowerCase().includes(sectionKey) &&
+                d.question === questionId &&
+                isNaN(+d.value)
+              );
+              if (!answers.length) return;
+
+              // Paginate 32 answers per page
+              for (let i = 0; i < answers.length; i += 32) {
+                const chunk = answers.slice(i, i+32);
+                const textPage = document.createElement('div');
+                textPage.className = 'page text-page';
+                const titleHTML = i===0
+                  ? `<div class="text-question-title">${questionId}</div>`
+                  : '';
+                textPage.innerHTML = `
+                  <div class="header"><img src="mind4time-logo.png"><div></div></div>
+                  <div class="text-question">
+                    ${titleHTML}
+                    <ul>
+                      ${chunk.map(a => `<li>${a.value.replace(/\n/g,'</li><li>')}</li>`).join('')}
+                    </ul>
+                  </div>
+                  <div class="footer"><div>www.MIND4TIME.com</div><div>© MIND4TIME ${currentYear}</div></div>`;
+                reportRoot.appendChild(textPage);
+              }
+            });
+          }
+
+        } // end section loop
+      } // end program loop
+    }
+
+    // 4) PDF generation -----------------------------------------------------
+    async function generatePdf() {
+      await build();
+      const pages = Array.from(document.querySelectorAll('.page'));
+      const images = [];
+      for (const pg of pages) {
+        const canvas = await html2canvas(pg, { backgroundColor: '#fff', scale: 2 });
+        images.push(canvas.toDataURL());
+      }
+      const docDefinition = {
+        pageSize: 'A4',
+        pageOrientation: 'landscape',
+        pageMargins: [0,0,0,0],
+        content: images.map((img, idx) => ({
+          image: img,
+          width: 842,
+          pageBreak: idx < images.length - 1 ? 'after' : undefined
+        }))
+      };
+      pdfMake.createPdf(docDefinition).download('report.pdf');
+    }
+
+    // 5) Init ----------------------------------------------------------------
+    document.addEventListener('DOMContentLoaded', () => {
+      build();
+      document.getElementById('gerar-pdf').addEventListener('click', generatePdf);
+    });
+  </script>
+</body>
+</html>

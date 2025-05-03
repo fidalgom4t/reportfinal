@@ -1,385 +1,231 @@
 <!DOCTYPE html>
 <html lang="pt">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Relatório de Formação</title>
-  <script src="https://cdn.jsdelivr.net/npm/echarts@5"></script>
+  <meta charset="UTF-8" />
+  <title>Selecionar Filtros</title>
   <style>
-    body {
-      font-family: 'Segoe UI', sans-serif;
-      padding: 30px;
-      background-color: #fff;
-      color: #333;
-    }
-    header {
-      display: flex;
-      align-items: center;
-      border-bottom: 2px solid #007c91;
-      padding-bottom: 10px;
-      margin-bottom: 30px;
-    }
-    .logo-text {
-      font-size: 20px;
-      font-weight: bold;
-      color: #007c91;
-      margin-left: 15px;
-    }
-    .dropdown-multiselect {
-      position: relative;
-      display: inline-block;
-      width: 250px;
-      margin: 10px;
-    }
-    .dropdown-multiselect .select-box {
-      border: 1px solid #ccc;
-      padding: 5px;
-      cursor: pointer;
-      background: #fff;
-    }
-    .dropdown-multiselect .checkboxes {
-      display: none;
-      border: 1px solid #ccc;
-      position: absolute;
-      background-color: white;
-      z-index: 1;
-      max-height: 200px;
-      overflow-y: auto;
-      width: 100%;
-    }
-    .dropdown-multiselect.open .checkboxes {
-      display: block;
-    }
-    .chart-container {
-      width: 100%;
-      height: 400px;
-      margin-bottom: 40px;
-    }
-    .turma-title {
-      font-size: 18px;
-      font-weight: bold;
-      margin-top: 40px;
-      margin-bottom: 10px;
-      color: #007c91;
-    }
-    .text-question {
-      border: 1px solid #007c91;
-      border-left: 6px solid #007c91;
-      padding: 16px;
-      margin-bottom: 30px;
-      background: #f9f9f9;
-    }
-    .text-question-title {
-      font-weight: bold;
-      margin-bottom: 8px;
-      font-size: 16px;
-      color: #007c91;
-    }
-    .toggle-btns button {
-      margin: 5px;
-      padding: 8px 16px;
-      border: none;
-      background-color: #007c91;
-      color: #fff;
-      cursor: pointer;
-    }
-    .toggle-btns button.active {
-      background-color: #005c6b;
-    }
-    #executiveSummary {
-      display: flex;
-      flex-wrap: wrap;
-      justify-content: space-between;
-      padding: 20px;
-      border: 1px solid #ddd;
-      background: #f3fafa;
-      margin-top: 30px;
-      margin-bottom: 40px;
-      font-size: 16px;
-    }
-    .summary-item {
-      flex: 1 1 200px;
-      margin: 10px;
-    }
-    .summary-label {
-      font-weight: bold;
-      color: #007c91;
-    }
-    .summary-value {
-      font-size: 20px;
-      margin-top: 4px;
-    }
+    /* General styling */
+    body { font-family: 'Segoe UI', sans-serif; background:#f5f5f5; margin:40px auto; max-width:800px; padding:0 20px; }
+    h2 { text-align:center; color:#007c91; margin-bottom:24px; }
+    form { display:grid; grid-template-columns:200px 1fr; gap:20px; align-items:center; }
+    label { font-weight:bold; }
+
+    /* Dropdown Multiselect */
+    .dropdown-multiselect { position:relative; width:100%; }
+    .select-box { background:#fff; border:1px solid #ccc; border-radius:4px; padding:8px 12px; cursor:pointer; position:relative; user-select:none; }
+    .select-box::after { content:'▾'; position:absolute; right:12px; top:50%; transform:translateY(-50%); color:#666; font-size:12px; }
+    .checkboxes { display:none; position:absolute; top:calc(100% + 4px); width:100%; max-height:180px; overflow-y:auto; background:#fff; border:1px solid #ccc; border-radius:4px; padding:8px; box-shadow:0 2px 6px rgba(0,0,0,0.1); z-index:10; }
+    .dropdown-multiselect.open .checkboxes { display:block; }
+    .checkboxes label { display:flex; align-items:center; margin-bottom:6px; cursor:pointer; }
+    .checkboxes input { margin-right:8px; }
+    .select-all { background:none; border:none; color:#007c91; cursor:pointer; display:block; margin-bottom:8px; padding:0; text-align:left; width:100%; font-size:0.9em; }
+
+    /* Program-specific blocks */
+    .program-block { grid-column: span 2; border:1px solid #ddd; padding:16px; border-radius:4px; background:#fff; margin-top:20px; }
+    .program-header { font-size:1.1em; margin-bottom:12px; color:#007c91; }
+    .program-grid { display:grid; grid-template-columns:200px 1fr; gap:10px 20px; align-items:center; }
+
+    /* Buttons */
+    .submit-row { grid-column:span 2; text-align:center; margin-top:30px; }
+    .link-button { background:#007c91; color:#fff; padding:10px 30px; border-radius:4px; text-decoration:none; font-weight:bold; margin:0 10px; display:inline-block; }
   </style>
 </head>
 <body>
-  <header>
-    <img src="logo.png" alt="Logo" height="50">
-    <div class="logo-text">MIND4TIME<br><span style="font-weight: normal; font-size: 14px;">Productivity Consulting</span></div>
-  </header>
+  <h2>Gerar Relatório Dinâmico</h2>
+  <form id="filtersForm" onsubmit="return false;">
+    <label>Cliente:</label>
+    <div class="dropdown-multiselect" id="clientWrapper">
+      <div class="select-box" id="clientBox" data-placeholder="Selecionar cliente(s)">Selecionar cliente(s)</div>
+      <div class="checkboxes" id="clientChecks"></div>
+    </div>
 
-  <h1>Relatório de Formação</h1>
+    <label>Cliente Info:</label>
+    <div class="dropdown-multiselect" id="clientInfoWrapper">
+      <div class="select-box" id="clientInfoBox" data-placeholder="Selecionar info(s)">Selecionar info(s)</div>
+      <div class="checkboxes" id="clientInfoChecks"></div>
+    </div>
 
-  <label>Cliente:</label>
-  <select id="clientSelect"></select>
+    <label>Programas:</label>
+    <div class="dropdown-multiselect" id="programWrapper">
+      <div class="select-box" id="programBox" data-placeholder="Selecionar programa(s)">Selecionar programa(s)</div>
+      <div class="checkboxes" id="programChecks"></div>
+    </div>
 
-  <label>Programa:</label>
-  <select id="programSelect"></select>
+    <label>Perguntas Abertas:</label>
+    <div class="dropdown-multiselect" id="textWrapper">
+      <div class="select-box" id="textBox" data-placeholder="Selecionar perguntas">Selecionar perguntas</div>
+      <div class="checkboxes" id="textChecks"></div>
+    </div>
 
-  <label>Turmas:</label>
-  <div class="dropdown-multiselect" id="turmaWrapper">
-    <div class="select-box" onclick="toggleDropdown('turmaWrapper')">Selecionar turmas</div>
-    <div class="checkboxes" id="turmaSelect"></div>
-  </div>
+    <!-- Container for dynamic per-program blocks -->
+    <div id="programsContainer"></div>
 
-  <label>Perguntas Abertas:</label>
-  <div class="dropdown-multiselect" id="textWrapper">
-    <div class="select-box" onclick="toggleDropdown('textWrapper')">Selecionar perguntas</div>
-    <div class="checkboxes" id="textQuestionSelect"></div>
-  </div>
-
-  <label>Formador:</label>
-  <input type="text" id="trainerInput" placeholder="Nome do formador" style="margin-bottom: 20px; padding: 5px; width: 250px;">
-
-  <div id="executiveSummary"></div>
-
-  <div class="toggle-btns">
-    <button onclick="setSection('assessment')" id="btn-assessment" class="active">Assessment</button>
-    <button onclick="setSection('evaluation')" id="btn-evaluation">Avaliação</button>
-  </div>
-
-  <div id="overallChart" class="chart-container"></div>
-  <div id="turmaCharts"></div>
-  <div id="textQuestions"></div>
+    <div class="submit-row">
+      <button type="button" class="link-button" id="viewReport">Ver Relatório</button>
+      <button type="button" class="link-button" id="downloadReport">Download Relatório</button>
+    </div>
+  </form>
 
   <script>
     let rawData = [];
-    let currentSection = 'assessment';
+    const getStorage = () => JSON.parse(localStorage.getItem('filters') || '{}');
+    const saveStorage = (key, val) => {
+      const s = getStorage(); s[key] = val; localStorage.setItem('filters', JSON.stringify(s));
+    };
+    const load = key => getStorage()[key] || [];
+    const getChecked = id => Array.from(document.querySelectorAll(`#${id} input:checked`)).map(i => i.value);
+    const updateBox = (boxId, values, placeholder) => {
+      const box = document.getElementById(boxId);
+      box.textContent = values.length ? values.join(', ') : placeholder;
+    };
 
-    fetch('data.json')
-      .then(res => res.json())
-      .then(data => {
-        rawData = data;
-        populateClientFilter();
-        applyFilters();
+    function populateCheckboxes({containerId, boxId, list, storageKey, placeholder, onChange}){
+      const cont = document.getElementById(containerId);
+      cont.innerHTML = '';
+      // Select all / none
+      ['Selecionar tudo', 'Desmarcar tudo'].forEach((text, idx) => {
+        const btn = document.createElement('button'); btn.type = 'button'; btn.className = 'select-all'; btn.textContent = text;
+        btn.onclick = e => {
+          e.stopPropagation();
+          const vals = idx === 0 ? list.slice() : [];
+          saveStorage(storageKey, vals);
+          onChange();
+        };
+        cont.appendChild(btn);
       });
-
-    function toggleDropdown(wrapperId) {
-      document.getElementById(wrapperId).classList.toggle('open');
+      const stored = load(storageKey);
+      list.forEach(item => {
+        const lbl = document.createElement('label');
+        const cb = document.createElement('input'); cb.type = 'checkbox'; cb.value = item; cb.checked = stored.includes(item);
+        cb.onchange = () => { saveStorage(storageKey, getChecked(containerId)); onChange(); };
+        lbl.append(cb, ` ${item}`);
+        cont.appendChild(lbl);
+      });
+      updateBox(boxId, load(storageKey), placeholder);
     }
 
-    function fillCheckboxes(id, values) {
-      const container = document.getElementById(id);
-      container.innerHTML = '';
-      values.forEach(val => {
-        const label = document.createElement('label');
-        const checkbox = document.createElement('input');
-        checkbox.type = 'checkbox';
-        checkbox.value = val;
-        checkbox.checked = true;
-        checkbox.onchange = applyFilters;
-        label.appendChild(checkbox);
-        label.appendChild(document.createTextNode(' ' + val));
-        container.appendChild(label);
-        container.appendChild(document.createElement('br'));
+    function toggle(id) {
+      document.querySelectorAll('.dropdown-multiselect').forEach(el => {
+        if (el.id !== id) el.classList.remove('open');
+      });
+      document.getElementById(id).classList.toggle('open');
+    }
+
+    function attachDropdowns() {
+      ['client','clientInfo','program','text'].forEach(key => {
+        const wrapper = document.getElementById(key + 'Wrapper');
+        const box = wrapper.querySelector('.select-box');
+        box.onclick = e => { e.stopPropagation(); toggle(key + 'Wrapper'); };
+      });
+      document.addEventListener('click', e => {
+        if (!e.target.closest('.dropdown-multiselect')) {
+          document.querySelectorAll('.dropdown-multiselect').forEach(el => el.classList.remove('open'));
+        }
       });
     }
 
-    function getChecked(id) {
-      return Array.from(document.querySelectorAll(`#${id} input:checked`)).map(c => c.value);
-    }
-
-    function populateClientFilter() {
+    function populateClients() {
       const clients = [...new Set(rawData.map(d => d.client))].sort();
-      const clientSelect = document.getElementById("clientSelect");
-      clientSelect.innerHTML = clients.map(c => `<option value="${c}">${c}</option>`).join('');
-      clientSelect.onchange = () => {
-        const selectedClient = clientSelect.value;
-        const filtered = rawData.filter(d => d.client === selectedClient);
-        const programs = [...new Set(filtered.map(d => d.program))].sort();
-        const programSelect = document.getElementById("programSelect");
-        programSelect.innerHTML = programs.map(p => `<option value="${p}">${p}</option>`).join('');
-        programSelect.onchange = populateTurmas;
-        populateTurmas();
-      };
+      populateCheckboxes({ containerId: 'clientChecks', boxId: 'clientBox', list: clients, storageKey: 'clients', placeholder: 'Selecionar cliente(s)', onChange: refreshAll });
     }
-
-    function populateTurmas() {
-      const client = document.getElementById("clientSelect").value;
-      const program = document.getElementById("programSelect").value;
-      const filtered = rawData.filter(d => d.client === client && d.program === program);
-      const turmas = [...new Set(filtered.map(d => d.turma))].sort();
-      fillCheckboxes("turmaSelect", turmas);
-      const textQs = [...new Set(filtered.filter(d => typeof d.value !== 'number').map(d => d.question))].sort();
-      fillCheckboxes("textQuestionSelect", textQs);
-      applyFilters();
+    function populateClientInfos() {
+      const sel = load('clients');
+      const infos = [...new Set(rawData.filter(d => sel.includes(d.client)).map(d => d.client_info))].sort();
+      populateCheckboxes({ containerId: 'clientInfoChecks', boxId: 'clientInfoBox', list: infos, storageKey: 'clientInfos', placeholder: 'Selecionar info(s)', onChange: refreshAll });
     }
-
-    function setSection(section) {
-      currentSection = section;
-      document.getElementById("btn-assessment").classList.toggle("active", section === 'assessment');
-      document.getElementById("btn-evaluation").classList.toggle("active", section === 'evaluation');
-      applyFilters();
+    function populatePrograms() {
+      const sel = load('clients');
+      const progs = [...new Set(rawData.filter(d => sel.includes(d.client)).map(d => d.program))].sort();
+      populateCheckboxes({ containerId: 'programChecks', boxId: 'programBox', list: progs, storageKey: 'programs', placeholder: 'Selecionar programa(s)', onChange: refreshAll });
     }
-
-    function applyFilters() {
-      const client = document.getElementById("clientSelect").value;
-      const program = document.getElementById("programSelect").value;
-      const turmas = getChecked("turmaSelect");
-      const selectedQuestions = getChecked("textQuestionSelect");
-      const trainer = document.getElementById("trainerInput").value || 'N/A';
-
-      const filtered = rawData.filter(d =>
-        (!client || d.client === client) &&
-        (!program || d.program === program) &&
-        (!turmas.length || turmas.includes(d.turma))
-      );
-
-      const evalDates = filtered
-        .filter(d => d.section === 'evaluation' && d.date)
-        .map(d => new Date(d.date));
-      const assessDates = filtered
-        .filter(d => d.section === 'assessment' && d.date)
-        .map(d => new Date(d.date));
-
-      const firstEval = evalDates.length ? new Intl.DateTimeFormat('pt-PT', { month: 'long', year: 'numeric' }).format(new Date(Math.min(...evalDates))) : 'N/A';
-      const firstAssess = assessDates.length ? new Intl.DateTimeFormat('pt-PT', { month: 'long', year: 'numeric' }).format(new Date(Math.min(...assessDates))) : 'N/A';
-
-      const summaryData = {
-        trainer,
-        firstEval,
-        firstAssess,
-        evalResponses: filtered.filter(d => d.section === 'evaluation' && typeof d.value === 'number').length,
-        assessResponses: filtered.filter(d => d.section === 'assessment' && typeof d.value === 'number').length,
-        classCount: new Set(filtered.map(d => d.turma)).size
-      };
-
-      document.getElementById("executiveSummary").innerHTML = `
-        <div class="summary-item">
-          <div class="summary-label">Primeira submissão avaliação</div>
-          <div class="summary-value">${summaryData.firstEval}</div>
-        </div>
-        <div class="summary-item">
-          <div class="summary-label">Primeira submissão assessment</div>
-          <div class="summary-value">${summaryData.firstAssess}</div>
-        </div>
-        <div class="summary-item">
-          <div class="summary-label">Formador</div>
-          <div class="summary-value">${summaryData.trainer}</div>
-        </div>
-        <div class="summary-item">
-          <div class="summary-label">Respostas avaliação</div>
-          <div class="summary-value">${summaryData.evalResponses}</div>
-        </div>
-        <div class="summary-item">
-          <div class="summary-label">Respostas assessment</div>
-          <div class="summary-value">${summaryData.assessResponses}</div>
-        </div>
-        <div class="summary-item">
-          <div class="summary-label">Nº Turmas</div>
-          <div class="summary-value">${summaryData.classCount}</div>
-        </div>
-      `;
-
-      const filteredForCurrentSection = filtered.filter(d => d.section === currentSection);
-      const numeric = filteredForCurrentSection.filter(d => typeof d.value === 'number');
-      const text = filteredForCurrentSection.filter(d => typeof d.value !== 'number' && selectedQuestions.includes(d.question));
-
-      drawCharts(numeric, turmas);
-      drawTextQuestions(text);
-    }
-
-    function drawCharts(data, turmas) {
-      const byTurma = {};
-      const overall = {};
-
-      data.forEach(({ turma, question, value }) => {
-        if (!byTurma[turma]) byTurma[turma] = {};
-        if (!byTurma[turma][question]) byTurma[turma][question] = [];
-        byTurma[turma][question].push(value);
-
-        if (!overall[question]) overall[question] = [];
-        overall[question].push(value);
+    function populateTextQuestions() {
+      const f = getStorage();
+      const qMap = {};
+      rawData.forEach(d => {
+        if (
+          (f.clients||[]).includes(d.client) &&
+          (f.clientInfos||[]).includes(d.client_info) &&
+          (f.programs||[]).includes(d.program) &&
+          isNaN(+d.value)
+        ) {
+          const sec = (d.section||'').toLowerCase();
+          const pr = sec.includes('assessment') ? 0 : sec.includes('evaluation') ? 1 : 2;
+          if (!qMap[d.question] || qMap[d.question] > pr) qMap[d.question] = pr;
+        }
       });
-
-      const container = document.getElementById("turmaCharts");
-      container.innerHTML = "";
-
-      if (turmas.length > 1) {
-        const overallData = Object.entries(overall).map(([q, vals]) => ({
-          question: q,
-          average: vals.reduce((a, b) => a + b, 0) / vals.length
-        }));
-        drawBarChart("overallChart", overallData);
-      } else {
-        document.getElementById("overallChart").innerHTML = "";
-      }
-
-      Object.entries(byTurma).forEach(([turma, questions], idx) => {
-        const chartId = `turmaChart${idx}`;
-        const title = document.createElement("div");
-        title.className = "turma-title";
-        title.textContent = `Turma: ${turma}`;
-        const div = document.createElement("div");
-        div.id = chartId;
-        div.className = "chart-container";
-        container.appendChild(title);
-        container.appendChild(div);
-
-        const data = Object.entries(questions).map(([q, vals]) => ({
-          question: q,
-          average: vals.reduce((a, b) => a + b, 0) / vals.length
-        }));
-        drawBarChart(chartId, data);
-      });
+      const questions = Object.keys(qMap).sort((a,b) => qMap[a] - qMap[b] || a.localeCompare(b,'pt'));
+      populateCheckboxes({ containerId: 'textChecks', boxId: 'textBox', list: questions, storageKey: 'textQuestions', placeholder: 'Selecionar perguntas', onChange: () => {} });
     }
 
-    function drawBarChart(containerId, data) {
-      const chart = echarts.init(document.getElementById(containerId));
-      const questions = data.map(d => d.question);
-      const values = data.map(d => d.average);
-      const color = currentSection === 'assessment'
-        ? val => val.value < 3 ? '#d94e5d' : val.value < 4 ? '#f2c037' : '#61c277'
-        : '#61c277';
-
-      chart.setOption({
-        tooltip: {},
-        xAxis: { type: 'category', data: questions, axisLabel: { rotate: 30 } },
-        yAxis: { type: 'value', min: 0, max: 5, axisLabel: { show: false } },
-        series: [{
-          type: 'bar',
-          data: values,
-          itemStyle: { color },
-          label: { show: true, position: 'top', formatter: '{c}' }
-        }]
-      });
-    }
-
-    function drawTextQuestions(data) {
-      const textDiv = document.getElementById("textQuestions");
-      textDiv.innerHTML = "";
-      const byQuestion = {};
-      data.forEach(d => {
-        if (!byQuestion[d.question]) byQuestion[d.question] = [];
-        byQuestion[d.question].push(d.value);
-      });
-
-      Object.entries(byQuestion).forEach(([q, answers]) => {
-        const box = document.createElement("div");
-        box.className = "text-question";
-        const title = document.createElement("div");
-        title.className = "text-question-title";
-        title.textContent = q;
-        const ul = document.createElement("ul");
-        answers.forEach(txt => {
-          const li = document.createElement("li");
-          li.textContent = txt;
-          ul.appendChild(li);
+    function renderProgramBlocks() {
+      const container = document.getElementById('programsContainer');
+      container.innerHTML = '';
+      const f = getStorage();
+      const selClients = f.clients || [];
+      const selInfos = f.clientInfos || [];
+      (f.programs||[]).forEach(prog => {
+        // Block wrapper
+        const block = document.createElement('div'); block.className = 'program-block';
+        const header = document.createElement('div'); header.className = 'program-header'; header.textContent = `Programa: ${prog}`;
+        block.appendChild(header);
+        const grid = document.createElement('div'); grid.className = 'program-grid';
+        // Trainer
+        const lblT = document.createElement('label'); lblT.textContent = `Formador (${prog}):`;
+        const inpT = document.createElement('input'); inpT.type = 'text'; inpT.placeholder = `Nome do formador para ${prog}`;
+        inpT.value = (f.trainers||{})[prog] || '';
+        inpT.oninput = () => { const s = getStorage(); s.trainers = s.trainers||{}; s.trainers[prog] = inpT.value; localStorage.setItem('filters', JSON.stringify(s)); };
+        grid.append(lblT, inpT);
+        // Dates
+        ['start','end'].forEach(k => {
+          const lblD = document.createElement('label'); lblD.textContent = `${k==='start'?'Início':'Fim'} (${prog}):`;
+          const inpD = document.createElement('input'); inpD.type = 'month'; inpD.value = ((s=>s[k+'s']||{})(f))[prog]||'';
+          inpD.onchange = () => { const s = getStorage(); s[k+'s'] = s[k+'s']||{}; s[k+'s'][prog] = inpD.value; localStorage.setItem('filters', JSON.stringify(s)); };
+          grid.append(lblD, inpD);
         });
-        box.appendChild(title);
-        box.appendChild(ul);
-        textDiv.appendChild(box);
+        // Turmas dropdown
+        const tw = document.createElement('div'); tw.className = 'dropdown-multiselect'; tw.id = `turmaWrapper_${prog}`;
+        const tb = document.createElement('div'); tb.className = 'select-box'; tb.id = `turmaBox_${prog}`; tb.dataset.placeholder = 'Selecionar turma(s)'; tb.textContent = 'Selecionar turma(s)';
+        const tc = document.createElement('div'); tc.className = 'checkboxes'; tc.id = `turmaChecks_${prog}`;
+        tw.append(tb, tc);
+        const lblU = document.createElement('label'); lblU.textContent = `Turmas (${prog}):`;
+        grid.append(lblU, tw);
+        block.appendChild(grid);
+        container.appendChild(block);
+        // Populate turma options
+        const turmas = [...new Set(rawData.filter(d => d.program===prog && selClients.includes(d.client) && selInfos.includes(d.client_info)).map(d => d.turma))].sort();
+        populateCheckboxes({ containerId: tc.id, boxId: tb.id, list: turmas, storageKey: `turmas_${prog}`, placeholder: 'Selecionar turma(s)', onChange: () => updateBox(tb.id, getChecked(tc.id), tb.dataset.placeholder) });
+        updateBox(tb.id, load(`turmas_${prog}`), tb.dataset.placeholder);
+        // Toggle
+        tb.onclick = e => { e.stopPropagation(); toggle(tw.id); };
       });
     }
+
+    function refreshAll() {
+      populateClientInfos();
+      populatePrograms();
+      populateTextQuestions();
+      renderProgramBlocks();
+    }
+
+    function navigateToReport(download) {
+      // Persist full filter state
+      const all = getStorage();
+      localStorage.setItem('reportFilters', JSON.stringify(all));
+      window.location.href = 'report.html' + (download ? '?download=true' : '');
+    }
+
+    function init() {
+      fetch('data.json').then(r => r.json()).then(data => {
+        rawData = data;
+        populateClients();
+        attachDropdowns();
+        refreshAll();
+        document.getElementById('viewReport').onclick = () => navigateToReport(false);
+        document.getElementById('downloadReport').onclick = () => navigateToReport(true);
+      }).catch(err => console.error('Erro carregando data.json:', err));
+    }
+
+    document.addEventListener('DOMContentLoaded', init);
   </script>
 </body>
 </html>

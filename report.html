@@ -47,7 +47,8 @@
     .page > .content {
       position: absolute;
       top: 80px; bottom: 60px; left: 0; right: 0;
-      overflow: hidden; box-sizing: border-box;
+      box-sizing: border-box;
+      overflow: visible !important;  /* ← allow chart overflow */
     }
 
     /* FILL CONTENT */
@@ -64,12 +65,8 @@
       overflow: hidden;
     }
     .page.hero > .hero {
-      position: absolute;
-      inset: 0;
-      display: flex;                  /* ← make it a flexbox */
-      align-items: center;            /* ← vertical centering */
-      justify-content: center;        /* ← horizontal centering */
-      overflow: hidden;
+      position: absolute; inset: 0;
+      display: flex; align-items: center; justify-content: center;
     }
     .page.hero .bg {
       position: absolute; inset: 0;
@@ -87,6 +84,13 @@
     }
     .hero-content .subtitle {
       font-size: 1.5rem; margin-top: 12px; opacity: .85;
+    }
+    .page.hero > .header,
+    .page.hero > .footer {
+      display: none;
+    }
+    .page.hero > .content {
+      top: 0; bottom: 0;
     }
 
     /* — INFO BANNER (second page) — */
@@ -155,23 +159,12 @@
       padding: 8px 16px; background: #007c91; color: #fff;
       border: none; border-radius: 4px; cursor: pointer;
     }
-    .page.hero > .header,
-.page.hero > .footer {
-  display: none;
-}
-.page.hero > .content {
-  top: 0;
-  bottom: 0;
-}
-.header .section-title {
-  text-transform: uppercase;    /* ALL CAPS */
-  color: #007c91;               /* your new color */
-  font-weight: 600;             /* semi‑bold */
-  letter-spacing: 0.05em;       /* a bit of extra tracking */
-  font-size: 1rem;              /* tweak as you need */
-  font-style: italic;
-}
-    
+    .header .section-title {
+      text-transform: uppercase;
+      color: #007c91; font-weight: 600;
+      letter-spacing: 0.05em; font-size: 1rem;
+      font-style: italic;
+    }
   </style>
 </head>
 <body>
@@ -182,109 +175,103 @@
     const currentYear = new Date().getFullYear();
 
     function createLabelMap(labels) {
-      const map = {};
+      const m = {};
       labels.forEach(l => {
-        const key = l.questionId || l['QUESTION ID'];
-        map[key] = l.label || l['LABEL'];
+        const k = l.questionId || l['QUESTION ID'];
+        m[k] = l.label || l['LABEL'];
       });
-      return map;
+      return m;
     }
-
     function createSortMap(labels) {
-      const map = {};
+      const m = {};
       labels.forEach(l => {
-        const key = l.questionId || l['QUESTION ID'];
-        map[key] = +(l.sortOrder || l['SORT ORDER'] || l.sort_order);
+        const k = l.questionId || l['QUESTION ID'];
+        m[k] = +(l.sortOrder || l['SORT ORDER'] || l.sort_order);
       });
-      return map;
+      return m;
     }
-
-    function groupBy(arr, k) {
-      return arr.reduce((o, i) => ((o[i[k]] ||= []).push(i), o), {});
+    function groupBy(arr,k) {
+      return arr.reduce((o,i)=>( (o[i[k]]||(o[i[k]]=[])).push(i),o ),{});
     }
-
     function computeAverages(rows, LM, OM) {
-      const g = {};
-      rows.forEach(r => (g[r.question] ||= []).push(+r.value));
-      return Object.entries(g).map(([q, vals]) => ({
-        question: q,
-        label: LM[q] || q,
-        avg: +(vals.reduce((a,b)=>a+b,0)/vals.length).toFixed(1)
+      const g={};
+      rows.forEach(r=>(g[r.question]||(g[r.question]=[])).push(+r.value));
+      return Object.entries(g).map(([q,vals])=>({
+        question:q, label:LM[q]||q,
+        avg:+(vals.reduce((a,b)=>a+b,0)/vals.length).toFixed(1)
       })).sort((a,b)=>(OM[a.question]||0)-(OM[b.question]||0));
     }
-
-    function countUnique(rows, sec) {
-      return new Set(
-        rows.filter(d => String(d.section||'').toLowerCase().includes(sec))
-            .map(d => d.respondent_id || d.id)
-      ).size;
+    function countUnique(rows,sec){
+      return new Set(rows.filter(d=>String(d.section||'').toLowerCase().includes(sec))
+        .map(d=>d.respondent_id||d.id)).size;
     }
-
     function formatMonthYear(val) {
-      const names = {
-        '01':'janeiro','02':'fevereiro','03':'março','04':'abril',
-        '05':'maio','06':'junho','07':'julho','08':'agosto',
-        '09':'setembro','10':'outubro','11':'novembro','12':'dezembro'
-      };
-      const [y,m] = val.split('-');
-      return { month: names[m], year: y };
+      const names={'01':'janeiro','02':'fevereiro','03':'março','04':'abril',
+                   '05':'maio','06':'junho','07':'julho','08':'agosto',
+                   '09':'setembro','10':'outubro','11':'novembro','12':'dezembro'};
+      const [y,m]=val.split('-'); return {month:names[m],year:y};
     }
 
-    function createBarChart(container, title, data, uniform) {
+    function createBarChart(container,title,data,uniform){
       const chart = echarts.init(container);
       chart.setOption({
-        title:{ text: title, left: 'center', textStyle:{ fontSize:20 } },
-        grid:{ top:80, left:'10%', right:'10%', bottom:120 },
+        title:{ text:title,left:'center', textStyle:{fontSize:20} },
+        grid:{ top:80,left:'10%',right:'10%',bottom:120 },
         tooltip:{},
-        xAxis:{ type:'category', data:data.map(d=>d.label),
-                axisLabel:{ rotate:30, interval:0, margin:10 } },
-        yAxis:{ type:'value', min:1, max:5,
-                splitLine:{ show:false },
-                axisLine:{ show:false },
-                axisTick:{ show:false },
-                axisLabel:{ show:false } },
+        xAxis:{
+          type:'category',
+          data:data.map(d=>d.label),
+          axisLabel:{rotate:30,interval:0,margin:10}
+        },
+        yAxis:{
+          type:'value',min:1,max:5,
+          splitLine:{show:false},
+          axisLine:{show:false},
+          axisTick:{show:false},
+          axisLabel:{show:false}
+        },
         series:[{
           type:'bar', data:data.map(d=>d.avg),
-          label:{ show:true, position:'top', formatter:'{c}' },
+          label:{show:true,position:'top',formatter:'{c}'},
           itemStyle: uniform
             ? { color:'#6A99D0' }
-            : { color: p => p.value<3?'#EA3323':p.value<4?'#6A99D0':'#9FCE63' }
+            : { color:p=>p.value<3?'#EA3323':p.value<4?'#6A99D0':'#9FCE63' }
         }]
       });
-      chart.resize(); setTimeout(()=>chart.resize(),300);
+      chart.resize();
+      setTimeout(()=>chart.resize(),300);
     }
 
-    async function build() {
-      const f = JSON.parse(localStorage.getItem('reportFilters')||'{}');
-      const [data, meta] = await Promise.all([
+    async function build(){
+      const f=JSON.parse(localStorage.getItem('reportFilters')||'{}');
+      const [data,meta]=await Promise.all([
         fetch('data.json').then(r=>r.json()),
         fetch('meta.json').then(r=>r.json())
       ]);
-      const LM = createLabelMap(meta.labels),
-            OM = createSortMap(meta.labels);
-      const root = document.getElementById('report');
-      root.innerHTML = '';
+      const LM=createLabelMap(meta.labels),
+            OM=createSortMap(meta.labels);
+      const root=document.getElementById('report');
+      root.innerHTML='';
 
-      let timeScope = '';
-      if (f.start && f.end) {
-        const s = formatMonthYear(f.start),
-              e = formatMonthYear(f.end);
-        timeScope = `${s.month} – ${e.month} ${e.year}`;
+      let timeScope='';
+      if(f.start&&f.end){
+        const s=formatMonthYear(f.start),
+              e=formatMonthYear(f.end);
+        timeScope=`${s.month} – ${e.month} ${e.year}`;
       }
 
-      for (const prog of f.programs || []) {
-        const selTur = f[`turmas_${prog}`] || [];
-        const rows = data.filter(d =>
-          (f.clients||[]).includes(d.client)
-          && d.program === prog
-          && selTur.includes(d.turma)
+      for(const prog of f.programs||[]){
+        const selTur=f[`turmas_${prog}`]||[];
+        const rows=data.filter(d=>
+          (f.clients||[]).includes(d.client)&&
+          d.program===prog&&selTur.includes(d.turma)
         );
-        const pm = meta.titles.find(t => t.program_id === prog) || {};
+        const pm=meta.titles.find(t=>t.program_id===prog)||{};
 
-        // — Hero page —
-        const heroPage = document.createElement('div');
-        heroPage.className = 'page hero';
-        heroPage.innerHTML = `
+        // Hero page
+        const heroPage=document.createElement('div');
+        heroPage.className='page hero';
+        heroPage.innerHTML=`
           <div class="hero">
             <img class="bg" src="hourglass-bg.jpg">
             <div class="hero-content">
@@ -294,10 +281,10 @@
           </div>`;
         root.appendChild(heroPage);
 
-        // — Info banner —
-        const infoPage = document.createElement('div');
-        infoPage.className = 'page';
-        infoPage.innerHTML = `
+        // Info banner
+        const infoPage=document.createElement('div');
+        infoPage.className='page';
+        infoPage.innerHTML=`
           <div class="header">
             <img src="mind4time-logo.png"><div></div>
           </div>
@@ -319,19 +306,20 @@
           </div>`;
         root.appendChild(infoPage);
 
-        // — Sections —
-        for (const sec of ['assessment','evaluation']) {
-          const name = sec === 'assessment' ? 'Assessment' : 'Evaluation';
-          const total = countUnique(rows, sec);
-          const numeric = rows.filter(d =>
-            String(d.section||'').toLowerCase().includes(sec)
-            && /^\d+(\.\d+)?$/.test(String(d.value).trim())
+        // Sections...
+        for(const sec of ['assessment','evaluation']){
+          const name=sec==='assessment'?'Assessment':'Evaluation';
+          const total=countUnique(rows,sec);
+          const numeric=rows.filter(d=>
+            String(d.section||'').toLowerCase().includes(sec)&&
+            /^\d+(\.\d+)?$/.test(String(d.value).trim())
           );
-          const byT = Object.entries(groupBy(numeric, 'turma'));
+          const byT=Object.entries(groupBy(numeric,'turma'));
 
-          // Banner page
-          const ban = document.createElement('div'); ban.className = 'page';
-          ban.innerHTML = `
+          // Section banner
+          const ban=document.createElement('div');
+          ban.className='page';
+          ban.innerHTML=`
             <div class="header">
               <img src="mind4time-logo.png">
               <div class="section-title">${name}</div>
@@ -340,7 +328,9 @@
               <div class="banner">
                 <div class="banner-box">
                   <h1>${name}</h1>
-                  <div class="meta"><div><span>Total de respostas:</span><strong>${total}</strong></div></div>
+                  <div class="meta">
+                    <div><span>Total de respostas:</span><strong>${total}</strong></div>
+                  </div>
                 </div>
               </div>
             </div>
@@ -350,10 +340,10 @@
             </div>`;
           root.appendChild(ban);
 
-          // Global chart page
-          if (numeric.length) {
-            const gp = document.createElement('div'); gp.className = 'page';
-            gp.innerHTML = `
+          // Global chart
+          if(numeric.length){
+            const gp=document.createElement('div'); gp.className='page';
+            gp.innerHTML=`
               <div class="header">
                 <img src="mind4time-logo.png">
                 <div class="section-title">${name}</div>
@@ -371,20 +361,19 @@
             createBarChart(
               gp.querySelector('.chart-full'),
               `Global (${name})`,
-              computeAverages(numeric, LM, OM),
-              sec === 'evaluation'
+              computeAverages(numeric,LM,OM),
+              sec==='evaluation'
             );
           }
 
           // 2‑chart grid
-          if (byT.length > 1) {
-            for (let i = 0; i < byT.length; i += 2) {
-              const gp2 = document.createElement('div'); gp2.className = 'page';
-              const boxes = byT.slice(i,i+2)
-                .map(([,vals],j) =>
-                  `<div class="chart-box" id="chart-${prog}-grid-${i+j}"></div>`
-                ).join('');
-              gp2.innerHTML = `
+          if(byT.length>1){
+            for(let i=0;i<byT.length;i+=2){
+              const gp2=document.createElement('div'); gp2.className='page';
+              const boxes=byT.slice(i,i+2).map(([,vals],j)=>
+                `<div class="chart-box" id="chart-${prog}-grid-${i+j}"></div>`
+              ).join('');
+              gp2.innerHTML=`
                 <div class="header">
                   <img src="mind4time-logo.png">
                   <div class="section-title">${name}</div>
@@ -397,32 +386,30 @@
                   <div>© MIND4TIME ${currentYear}</div>
                 </div>`;
               root.appendChild(gp2);
-              byT.slice(i,i+2).forEach(([,vals],j) => {
+              byT.slice(i,i+2).forEach(([,vals],j)=>
                 createBarChart(
                   document.getElementById(`chart-${prog}-grid-${i+j}`),
                   byT[i+j][0],
-                  computeAverages(vals, LM, OM),
-                  sec === 'evaluation'
-                );
-              });
+                  computeAverages(vals,LM,OM),
+                  sec==='evaluation'
+                )
+              );
             }
           }
 
           // Text‑answer pages
-          const selQs = f.textQuestions||[];
-          selQs.forEach(qid => {
-            const ans = rows.filter(d =>
-              String(d.section||'').toLowerCase().includes(sec)
-              && d.question===qid
-              && isNaN(+d.value)
+          const selQs=f.textQuestions||[];
+          selQs.forEach(qid=>{
+            const ans=rows.filter(d=>
+              String(d.section||'').toLowerCase().includes(sec)&&
+              d.question===qid&&isNaN(+d.value)
             );
-            if (!ans.length) return;
-            for (let i = 0; i < ans.length; i += 8) {
-              const chunk = ans.slice(i,i+8)
-                .map(a => `<li>${a.value.replace(/\n/g,'</li><li>')}</li>`)
-                .join('');
-              const tp = document.createElement('div'); tp.className = 'page';
-              tp.innerHTML = `
+            if(!ans.length) return;
+            for(let i=0;i<ans.length;i+=12){
+              const chunk=ans.slice(i,i+12)
+                .map(a=>`<li>${a.value.replace(/\n/g,'</li><li>')}</li>`).join('');
+              const tp=document.createElement('div'); tp.className='page';
+              tp.innerHTML=`
                 <div class="header">
                   <img src="mind4time-logo.png">
                   <div class="section-title">${name}</div>
@@ -446,35 +433,24 @@
       }
     }
 
-   async function generatePdf() {
-  // 1) rebuild your 960×540 pages
-  await build();
-
-  const pages = Array.from(document.querySelectorAll('.page'));
-  const images = await Promise.all(
-    pages.map(pg =>
-      html2canvas(pg, {
-        backgroundColor: '#fff',
-        // capture at 2× resolution (so our 960px width ⇒ 1920px image)
-        scale: 2
-      }).then(canvas => canvas.toDataURL('image/png', 1.0))
-    )
-  );
-
-  // 2) assemble PDF with custom pageSize = 960×540
-  const docDefinition = {
-    pageSize: { width: 960, height: 540 },
-    pageMargins: [0, 0, 0, 0],
-    content: images.map((img, i) => ({
-      image: img,
-      width: 960,                         // exactly CSS width
-      pageBreak: i < images.length - 1 ? 'after' : undefined
-    }))
-  };
-
-  // 3) download
-  pdfMake.createPdf(docDefinition).download('report.pdf');
-}
+    async function generatePdf() {
+      await build();
+      const pages = Array.from(document.querySelectorAll('.page'));
+      const images = await Promise.all(
+        pages.map(pg =>
+          html2canvas(pg, { backgroundColor:'#fff', scale: 3 })
+            .then(canvas => canvas.toDataURL('image/png',1.0))
+        )
+      );
+      pdfMake.createPdf({
+        pageSize: { width:960, height:540 },
+        pageMargins: [0,0,0,0],
+        content: images.map((img,i)=>({
+          image: img, width:960,
+          pageBreak: i<images.length-1?'after':undefined
+        }))
+      }).download('report.pdf');
+    }
 
     document.addEventListener('DOMContentLoaded', ()=>{
       document.getElementById('gerar-pdf').addEventListener('click', generatePdf);

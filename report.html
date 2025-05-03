@@ -122,7 +122,7 @@
       margin-bottom: 12px; color: #007c91;
     }
     .text-question ul {
-      padding-left: 16px; font-size: 1rem; line-height: 1.6;
+      padding-left: 16px; font-size: 0.625rem; line-height: 1.6;
     }
     .text-question li { margin-bottom: 8px; }
 
@@ -231,24 +231,22 @@
         const pm = meta.titles.find(t=>t.program_id===prog)||{};
 
         // Hero page
-       const hero = document.createElement('div');
-hero.className = 'page';
-hero.innerHTML = `
-  <div class="content">
-    <div class="hero">
-      <img class="bg" src="hourglass-bg.jpg">
-      <div class="hero-content">
-        <small>${pm.SUBTÍTULO||''}</small>
-        <h1>${pm.TÍTULO||prog}</h1>
-        <div class="subtitle">${pm.TAGLINE||''}</div>
-        <div class="meta">
-          <div><span>time scope</span><strong>${timeScope}</strong></div>
-          <div><span>trainers</span><strong>${(f.trainers||{})[prog]||'N/A'}</strong></div>
-        </div>
+       const heroPage = document.createElement('div');
+heroPage.className = 'page hero';       // note the extra "hero" class
+heroPage.innerHTML = `
+  <div class="hero">
+    <img class="bg" src="hourglass-bg.jpg">
+    <div class="hero-content">
+      <small>${pm.SUBTÍTULO||''}</small>
+      <h1>${pm.TÍTULO||prog}</h1>
+      <div class="subtitle">${pm.TAGLINE||''}</div>
+      <div class="meta">
+        <div><span>time scope</span><strong>${timeScope}</strong></div>
+        <div><span>trainers</span><strong>${(f.trainers||{})[prog]||'N/A'}</strong></div>
       </div>
     </div>
   </div>`;
-root.appendChild(hero);
+root.appendChild(heroPage);
 
         for (const sec of ['assessment','evaluation']) {
           const name = sec==='assessment'?'Assessment':'Avaliação do Programa';

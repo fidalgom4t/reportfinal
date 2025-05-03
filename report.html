@@ -417,8 +417,8 @@
               && isNaN(+d.value)
             );
             if (!ans.length) return;
-            for (let i = 0; i < ans.length; i += 12) {
-              const chunk = ans.slice(i,i+12)
+            for (let i = 0; i < ans.length; i += 8) {
+              const chunk = ans.slice(i,i+8)
                 .map(a => `<li>${a.value.replace(/\n/g,'</li><li>')}</li>`)
                 .join('');
               const tp = document.createElement('div'); tp.className = 'page';

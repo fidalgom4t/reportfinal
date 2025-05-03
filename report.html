@@ -59,11 +59,13 @@
       width: 100%; height: 100%; box-sizing: border-box;
     }
 
-    /* HERO */
+    /* — HERO (full‑bleed, no header/footer) — */
+    .page.hero {
+      overflow: hidden;
+    }
     .page.hero > .hero {
       position: absolute;
-      top: 0; right: 0; bottom: 0; left: 0;
-      overflow: hidden;
+      inset: 0;
     }
     .page.hero .bg {
       position: absolute; inset: 0;
@@ -76,26 +78,37 @@
       color: #fff; text-align: center;
       padding: 0 30px; box-sizing: border-box;
     }
-    .hero-content small { font-size: 1.2rem; opacity: .8; margin-bottom: 8px; }
-    .hero-content h1  { font-size: 3rem; margin: 0; }
-    .hero-content .subtitle { font-size: 1.4rem; margin-top: 12px; }
-    .hero-content .meta {
-      display: flex; gap: 30px; margin-top: 20px; font-size: 1rem;
+    .hero-content h1 {
+      font-size: 3.5rem; margin: 0;
     }
-    .hero-content .meta span { opacity: .8; }
+    .hero-content .subtitle {
+      font-size: 1.5rem; margin-top: 12px; opacity: .85;
+    }
 
-    /* BANNER */
+    /* — INFO BANNER (second page) — */
     .banner {
-      display: flex; align-items: center; justify-content: center;
+      position: relative;
+      width: 100%; height: 100%;
+      overflow: hidden;
+    }
+    .banner-bg {
+      position: absolute; inset: 0;
+      width: 100%; height: 100%; object-fit: cover;
+      opacity: .3;
     }
     .banner-box {
-      width: 70%; background: #f0f8f9;
+      position: relative; z-index: 1;
+      width: 70%; background: rgba(240,248,249, .9);
       padding: 30px 50px; border-left: 6px solid #007c91;
       box-shadow: 0 2px 6px rgba(0,0,0,0.1);
       box-sizing: border-box;
     }
-    .banner-box h1 { font-size: 2.5rem; margin-bottom: 12px; }
-    .banner-box .meta { font-size: 1rem; }
+    .banner-box h1 {
+      font-size: 2.5rem; margin-bottom: 12px; color: #007c91;
+    }
+    .banner-box .meta {
+      font-size: 1rem; color: #333;
+    }
 
     /* SINGLE GLOBAL CHART */
     .chart-fullpage {
@@ -119,7 +132,7 @@
     }
     .text-question {
       background: #f9f9f9;
-      border: 1px solid #007c91; border-left: 6px solid #007c91;
+      border: 1px solid #007c91; border-left: 6px ;
       padding: 20px; margin-bottom: 20px; box-sizing: border-box;
       page-break-inside: avoid; break-inside: avoid;
     }
@@ -148,24 +161,27 @@
     const currentYear = new Date().getFullYear();
 
     function createLabelMap(labels) {
-      const m = {};
+      const map = {};
       labels.forEach(l => {
-        const k = l.questionId || l['QUESTION ID'];
-        m[k] = l.label || l['LABEL'];
+        const key = l.questionId || l['QUESTION ID'];
+        map[key] = l.label || l['LABEL'];
       });
-      return m;
+      return map;
     }
+
     function createSortMap(labels) {
-      const m = {};
+      const map = {};
       labels.forEach(l => {
-        const k = l.questionId || l['QUESTION ID'];
-        m[k] = +(l.sortOrder || l['SORT ORDER'] || l.sort_order);
+        const key = l.questionId || l['QUESTION ID'];
+        map[key] = +(l.sortOrder || l['SORT ORDER'] || l.sort_order);
       });
-      return m;
+      return map;
     }
+
     function groupBy(arr, k) {
       return arr.reduce((o, i) => ((o[i[k]] ||= []).push(i), o), {});
     }
+
     function computeAverages(rows, LM, OM) {
       const g = {};
       rows.forEach(r => (g[r.question] ||= []).push(+r.value));
@@ -175,12 +191,14 @@
         avg: +(vals.reduce((a,b)=>a+b,0)/vals.length).toFixed(1)
       })).sort((a,b)=>(OM[a.question]||0)-(OM[b.question]||0));
     }
+
     function countUnique(rows, sec) {
       return new Set(
-        rows.filter(d=>String(d.section||'').toLowerCase().includes(sec))
-            .map(d=>d.respondent_id||d.id)
+        rows.filter(d => String(d.section||'').toLowerCase().includes(sec))
+            .map(d => d.respondent_id || d.id)
       ).size;
     }
+
     function formatMonthYear(val) {
       const names = {
         '01':'janeiro','02':'fevereiro','03':'março','04':'abril',
@@ -194,17 +212,22 @@
     function createBarChart(container, title, data, uniform) {
       const chart = echarts.init(container);
       chart.setOption({
-        title:{ text: title, left: 'center', textStyle: { fontSize: 20 } },
-        grid:{ top: 80, left: '10%', right: '10%', bottom: 100 },
+        title:{ text: title, left: 'center', textStyle:{ fontSize:20 } },
+        grid:{ top:80, left:'10%', right:'10%', bottom:120 },
         tooltip:{},
-        xAxis:{ type: 'category', data: data.map(d=>d.label), axisLabel:{ rotate:30 }},
-        yAxis:{ type: 'value', min:0, max:5, splitLine:{show:false}, axisLine:{show:false}, axisTick:{show:false}, axisLabel:{show:false} },
+        xAxis:{ type:'category', data:data.map(d=>d.label),
+                axisLabel:{ rotate:30, interval:0, margin:10 } },
+        yAxis:{ type:'value', min:1, max:5,
+                splitLine:{ show:false },
+                axisLine:{ show:false },
+                axisTick:{ show:false },
+                axisLabel:{ show:false } },
         series:[{
-          type:'bar', data: data.map(d=>d.avg),
+          type:'bar', data:data.map(d=>d.avg),
           label:{ show:true, position:'top', formatter:'{c}' },
           itemStyle: uniform
             ? { color:'#6A99D0' }
-            : { color: p => { const v=p.value; return v<3?'#EA3323':v<4?'#6A99D0':'#9FCE63'; } }
+            : { color: p => p.value<3?'#EA3323':p.value<4?'#6A99D0':'#9FCE63' }
         }]
       });
       chart.resize(); setTimeout(()=>chart.resize(),300);
@@ -212,7 +235,7 @@
 
     async function build() {
       const f = JSON.parse(localStorage.getItem('reportFilters')||'{}');
-      const [data,meta] = await Promise.all([
+      const [data, meta] = await Promise.all([
         fetch('data.json').then(r=>r.json()),
         fetch('meta.json').then(r=>r.json())
       ]);
@@ -223,20 +246,21 @@
 
       let timeScope = '';
       if (f.start && f.end) {
-        const s = formatMonthYear(f.start), e = formatMonthYear(f.end);
+        const s = formatMonthYear(f.start),
+              e = formatMonthYear(f.end);
         timeScope = `${s.month} – ${e.month} ${e.year}`;
       }
 
       for (const prog of f.programs || []) {
-        const selTur = f[`turmas_${prog}`]||[];
+        const selTur = f[`turmas_${prog}`] || [];
         const rows = data.filter(d =>
-          (f.clients||[]).includes(d.client) &&
-          d.program===prog &&
-          selTur.includes(d.turma)
+          (f.clients||[]).includes(d.client)
+          && d.program === prog
+          && selTur.includes(d.turma)
         );
-        const pm = meta.titles.find(t=>t.program_id===prog)||{};
+        const pm = meta.titles.find(t => t.program_id === prog) || {};
 
-        // Hero page (full-bleed, no header/footer)
+        // — Hero page —
         const heroPage = document.createElement('div');
         heroPage.className = 'page hero';
         heroPage.innerHTML = `
@@ -244,17 +268,12 @@
             <img class="bg" src="hourglass-bg.jpg">
             <div class="hero-content">
               <h1>${pm.TÍTULO||prog}</h1>
-              <small>${pm.SUBTÍTULO||''}</small>
-              <div class="subtitle">${pm.TAGLINE||''}</div>
-              <div class="meta">
-                <div><span>time scope</span><strong>${timeScope}</strong></div>
-                <div><span>trainers</span><strong>${(f.trainers||{})[prog]||'N/A'}</strong></div>
-              </div>
+              <div class="subtitle">${pm.SUBTÍTULO||''}</div>
             </div>
           </div>`;
         root.appendChild(heroPage);
 
-        // Info Banner page (below hero)
+        // — Info banner —
         const infoPage = document.createElement('div');
         infoPage.className = 'page';
         infoPage.innerHTML = `
@@ -263,6 +282,7 @@
           </div>
           <div class="content">
             <div class="banner">
+              <img class="banner-bg" src="hourglass-bg.jpg">
               <div class="banner-box">
                 <h1>Detalhes do Programa</h1>
                 <div class="meta">
@@ -278,21 +298,22 @@
           </div>`;
         root.appendChild(infoPage);
 
-        // Then the assessment / evaluation sections as before
+        // — Sections —
         for (const sec of ['assessment','evaluation']) {
-          const name = sec==='assessment'?'Assessment':'Avaliação do Programa';
+          const name = sec === 'assessment' ? 'Assessment' : 'Avaliação do Programa';
           const total = countUnique(rows, sec);
-          const numeric = rows.filter(d=>
-            String(d.section||'').toLowerCase().includes(sec) &&
-            /^\d+(\.\d+)?$/.test(String(d.value).trim())
+          const numeric = rows.filter(d =>
+            String(d.section||'').toLowerCase().includes(sec)
+            && /^\d+(\.\d+)?$/.test(String(d.value).trim())
           );
-          const byT = Object.entries(groupBy(numeric,'turma'));
+          const byT = Object.entries(groupBy(numeric, 'turma'));
 
           // Banner page
-          const ban = document.createElement('div'); ban.className='page';
+          const ban = document.createElement('div'); ban.className = 'page';
           ban.innerHTML = `
             <div class="header">
-              <img src="mind4time-logo.png"><div></div>
+              <img src="mind4time-logo.png">
+              <div>${name}</div>
             </div>
             <div class="content">
               <div class="banner">
@@ -308,12 +329,13 @@
             </div>`;
           root.appendChild(ban);
 
-          // Global chart
+          // Global chart page
           if (numeric.length) {
-            const gp = document.createElement('div'); gp.className='page';
+            const gp = document.createElement('div'); gp.className = 'page';
             gp.innerHTML = `
               <div class="header">
-                <img src="mind4time-logo.png"><div></div>
+                <img src="mind4time-logo.png">
+                <div>${name}</div>
               </div>
               <div class="content">
                 <div class="chart-fullpage">
@@ -329,20 +351,22 @@
               gp.querySelector('.chart-full'),
               `Global (${name})`,
               computeAverages(numeric, LM, OM),
-              sec==='evaluation'
+              sec === 'evaluation'
             );
           }
 
           // 2‑chart grid
-          if (byT.length>1) {
-            for (let i=0; i<byT.length; i+=2) {
-              const gp2 = document.createElement('div'); gp2.className='page';
-              const boxes = byT.slice(i,i+2).map(([,vals],j)=>
-                `<div class="chart-box" id="chart-${prog}-grid-${i+j}"></div>`
-              ).join('');
+          if (byT.length > 1) {
+            for (let i = 0; i < byT.length; i += 2) {
+              const gp2 = document.createElement('div'); gp2.className = 'page';
+              const boxes = byT.slice(i,i+2)
+                .map(([,vals],j) =>
+                  `<div class="chart-box" id="chart-${prog}-grid-${i+j}"></div>`
+                ).join('');
               gp2.innerHTML = `
                 <div class="header">
-                  <img src="mind4time-logo.png"><div></div>
+                  <img src="mind4time-logo.png">
+                  <div>${name}</div>
                 </div>
                 <div class="content">
                   <div class="chart-grid">${boxes}</div>
@@ -352,34 +376,35 @@
                   <div>© MIND4TIME ${currentYear}</div>
                 </div>`;
               root.appendChild(gp2);
-              byT.slice(i,i+2).forEach(([,vals],j)=>{
+              byT.slice(i,i+2).forEach(([,vals],j) => {
                 createBarChart(
                   document.getElementById(`chart-${prog}-grid-${i+j}`),
                   byT[i+j][0],
                   computeAverages(vals, LM, OM),
-                  sec==='evaluation'
+                  sec === 'evaluation'
                 );
               });
             }
           }
 
-          // Text‑answers (12/page)
+          // Text‑answer pages
           const selQs = f.textQuestions||[];
-          selQs.forEach(qid=>{
-            const ans = rows.filter(d=>
-              String(d.section||'').toLowerCase().includes(sec) &&
-              d.question===qid &&
-              isNaN(+d.value)
+          selQs.forEach(qid => {
+            const ans = rows.filter(d =>
+              String(d.section||'').toLowerCase().includes(sec)
+              && d.question===qid
+              && isNaN(+d.value)
             );
             if (!ans.length) return;
-            for (let i=0; i<ans.length; i+=12) {
+            for (let i = 0; i < ans.length; i += 12) {
               const chunk = ans.slice(i,i+12)
-                               .map(a => `<li>${a.value.replace(/\n/g,'</li><li>')}</li>`)
-                               .join('');
-              const tp = document.createElement('div'); tp.className='page';
+                .map(a => `<li>${a.value.replace(/\n/g,'</li><li>')}</li>`)
+                .join('');
+              const tp = document.createElement('div'); tp.className = 'page';
               tp.innerHTML = `
                 <div class="header">
-                  <img src="mind4time-logo.png"><div></div>
+                  <img src="mind4time-logo.png">
+                  <div>${name}</div>
                 </div>
                 <div class="content">
                   <div class="text-page">
@@ -405,16 +430,16 @@
       const pages = Array.from(document.querySelectorAll('.page'));
       const images = [];
       for (const pg of pages) {
-        const canvas = await html2canvas(pg,{ backgroundColor:'#fff', scale:2 });
+        const canvas = await html2canvas(pg, { backgroundColor:'#fff', scale:2 });
         images.push(canvas.toDataURL());
       }
       pdfMake.createPdf({
-        pageSize: { width: 960, height: 540 },
-        pageMargins: [0,0,0,0],
-        content: images.map((img,i) => ({
+        pageSize:{ width:960, height:540 },
+        pageMargins:[0,0,0,0],
+        content: images.map((img,i)=>({
           image: img,
           width: 960,
-          pageBreak: i < images.length - 1 ? 'after' : undefined
+          pageBreak: i < pages.length - 1 ? 'after' : undefined
         }))
       }).download('report.pdf');
     }

@@ -215,6 +215,29 @@
 
 
   <script>
+    
+     let lang = 'pt';
+  const translations = {
+    pt: {
+      corporate_training:   'corporate training',
+      scope_temporal:       'scope temporal:',
+      trainers:             'trainer:',
+      total_responses:      'Total de respostas:',
+      assessment:           'Assessment',
+      evaluation:           'Avaliação'
+    },
+    en: {
+      corporate_training:   'corporate training',
+      scope_temporal:       'Time Frame:',
+      trainers:             'Trainers:',
+      total_responses:      'Total Responses:',
+      assessment:           'Assessment',
+      evaluation:           'Evaluation'
+    }
+  };
+  function t(key) {
+    return (translations[lang] && translations[lang][key]) || key;
+  }
     const currentYear = new Date().getFullYear();
 
     // UTILITIES
@@ -256,14 +279,43 @@
       ).size;
     }
     function formatMonthYear(v) {
-      const names = {
-        '01':'janeiro','02':'fevereiro','03':'março','04':'abril',
-        '05':'maio','06':'junho','07':'julho','08':'agosto',
-        '09':'setembro','10':'outubro','11':'novembro','12':'dezembro'
-      };
-      const [y,m] = v.split('-');
-      return { month:names[m], year:y };
+  const monthNames = {
+    pt: {
+      '01': 'janeiro',
+      '02': 'fevereiro',
+      '03': 'março',
+      '04': 'abril',
+      '05': 'maio',
+      '06': 'junho',
+      '07': 'julho',
+      '08': 'agosto',
+      '09': 'setembro',
+      '10': 'outubro',
+      '11': 'novembro',
+      '12': 'dezembro'
+    },
+    en: {
+      '01': 'January',
+      '02': 'February',
+      '03': 'March',
+      '04': 'April',
+      '05': 'May',
+      '06': 'June',
+      '07': 'July',
+      '08': 'August',
+      '09': 'September',
+      '10': 'October',
+      '11': 'November',
+      '12': 'December'
     }
+  }[lang];
+
+  const [year, month] = v.split('-');
+  return {
+    month: monthNames[month],
+    year:  year
+  };
+}
 
     // CHART
     function createBarChart(container, title, data, uniform) {
@@ -299,7 +351,7 @@
       tp.innerHTML = `
         <div class="header">
           <img src="mind4time-logo.png">
-          <div class="section-title">${sec==='assessment'?'Assessment':'Evaluation'}</div>
+          <div class="section-title">${t(sec)}</div>
         </div>
         <div class="content">
           <div class="text-question">
@@ -316,12 +368,22 @@
 
   async function build() {
   const f = JSON.parse(localStorage.getItem('reportFilters') || '{}');
-  const [data, meta] = await Promise.all([
-    fetch('data.json').then(r => r.json()),
-    fetch('meta.json').then(r => r.json())
-  ]);
-  const LM = createLabelMap(meta.labels),
-        OM = createSortMap(meta.labels);
+ let raw = await fetch('data.json').then(r => r.json());
+// if you have { lang: "en", data: […] }
+ if (raw.lang) {
+  lang = raw.lang === 'en' ? 'en' : 'pt';
+  var data = raw.data;
+ } else {
+  // or if it’s just an array of rows with `.lang`
+  const langs = [...new Set(raw.map(d=>d.lang))];
+  if (langs.length === 1) lang = langs[0];
+  var data = raw;
+ }
+
+ // now fetch your metadata
+ const meta = await fetch('meta.json').then(r => r.json());
+ const LM = createLabelMap(meta.labels),
+       OM = createSortMap(meta.labels);
   const root = document.getElementById('report');
   root.innerHTML = '';
 

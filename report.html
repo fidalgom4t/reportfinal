@@ -124,6 +124,11 @@
   line-height: 1.6;          /* mais espaçamento vertical entre linhas */
   
 }
+    .meta-line {
+  color: #007c91;
+  font-size: 1rem;
+  opacity: 0.85;
+}
 
     /* CHARTS */
     .chart-fullpage { display:flex; align-items:center; justify-content:center; padding:20px; box-sizing:border-box; }
@@ -373,8 +378,8 @@ info.innerHTML = `
           <h1>${pm.TÍTULO || prog}</h1>
           <div class="program-subtitle">${pm.SUBTÍTULO || ''}</div>
           <div class="meta-banner">
-    <div><strong>Scope temporal:</strong> ${timeScope}</div>
-    <div><strong>Trainers:</strong> ${(f.trainers || {})[prog] || 'N/A'}</div>
+    <div class="meta-line">Scope temporal: ${timeScope}</div>
+    <div class="meta-line">Trainers: ${(f.trainers || {})[prog] || 'N/A'}</div>
   </div>
 </div>
     </div>

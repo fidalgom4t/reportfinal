@@ -80,7 +80,7 @@
     }
 
     /* PROGRAM DETAILS BOX */
-   .banner-box {
+   banner-box {
   position: absolute;
   top: 50%;
   left: 50%;
@@ -92,10 +92,21 @@
   align-items: flex-start;
   padding: 0 30px;
 }
-    .banner-box h1 { margin:0 0 12px; color:#007c91; font-size:3.5rem; }
+  .banner-box h1 {
+  margin: 0;
+  font-size: 3.5rem;
+  color: #007c91;
+  font-weight: 700;
+  text-transform: uppercase;
+}
     .banner-box .meta { display:flex; gap:20px; font-size:1.5rem; opacity:.85; }
     .banner-box .meta span,
     .banner-box .meta strong { color:#007c91; }
+    .meta-banner {
+  margin-top: 24px;
+  font-size: 1rem;
+  line-height: 1.6;
+}
 
     /* CHARTS */
     .chart-fullpage { display:flex; align-items:center; justify-content:center; padding:20px; box-sizing:border-box; }
@@ -163,8 +174,12 @@
     }
     
   .program-subtitle {
+   margin-top: 8px;
   font-size: 1.25rem;
-  opacity: 0.85;
+  font-style: italic;
+  color: #007c91;
+  opacity: 0.7;
+  white-space: nowrap;
 }
   </style>
 </head>
@@ -334,9 +349,13 @@ info.innerHTML = `
     <div class="banner">
       <img class="banner-bg" src="${bannerImg}">
       <div class="banner-box">
-        <h1>${pm.TÍTULO || prog}</h1>
-        <div class="program-subtitle">${pm.SUBTÍTULO || ''}</div>
-      </div>
+          <h1>${pm.TÍTULO || prog}</h1>
+          <div class="subtitle">${pm.SUBTÍTULO || ''}</div>
+          <div class="meta-banner">
+    <div><strong>Scope temporal:</strong> ${timeScope}</div>
+    <div><strong>Trainers:</strong> ${(f.trainers || {})[prog] || 'N/A'}</div>
+  </div>
+</div>
     </div>
   </div>
   <div class="footer">

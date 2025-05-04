@@ -334,7 +334,14 @@ for (const key in previous) {
 }
 localStorage.setItem('filters', JSON.stringify(previous));
         const progs = [...new Set(data.filter(d => d.client === client).map(d => d.program))].sort();
-        const infos = [...new Set(data.filter(d => d.client === client).map(d => d.client_info))].sort();
+        const infos = [
+  ...new Set(
+    data
+      .filter(d => d.client === client)
+      .map(d => d.client_info)
+  )
+].sort();
+
         buildCheckboxList(document.getElementById('programList'), progs, 'programs', refreshDynamic);
         buildCheckboxList(document.getElementById('infoList'), infos, 'clientInfos', refreshDynamic);
       });

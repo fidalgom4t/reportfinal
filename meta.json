@@ -313,25 +313,25 @@
       "": ""
     },
     {
-      "QUESTION ID": "01. O/a formador/a reunia a experiência e a competência certas para abordar a temática em questão e liderou produtivamente o programa no tempo de que dispôs.",
+      "QUESTION ID": "The trainer demonstrated both the experience and the right skills to approach the theme and led the program productively.",
       "LABEL": "TRAINER",
       "sort order": 1,
       "": ""
     },
     {
-      "QUESTION ID": "02. Esta experiência de aprendizagem deu-me a oportunidade de pensar e obter novas perspetivas sobre o meu trabalho.",
+      "QUESTION ID": "This learning experience has given me an opportunity to think about and gain new perspectives about my work.",
       "LABEL": "PERSPECTIVE",
       "sort order": 2,
       "": ""
     },
     {
-      "QUESTION ID": "03. O programa foi útil para o meu desenvolvimento pessoal/profissional.",
+      "QUESTION ID": "This program has been useful for my professional and personal development.",
       "LABEL": "DEVELOPMENT",
       "sort order": 3,
       "": ""
     },
     {
-      "QUESTION ID": "04. Qual a probabilidade de recomendar este programa a um colega ou amigo?",
+      "QUESTION ID": "How likely are you to recommend this training program to a colleague within your organization or professional network?",
       "LABEL": "RECOMMEND?",
       "sort order": 4,
       "": ""

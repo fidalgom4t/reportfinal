@@ -545,32 +545,38 @@
     {
       "program_id": "COLAB365",
       "TÍTULO": "COLAB 365",
-      "SUBTÍTULO": "A ARTE DA EFICIÊNCIA COLABORATIVA"
+      "SUBTÍTULO": "A ARTE DA EFICIÊNCIA COLABORATIVA",
+      "SUBTITLE": ""
     },
     {
       "program_id": "P365",
       "TÍTULO": "PRODUCTIVITY 365",
-      "SUBTÍTULO": "PRODUTIVIDADE PESSOAL E ALTA PERFORMANCE"
+      "SUBTÍTULO": "PRODUTIVIDADE PESSOAL E ALTA PERFORMANCE",
+      "SUBTITLE": ""
     },
     {
       "program_id": "EIO",
       "TÍTULO": "EMOTIONS INSIDE OUT",
-      "SUBTÍTULO": "DA GESTÃO EMOCIONAL AOS RESULTADOS"
+      "SUBTÍTULO": "DA GESTÃO EMOCIONAL AOS RESULTADOS",
+      "SUBTITLE": ""
     },
     {
       "program_id": "CIO",
       "TÍTULO": "COMMUNICATIONS INSIDE OUT",
-      "SUBTÍTULO": "GESTÃO EMOCIONAL E EFICÁCIA INTERPESSOAL"
+      "SUBTÍTULO": "GESTÃO EMOCIONAL E EFICÁCIA INTERPESSOAL",
+      "SUBTITLE": ""
     },
     {
       "program_id": "EL",
       "TÍTULO": "EFFECTIVE LEADERSHIP",
-      "SUBTÍTULO": "LIDERANÇA E GESTÃO DE EQUIPAS"
+      "SUBTÍTULO": "LIDERANÇA E GESTÃO DE EQUIPAS",
+      "SUBTITLE": ""
     },
     {
       "program_id": "XMAN",
       "TÍTULO": "X-MAN",
-      "SUBTÍTULO": "EXPECTATIONS MANAGEMENT TRAINING"
+      "SUBTÍTULO": "EXPECTATIONS MANAGEMENT TRAINING",
+      "SUBTITLE": ""
     }
   ]
 }

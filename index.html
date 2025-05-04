@@ -207,7 +207,7 @@
       container.innerHTML = '';
       const grouped = {};
       data.forEach(d => {
-        if (d.client === client && programs.includes(d.program) && infos.includes(d.client_info) && isNaN(+d.value)) {
+        if (isNaN(+d.value)) {
           if (!grouped[d.program]) grouped[d.program] = new Set();
           grouped[d.program].add(d.question);
         }

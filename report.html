@@ -320,8 +320,11 @@
 
       // Program banner
       const pm = meta.titles.find(t=>t.program_id===prog)||{};
-      const title    = lang==='en'?pm.title_en||prog:pm.title_pt||prog;
-      const subtitle = lang==='en'?pm.subtitle_en||'':pm.subtitle_pt||'';
+      const title    = pm.title || pm.TÍTULO || prog;
+      const subtitle = lang==='en'
+  ? (pm.subtitle_en|| pm.SUBTITLE|| '')
+  : (pm.subtitle_pt|| pm.SUBTÍTULO|| '');
+      
       const bannerImg = prog.toLowerCase()==='colab365'
         ? 'colab365-banner.png'
         : 'p365-banner.png';

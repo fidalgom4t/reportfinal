@@ -16,8 +16,7 @@
 
   <style>
     /* RESET & PAGE SETUP */
-    html, body { margin:0; padding:0; background:#333; }
-    body { font-family:'Roboto',sans-serif; }
+    html, body { margin:0; padding:0; background:#333; font-family:'Roboto',sans-serif; }
     @page { size:960px 540px; margin:0; }
     @media print { .page { page-break-after: always; } }
 
@@ -49,9 +48,7 @@
       left:0; right:0;
       overflow:hidden; box-sizing:border-box;
     }
-    .content > * {
-      width:100%; height:100%; position:relative;
-    }
+    .content > * { width:100%; height:100%; position:relative; }
 
     /* HERO */
     .page.hero { overflow:hidden; }
@@ -91,8 +88,7 @@
     }
     .banner-box h1 { margin:0 0 12px; color:#007c91; font-size:2.5rem; }
     .banner-box .meta { display:flex; gap:20px; font-size:1rem; }
-    .banner-box .meta span,
-    .banner-box .meta strong { color:#000; }
+    .banner-box .meta span, .banner-box .meta strong { color:#000; }
 
     /* CHARTS */
     .chart-fullpage { display:flex; align-items:center; justify-content:center; padding:20px; box-sizing:border-box; }
@@ -106,27 +102,15 @@
     /* TEXT PAGES */
     .text-page { padding:20px; box-sizing:border-box; }
     .text-question {
-      background:#f9f9f9;
-      border:1px solid #007c91;
-      padding:10px; 
-      box-sizing:border-box;
-      max-width:calc(100% - 40px);
-      max-height:360px;
-      overflow:visible;
+      background:#f9f9f9; border:1px solid #007c91;
+      padding:10px; max-width:calc(100% - 40px);
+      max-height:360px; overflow:auto;
       page-break-inside:avoid; break-inside:avoid;
-      margin:20px auto 20px auto
+      margin:20px auto;
     }
-    .text-question-title {
-      font-size:1.2rem; font-weight:bold; margin-bottom:12px; color:#007c91;
-    }
-    .text-question ul {
-      padding-left:16px; font-size:0.75rem; line-height:1.6;
-    }
+    .text-question-title { font-size:1.2rem; font-weight:bold; margin-bottom:12px; color:#007c91; }
+    .text-question ul { padding-left:16px; font-size:0.75rem; line-height:1.6; }
     .text-question li { margin-bottom:8px; }
-    .page.text-page .answer-list {
-      max-height:100%;
-      overflow:hidden;
-    }
 
     /* SECTION TITLE IN HEADER */
     .header .section-title {
@@ -134,23 +118,6 @@
       font-weight:600; letter-spacing:0.05em;
       font-size:1rem; font-style:italic;
     }
-
-    .page.text-page .content {
-      display: flex;
-      align-items: flex-start;
-      justify-content: center;
-    }
-    .page.text-page .content > .text-question {
-      height: auto;
-      max-height: 360px;
-      overflow-y: auto;
-      display: inline-block;
-    }
-
-    /* HIDE HEADER/FOOTER ON HERO */
-    .page.hero > .header,
-    .page.hero > .footer { display:none; }
-    .page.hero > .content { top:0; bottom:0; }
 
     /* PDF BUTTON */
     #gerar-pdf {
@@ -169,40 +136,41 @@
 
     // UTILITIES
     function createLabelMap(labels) {
-      return labels.reduce((m, l) => {
-        const k = l.questionId || l['QUESTION ID'];
-        m[k] = l.label || l['LABEL'];
-        return m;
+      return labels.reduce((map, item) => {
+        const k = item.questionId || item['QUESTION ID'];
+        map[k] = item.label || item['LABEL'];
+        return map;
       }, {});
     }
     function createSortMap(labels) {
-      return labels.reduce((m, l) => {
-        const k = l.questionId || l['QUESTION ID'];
-        m[k] = +(l.sortOrder || l['SORT ORDER'] || l.sort_order);
-        return m;
+      return labels.reduce((map, item) => {
+        const k = item.questionId || item['QUESTION ID'];
+        map[k] = +(item.sortOrder || item['SORT ORDER'] || item.sort_order);
+        return map;
       }, {});
     }
     function groupBy(arr, key) {
-      return arr.reduce((o, i) => {
-        (o[i[key]] ||= []).push(i);
-        return o;
+      return arr.reduce((acc, obj) => {
+        (acc[obj[key]] ||= []).push(obj);
+        return acc;
       }, {});
     }
-    function computeAverages(rows, LM, OM) {
-      const g = {};
-      rows.forEach(r => (g[r.question] ||= []).push(+r.value));
-      return Object.entries(g)
+    function computeAverages(rows, labelMap, sortMap) {
+      const grouped = {};
+      rows.forEach(r => (grouped[r.question] ||= []).push(+r.value));
+      return Object.entries(grouped)
         .map(([q, vals]) => ({
           question: q,
-          label: LM[q] || q,
-          avg: +(vals.reduce((a,b)=>a+b,0)/vals.length).toFixed(1)
+          label: labelMap[q] || q,
+          avg: +(vals.reduce((a,b)=>a+b,0) / vals.length).toFixed(1)
         }))
-        .sort((a,b) => (OM[a.question]||0) - (OM[b.question]||0));
+        .sort((a,b) => (sortMap[a.question]||0) - (sortMap[b.question]||0));
     }
-    function countUnique(rows, sec) {
+    function countUnique(rows, section) {
       return new Set(
-        rows.filter(d => String(d.section||'').toLowerCase().includes(sec))
-            .map(d => d['Submission ID'])
+        rows
+          .filter(d => String(d.section||'').toLowerCase().includes(section))
+          .map(d => d['Submission ID'])
       ).size;
     }
     function formatMonthYear(v) {
@@ -211,32 +179,27 @@
         '05':'maio','06':'junho','07':'julho','08':'agosto',
         '09':'setembro','10':'outubro','11':'novembro','12':'dezembro'
       };
-      const [y,m] = v.split('-');
-      return { month:names[m], year:y };
+      const [year,month] = v.split('-');
+      return { month: names[month], year };
     }
 
     // CHART
     function createBarChart(container, title, data, uniform) {
-      const chart = echarts.init(container, null, {
-      renderer: 'svg'
-       // alternatively for canvas at 2× DPI:
-       // devicePixelRatio: window.devicePixelRatio
-     });
-
+      const chart = echarts.init(container, null, { renderer: 'svg' });
       chart.setOption({
-        title:{text:title,left:'center',textStyle:{fontSize:20}},
-        grid:{top:80,left:'10%',right:'10%',bottom:120},
+        title: { text: title, left:'center', textStyle:{ fontSize:20 }},
+        grid: { top:80, left:'10%', right:'10%', bottom:120 },
         tooltip:{},
-        xAxis:{type:'category',data:data.map(d=>d.label),
-               axisLabel:{rotate:30,interval:0,margin:10}},
-        yAxis:{type:'value',min:1,max:5,
-               splitLine:{show:false},axisLine:{show:false},
-               axisTick:{show:false},axisLabel:{show:false}},
-        series:[{type:'bar',data:data.map(d=>d.avg),
-          label:{show:true,position:'top',formatter:'{c}'},
+        xAxis:{ type:'category', data:data.map(d=>d.label),
+          axisLabel:{ rotate:30, interval:0, margin:10 } },
+        yAxis:{ type:'value', min:1, max:5,
+          splitLine:{show:false}, axisLine:{show:false},
+          axisTick:{show:false}, axisLabel:{show:false} },
+        series:[{ type:'bar', data:data.map(d=>d.avg),
+          label:{ show:true, position:'top', formatter:'{c}' },
           itemStyle: uniform
-            ? {color:'#6A99D0'}
-            : {color:p=>p.value<3?'#EA3323':p.value<4?'#6A99D0':'#9FCE63'}
+            ? { color:'#6A99D0' }
+            : { color: p => p.value<3 ? '#EA3323' : p.value<4 ? '#6A99D0' : '#9FCE63' }
         }]
       });
       chart.resize();
@@ -244,16 +207,15 @@
 
     // TEXT PAGE BUILDER
     function createTextPage(prog, sec, qid, showTitle) {
-      const tp = document.createElement('div');
-      tp.className = 'page text-page';
-      tp.innerHTML = `
+      const page = document.createElement('div');
+      page.className = 'page text-page';
+      page.innerHTML = `
         <div class="header">
-          <img src="mind4time-logo.png">
-          <div class="section-title">${sec==='assessment'?'Assessment':'Evaluation'}</div>
+          <img src="mind4time-logo.png"><div></div>
         </div>
         <div class="content">
           <div class="text-question">
-            ${showTitle?`<div class="text-question-title">${qid}</div>`:``}
+            ${ showTitle ? `<div class="text-question-title">${qid}</div>` : `` }
             <ul class="answer-list"></ul>
           </div>
         </div>
@@ -261,7 +223,7 @@
           <div>www.MIND4TIME.com</div>
           <div>© MIND4TIME ${currentYear}</div>
         </div>`;
-      return tp;
+      return page;
     }
 
     // MAIN BUILD
@@ -271,12 +233,12 @@
         fetch('data.json').then(r=>r.json()),
         fetch('meta.json').then(r=>r.json())
       ]);
-      const LM = createLabelMap(meta.labels),
-            OM = createSortMap(meta.labels);
+      const labelMap = createLabelMap(meta.labels),
+            sortMap  = createSortMap(meta.labels);
       const root = document.getElementById('report');
       root.innerHTML = '';
 
-      // compute timeScope
+      // time scope
       let timeScope = '';
       if (f.start && f.end) {
         const s = formatMonthYear(f.start),
@@ -286,14 +248,14 @@
 
       for (const prog of f.programs||[]) {
         const selTur = f[`turmas_${prog}`]||[];
-        const rows   = data.filter(d=>
+        const rows   = data.filter(d =>
           (f.clients||[]).includes(d.client) &&
           d.program===prog &&
           selTur.includes(d.turma)
         );
-        const pm     = meta.titles.find(t=>t.program_id===prog)||{};
+        const pm = meta.titles.find(t=>t.program_id===prog)||{};
 
-        // Hero
+        // HERO
         const hero = document.createElement('div');
         hero.className = 'page hero';
         hero.innerHTML = `
@@ -306,7 +268,13 @@
           </div>`;
         root.appendChild(hero);
 
-        // Program details
+        // PROGRAM DETAILS with conditional banner
+        const bannerImg = prog.toLowerCase() === 'p365'
+          ? 'p365-banner.jpg'
+          : prog.toLowerCase() === 'colab365'
+            ? 'colab365-banner.jpg'
+            : 'assessment-bg.jpg';
+
         const info = document.createElement('div');
         info.className = 'page';
         info.innerHTML = `
@@ -315,7 +283,7 @@
           </div>
           <div class="content">
             <div class="banner">
-              <img class="banner-bg" src="assessment-bg.jpg">
+              <img class="banner-bg" src="${bannerImg}">
               <div class="banner-box">
                 <h1>Detalhes do Programa</h1>
                 <div class="meta">
@@ -331,17 +299,17 @@
           </div>`;
         root.appendChild(info);
 
-        // Sections
+        // ASSESSMENT & EVALUATION sections
         for (const sec of ['assessment','evaluation']) {
-          const name    = sec==='assessment'?'Assessment':'Evaluation';
-          const total   = countUnique(rows, sec);
-          const numeric = rows.filter(d=>
+          const name = sec==='assessment'?'Assessment':'Evaluation';
+          const total = countUnique(rows, sec);
+          const numeric = rows.filter(d =>
             String(d.section||'').toLowerCase().includes(sec) &&
             /^\d+(\.\d+)?$/.test(String(d.value).trim())
           );
-          const byT     = Object.entries(groupBy(numeric,'turma'));
+          const byTurma = Object.entries(groupBy(numeric, 'turma'));
 
-          // banner
+          // Section banner
           const ban = document.createElement('div'); ban.className='page';
           ban.innerHTML = `
             <div class="header">
@@ -360,7 +328,7 @@
             </div>`;
           root.appendChild(ban);
 
-          // global chart
+          // Global chart
           if (numeric.length) {
             const gp = document.createElement('div'); gp.className='page';
             gp.innerHTML = `
@@ -380,18 +348,18 @@
             root.appendChild(gp);
             createBarChart(
               gp.querySelector('.chart-full'),
-              `Global`,
-              computeAverages(numeric, LM, OM),
-              sec==='evaluation'
+              'Global',
+              computeAverages(numeric, labelMap, sortMap),
+              sec === 'evaluation'
             );
           }
 
-          // 2‑chart grid
-          if (byT.length>1) {
-            for (let i=0; i<byT.length; i+=2) {
+          // Per-turma grid
+          if (byTurma.length > 1) {
+            for (let i = 0; i < byTurma.length; i += 2) {
               const gp2 = document.createElement('div'); gp2.className='page';
-              const boxes = byT.slice(i,i+2)
-                .map(([,v],j)=>`<div class="chart-box" id="chart-${prog}-grid-${i+j}"></div>`)
+              const boxes = byTurma.slice(i, i+2)
+                .map(([, vals], j) => `<div class="chart-box" id="chart-${prog}-grid-${i+j}"></div>`)
                 .join('');
               gp2.innerHTML = `
                 <div class="header">
@@ -406,94 +374,88 @@
                   <div>© MIND4TIME ${currentYear}</div>
                 </div>`;
               root.appendChild(gp2);
-              byT.slice(i,i+2).forEach(([,v],j)=>{
+              byTurma.slice(i, i+2).forEach(([, vals], j) => {
                 createBarChart(
                   document.getElementById(`chart-${prog}-grid-${i+j}`),
-                  byT[i+j][0],
-                  computeAverages(v, LM, OM),
-                  sec==='evaluation'
+                  byTurma[i+j][0],
+                  computeAverages(vals, labelMap, sortMap),
+                  sec === 'evaluation'
                 );
               });
             }
           }
 
-          // — TEXT ANSWERS WITH SPILL + FIT‑TO‑SHRINK —
-          const selQs = f.textQuestions || [];
-          selQs.forEach(qid => {
-            const ans = data.filter(d =>
-              (f.clients || []).includes(d.client) &&
+          // Text responses
+          ;(f.textQuestions||[]).forEach(qid => {
+            const answers = data.filter(d =>
+              (f.clients||[]).includes(d.client) &&
               d.program === prog &&
-              (f.clientInfos || []).includes(d.client_info) &&
-              (f[`turmas_${prog}`] || []).includes(d.turma) &&
-              String(d.section || '').toLowerCase().includes(sec) &&
+              (f.clientInfos||[]).includes(d.client_info) &&
+              (f[`turmas_${prog}`]||[]).includes(d.turma) &&
+              String(d.section||'').toLowerCase().includes(sec) &&
               d.question === qid &&
               isNaN(+d.value)
             );
-            if (!ans.length) return;
+            if (!answers.length) return;
 
-            const pagesForThisQ = [];
-            let page   = createTextPage(prog, sec, qid, true);
-            let listEl = page.querySelector('.answer-list');
+            let page = createTextPage(prog, sec, qid, true);
+            let ul   = page.querySelector('.answer-list');
             root.appendChild(page);
-            pagesForThisQ.push(page);
 
-            ans.forEach(a => {
+            answers.forEach(ans => {
               const li = document.createElement('li');
-              li.textContent = a.value;
-              listEl.appendChild(li);
-
-              // overflow spill logic
+              li.textContent = ans.value;
+              ul.appendChild(li);
               const tq = page.querySelector('.text-question');
               if (tq.scrollHeight > tq.clientHeight) {
-                listEl.removeChild(li);
-                page   = createTextPage(prog, sec, qid, false);
-                listEl = page.querySelector('.answer-list');
+                ul.removeChild(li);
+                page = createTextPage(prog, sec, qid, false);
+                ul   = page.querySelector('.answer-list');
                 root.appendChild(page);
-                pagesForThisQ.push(page);
-                listEl.appendChild(li);
+                ul.appendChild(li);
               }
             });
 
-            // shrink each grey box
-            pagesForThisQ.forEach(pg => {
-              const tq = pg.querySelector('.text-question');
+            // shrink to fit
+            page.querySelectorAll('.text-question').forEach(tq => {
               tq.style.height = tq.scrollHeight + 'px';
             });
           });
 
-        } // end for sec
-      }   // end for prog
+        } // end section loop
+      }   // end program loop
     }
 
     // PDF
     async function generatePdf() {
       await build();
-      document.querySelectorAll('.chart-full, .chart-box').forEach(el=>{
-        const c = echarts.getInstanceByDom(el);
-        if (c) c.resize();
+      document.querySelectorAll('.chart-full, .chart-box').forEach(el => {
+        const chart = echarts.getInstanceByDom(el);
+        if (chart) chart.resize();
       });
-      await new Promise(r=>setTimeout(r,100));
+      await new Promise(r => setTimeout(r,100));
 
-      const pages  = Array.from(document.querySelectorAll('.page'));
+      const pages = Array.from(document.querySelectorAll('.page'));
       const CANVAS_SCALE = 4;
-      const images = await Promise.all(pages.map(pg =>
-      html2canvas(pg, {
-        backgroundColor: '#fff',
-         useCORS: true,
-         scale: CANVAS_SCALE
-       }).then(cnv => cnv.toDataURL('image/png', 1.0))
-     ));
+      const images = await Promise.all(
+        pages.map(pg =>
+          html2canvas(pg, { backgroundColor:'#fff', useCORS:true, scale:CANVAS_SCALE })
+            .then(cnv => cnv.toDataURL('image/png',1.0))
+        )
+      );
+
       pdfMake.createPdf({
         pageSize: { width:960, height:540 },
         pageMargins: [0,0,0,0],
-        content: images.map((img,i)=>({
-          image: img, width: 960,
-          pageBreak: i<images.length-1 ? 'after' : undefined
+        content: images.map((img,i) => ({
+          image: img,
+          width: 960,
+          pageBreak: i < images.length-1 ? 'after' : undefined
         }))
       }).download('report.pdf');
     }
 
-    document.addEventListener('DOMContentLoaded', ()=>{
+    document.addEventListener('DOMContentLoaded', () => {
       document.getElementById('gerar-pdf').addEventListener('click', generatePdf);
       build();
     });

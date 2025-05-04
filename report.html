@@ -395,7 +395,7 @@ root.appendChild(info);
 
         // Sections
         for (const sec of ['assessment','evaluation']) {
-          const name    = sec==='assessment'?'Assessment':'Evaluation';
+          const name    = sec==='assessment'?'Assessment':'Avaliação';
           const total   = countUnique(rows, sec);
           const numeric = rows.filter(d=>
             String(d.section||'').toLowerCase().includes(sec) &&

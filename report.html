@@ -118,8 +118,7 @@
     .text-page { padding:20px; box-sizing:border-box; }
     .text-question {
       background:#f9f9f9; border:1px solid #007c91; border-left:6px solid #007c91;
-      padding:10px; box-sizing:border-box;
-      max-height:360px;  /* content area height minus padding */
+      padding:10px; box-sizing:border-box; /* content area height minus padding */
       page-break-inside:avoid; break-inside:avoid;
       overflow: visible;
       margin: 20px auto 20px;
@@ -135,7 +134,7 @@
 
     /* CLAMP THE LIST */
     .page.text-page .answer-list {
-      max-height: 320px; /* 360px − (20px top padding + 20px bottom breathing) */
+      max-height: 320px; 
       overflow: hidden;
     }
 

@@ -265,230 +265,100 @@
   </form>
 
   <script>
-  // === Estado e utils ===
+  // Estado e utilitários
   let rawData = [];
-  const loadFilters = () => JSON.parse(localStorage.getItem('filters') || '{}');
-  const saveFilters = f => localStorage.setItem('filters', JSON.stringify(f));
-  const getChecked = id => Array.from(document.querySelectorAll(`#${id} input:checked`)).map(cb => cb.value);
 
-  // Atualiza texto do box
-    // Atualiza o texto exibido na select-box a partir do storageKey
-  function updateBox(boxId, storageKey, placeholder) {
+  function loadFilters() {
+    return JSON.parse(localStorage.getItem('filters') || '{}');
+  }
+  function saveFilters(filters) {
+    localStorage.setItem('filters', JSON.stringify(filters));
+  }
+  function updateFilter(key, values) {
+    const f = loadFilters(); f[key] = values; saveFilters(f);
+  }
+
+  // Retorna valores checados
+  function getChecked(id) {
+    return Array.from(document.querySelectorAll(`#${id} input:checked`)).map(cb => cb.value);
+  }
+
+  // Atualiza texto no select-box
+  function updateBox(boxId, filterKey, placeholder) {
     const f = loadFilters();
-    const arr = f[storageKey] || [];
+    const arr = f[filterKey] || [];
     document.getElementById(boxId).textContent = arr.length ? arr.join(', ') : placeholder;
   }
 
-  // Abre/fecha dropdown
+  // Alterna dropdown
   function toggleDropdown(wrapperId) {
-    document.querySelectorAll('.dropdown-multiselect').forEach(w => {
-      if (w.id !== wrapperId) w.classList.remove('open');
-    });
+    document.querySelectorAll('.dropdown-multiselect').forEach(w => w.id !== wrapperId && w.classList.remove('open'));
     document.getElementById(wrapperId).classList.toggle('open');
   }
 
-  // Constrói dropdown multiselect
-  function buildDropdown({ wrapperId, boxId, checksId, filterKey, items, placeholder, onChange }) {
-    const wrapper = document.getElementById(wrapperId);
-    const box = document.getElementById(boxId);
-    const checks = document.getElementById(checksId);
+  // Constrói ou atualiza dropdown multiselect
+def buildDropdown({ wrapperId, boxId, checksId, filterKey, items, placeholder, onChange }) {
+  const wrapper = document.getElementById(wrapperId);
+  const box = document.getElementById(boxId);
+  const checks = document.getElementById(checksId);
+  checks.innerHTML = '';
 
-    // Limpa checkboxes
-    checks.innerHTML = '';
+  ['Selecionar tudo', 'Desmarcar tudo'].forEach((text, i) => {
+    const btn = document.createElement('button');
+    btn.type = 'button'; btn.className = 'select-all'; btn.textContent = text;
+    btn.onclick = e => {
+      e.stopPropagation();
+      updateFilter(filterKey, i === 0 ? items.slice() : []);
+      onChange();
+      updateBox(boxId, filterKey, placeholder);
+    };
+    checks.appendChild(btn);
+  });
 
-    // Botões selecionar/desmarcar todos
-    ['Selecionar tudo', 'Desmarcar tudo'].forEach((text, i) => {
-      const btn = document.createElement('button');
-      btn.type = 'button';
-      btn.className = 'select-all';
-      btn.textContent = text;
-      btn.onclick = () => {
-        const vals = i === 0 ? items.slice() : [];
-        const f = loadFilters();
-        f[filterKey] = vals;
-        saveFilters(f);
-        onChange();
-        updateBox(boxId, placeholder);
-      };
-      checks.appendChild(btn);
-    });
+  const stored = loadFilters()[filterKey] || [];
+  items.forEach(item => {
+    const label = document.createElement('label');
+    const cb = document.createElement('input');
+    cb.type = 'checkbox'; cb.value = item; cb.checked = stored.includes(item);
+    cb.onchange = () => {
+      updateFilter(filterKey, getChecked(checksId));
+      onChange();
+      updateBox(boxId, filterKey, placeholder);
+    };
+    label.append(cb, ' ', item);
+    checks.appendChild(label);
+  });
 
-    // Itens
-    const stored = loadFilters()[filterKey] || [];
-    items.forEach(item => {
-      const label = document.createElement('label');
-      const cb = document.createElement('input');
-      cb.type = 'checkbox';
-      cb.value = item;
-      cb.checked = stored.includes(item);
-      cb.onchange = () => {
-        const vals = getChecked(checksId);
-        const f = loadFilters();
-        f[filterKey] = vals;
-        saveFilters(f);
-        onChange();
-        updateBox(boxId, placeholder);
-      };
-      label.append(cb, ' ', item);
-      checks.appendChild(label);
-    });
+  box.onclick = e => { e.stopPropagation(); toggleDropdown(wrapperId); };
+  checks.onclick = e => e.stopPropagation();
 
-        // Toggle and click propagation
-    box.onclick = e => { e.stopPropagation(); toggleDropdown(wrapperId); };
-    checks.onclick = e => e.stopPropagation();
+  updateBox(boxId, filterKey, placeholder);
+}
 
-    // Atualiza label inicial
-    updateBox(boxId, filterKey, placeholder)
-    updateBox(boxId, placeholder);
-  }
+// === Inicialização ===
+async function initializeFilters() {
+  rawData = await fetch('data.json').then(r => r.json());
+  const clients = [...new Set(rawData.map(d => d.client))].sort();
 
-  // === Atualizações dependentes ===
-  function refreshAll() {
-    const f = loadFilters();
-    // Programas, depende de clientes
-    const progs = [...new Set(rawData
-      .filter(d => f.clients?.includes(d.client))
-      .map(d => d.program)
-    )].sort();
-    buildDropdown({
-      wrapperId: 'programWrapper', boxId: 'programBox', checksId: 'programChecks',
-      filterKey: 'programs', items: progs, placeholder: 'Selecionar programa(s)',
-      onChange: refreshAll
-    });
-
-    // Cliente Infos, depende de clientes + programas
-    const infos = [...new Set(rawData
-      .filter(d => f.clients?.includes(d.client) && f.programs?.includes(d.program))
-      .map(d => d.client_info)
-    )].sort();
-    buildDropdown({
-      wrapperId: 'clientInfoWrapper', boxId: 'clientInfoBox', checksId: 'clientInfoChecks',
-      filterKey: 'clientInfos', items: infos, placeholder: 'Selecionar info(s)',
-      onChange: renderProgramBlocks
-    });
-
-    renderProgramBlocks();
-  }
-
-  // === Render dinâmico por programa ===
-  function renderProgramBlocks() {
-    const container = document.getElementById('programsContainer');
-    container.innerHTML = '';
-    const f = loadFilters();
-
-    (f.programs || []).forEach(prog => {
-      const block = document.createElement('div'); block.className = 'program-block';
-      const header = document.createElement('div'); header.className = 'program-header';
-      header.textContent = `Programa: ${prog}`;
-      block.appendChild(header);
-
-      const grid = document.createElement('div'); grid.className = 'program-grid';
-
-      // Campos fixos
-      [['Formador', 'text'], ['Início', 'month'], ['Fim', 'month']]
-      .forEach(([labelText, type]) => {
-        const label = document.createElement('label'); label.textContent = `${labelText}:`;
-        const input = document.createElement('input');
-        input.type = type;
-        if (labelText === 'Formador') {
-          input.value = (f.trainers || {})[prog] || '';
-          input.oninput = e => {
-            const s = loadFilters();
-            s.trainers = s.trainers || {};
-            s.trainers[prog] = e.target.value;
-            saveFilters(s);
-          };
-        } else {
-          input.value = ((s => s[`${labelText.toLowerCase()}s`] || {})(f))[prog] || '';
-          input.onchange = e => {
-            const s = loadFilters();
-            s[`${labelText.toLowerCase()}s`] = s[`${labelText.toLowerCase()}s`] || {};
-            s[`${labelText.toLowerCase()}s`][prog] = e.target.value;
-            saveFilters(s);
-          };
-        }
-        grid.appendChild(label);
-        grid.appendChild(input);
-      });
-
-      // Dropdowns dinâmicos
-      [['Turmas', 'turmas'], ['Perguntas Abertas', 'textQuestions']]
-      .forEach(([labelText, keyPrefix]) => {
-        const filterKey = `${keyPrefix}_${prog}`;
-        const wrapperId = `${keyPrefix}Wrapper_${prog}`;
-        const boxId = `${keyPrefix}Box_${prog}`;
-        const checksId = `${keyPrefix}Checks_${prog}`;
-
-        const label = document.createElement('label'); label.textContent = `${labelText}:`;
-        const wrapper = document.createElement('div'); wrapper.id = wrapperId; wrapper.className = 'dropdown-multiselect';
-        const box = document.createElement('div'); box.id = boxId; box.className = 'select-box';
-        const checks = document.createElement('div'); checks.id = checksId; checks.className = 'checkboxes';
-        wrapper.appendChild(box); wrapper.appendChild(checks);
-
-        // Itens para dropdown
-        let items = [];
-        if (keyPrefix === 'turmas') {
-          items = [...new Set(rawData
-            .filter(d => d.program === prog && f.clients.includes(d.client) && f.clientInfos.includes(d.client_info))
-            .map(d => d.turma)
-          )].sort();
-        } else {
-          items = [...new Set(rawData
-            .filter(d => f.clients.includes(d.client) && f.clientInfos.includes(d.client_info) && d.program === prog && isNaN(+d.value))
-            .map(d => d.question)
-          )].sort();
-        }
-
-        grid.appendChild(label);
-        grid.appendChild(wrapper);
-
-        buildDropdown({
-          wrapperId, boxId, checksId, filterKey,
-          items, placeholder: `Selecionar ${labelText.toLowerCase()}`,
-          onChange: () => {}
-        });
-      });
-
-      block.appendChild(grid);
-      container.appendChild(block);
-    });
-  }
-
-  // === Inicialização ===
-  async function initializeFilters(){
-    rawData = await fetch('data.json').then(r => r.json());
-
-    // Dropdown clientes
-    const clients = [...new Set(rawData.map(d => d.client))].sort();
-    buildDropdown({
-      wrapperId: 'clientWrapper', boxId: 'clientBox', checksId: 'clientChecks',
-      filterKey: 'clients', items: clients, placeholder: 'Selecionar cliente(s)',
-      onChange: refreshAll
-    });
-
-    // Primeiro render
-    refreshAll();
-  }
-
-  // Botões relatório
-  document.getElementById('viewReport').onclick = () => {
-    localStorage.setItem('reportFilters', JSON.stringify(loadFilters()));
-    window.location.href = 'report.html';
-  };
-  document.getElementById('downloadReport').onclick = () => {
-    localStorage.setItem('reportFilters', JSON.stringify(loadFilters()));
-    window.location.href = 'report.html?download=true';
-  };
-
-  // Fecha todos dropdowns ao clicar fora
-  document.addEventListener('click', e => {
-    if (!e.target.closest('.dropdown-multiselect')) {
-      document.querySelectorAll('.dropdown-multiselect').forEach(w => w.classList.remove('open'));
+  // Cliente dropdown
+  buildDropdown({
+    wrapperId: 'clientWrapper',
+    boxId: 'clientBox',
+    checksId: 'clientChecks',
+    filterKey: 'clients',
+    items: clients,
+    placeholder: 'Selecionar cliente(s)',
+    onChange: () => {
+      updateFilter('programs', []);
+      updateFilter('clientInfos', []);
+      refreshAll();
     }
   });
 
-  // Iniciar
-  initializeFilters();
+  refreshAll();
+}
+
+document.addEventListener('DOMContentLoaded', initializeFilters);
 </script>
 </body>
 </html>

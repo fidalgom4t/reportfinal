@@ -149,23 +149,7 @@
     opt.value = c; opt.textContent = c;
     clientSelect.appendChild(opt);
   });
-};
-    }
-
-    function buildCheckboxList(container, options, storageKey, onChange) {
-      container.innerHTML = '';
-      const stored = loadFilters()[storageKey] || [];
-      options.forEach(opt => {
-        const lbl = document.createElement('label');
-        const cb = document.createElement('input');
-        cb.type = 'checkbox';
-        cb.value = opt;
-        cb.checked = stored.includes(opt);
-        cb.onchange = () => {
-          const vals = Array.from(container.querySelectorAll('input:checked')).map(i => i.value);
-          updateFilter(storageKey, vals);
-          onChange();
-        };
+}
         lbl.append(cb, opt);
         container.appendChild(lbl);
       });
@@ -323,6 +307,8 @@
     const block = document.getElementById('textQuestionsBlock');
     block.style.display = block.style.display === 'none' ? 'block' : 'none';
   });
+    block.style.display = block.style.display === 'none' ? 'block' : 'none';
+  });
 
   document.getElementById('viewReport').onclick = () => applyAndGo(false);
   
@@ -352,12 +338,12 @@ localStorage.setItem('filters', JSON.stringify(previous));
     });
 
     function applyAndGo(download) {
-      const all = loadFilters();
-      localStorage.setItem('reportFilters', JSON.stringify(all));
-      window.location.href = 'report.html' + (download ? '?download=true' : '');
-    }
+  const all = loadFilters();
+  localStorage.setItem('reportFilters', JSON.stringify(all));
+  window.location.href = 'report.html' + (download ? '?download=true' : '');
+}
     document.getElementById('viewReport').onclick = () => applyAndGo(false);
-    document.getElementById('downloadReport').onclick = () => applyAndGo(true);
+    
   function applyAndGo(download) {
   const all = loadFilters();
   localStorage.setItem('reportFilters', JSON.stringify(all));

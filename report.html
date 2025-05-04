@@ -528,47 +528,45 @@ root.appendChild(info);
         </div>`;
       root.appendChild(endPage);
     }
-   
-
-    // PDF
+  
     async function generatePdf() {
-      await build();
-      document.querySelectorAll('.chart-full, .chart-box').forEach(el=>{
-        const c = echarts.getInstanceByDom(el);
-        if (c) c.resize();
-      });
-      await new Promise(r=>setTimeout(r,100));
+  await build();
+  document.querySelectorAll('.chart-full, .chart-box').forEach(el => {
+    const c = echarts.getInstanceByDom(el);
+    if (c) c.resize();
+  });
+  await new Promise(r => setTimeout(r, 100));
 
-      const pages  = Array.from(document.querySelectorAll('.page'));
-      const CANVAS_SCALE = 4;
-      const images = await Promise.all(pages.map(pg =>
-      html2canvas(pg, {
-        backgroundColor: '#fff',
-         useCORS: true,
-         scale: CANVAS_SCALE
-       }).then(cnv => cnv.toDataURL('image/png', 1.0))
-     ));
-     const now = new Date();
-const monthsPT = [
-  'janeiro','fevereiro','março','abril','maio','junho',
-  'julho','agosto','setembro','outubro','novembro','dezembro'
-];
-const clientName = (f.clients && f.clients[0]) || 'cliente';
-const filename = `MIND4TIME ${clientName} report ${monthsPT[now.getMonth()]}.${now.getFullYear()}`;
+  const pages = Array.from(document.querySelectorAll('.page'));
+  const CANVAS_SCALE = 4;
+  const images = await Promise.all(pages.map(pg =>
+    html2canvas(pg, {
+      backgroundColor: '#fff',
+      useCORS: true,
+      scale: CANVAS_SCALE
+    }).then(cnv => cnv.toDataURL('image/png', 1.0))
+  ));
 
-pdfMake.createPdf({
-  pageSize: { width:960, height:540 },
-  pageMargins: [0,0,0,0],
-  content: images.map((img,i)=>({
-    image: img, width: 960,
-    pageBreak: i<images.length-1 ? 'after' : undefined
-  }))
-}).download(`${filename}.pdf`);
+  // 🟢 ADD THIS BLOCK HERE
+  const now = new Date();
+  const monthsPT = [
+    'janeiro','fevereiro','março','abril','maio','junho',
+    'julho','agosto','setembro','outubro','novembro','dezembro'
+  ];
+  const f = JSON.parse(localStorage.getItem('reportFilters') || '{}');
+  const clientName = (f.clients && f.clients[0]) || 'cliente';
+  const filename = `MIND4TIME ${clientName} report ${monthsPT[now.getMonth()]}.${now.getFullYear()}`;
 
-    document.addEventListener('DOMContentLoaded', ()=>{
-      document.getElementById('gerar-pdf').addEventListener('click', generatePdf);
-      build();
-    });
+  pdfMake.createPdf({
+    pageSize: { width: 960, height: 540 },
+    pageMargins: [0, 0, 0, 0],
+    content: images.map((img, i) => ({
+      image: img,
+      width: 960,
+      pageBreak: i < images.length - 1 ? 'after' : undefined
+    }))
+  }).download(`${filename}.pdf`);
+}
   </script>
 </body>
 </html>

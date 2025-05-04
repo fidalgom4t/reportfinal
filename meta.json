@@ -346,151 +346,151 @@
       "QUESTION ID": "01. In general, how would you rate the current level of Collaborative Efficiency? [In your team]",
       "LABEL": "",
       "": "",
-      "sort order": ""
+      "sort order": 1
     },
     {
       "QUESTION ID": "01. In general, how would you rate the current level of Collaborative Efficiency? [Between teams (of departments with which you regularly work with)]",
       "LABEL": "",
       "": "",
-      "sort order": ""
+      "sort order": 2
     },
     {
       "QUESTION ID": "01. In general, how would you rate the current level of Collaborative Efficiency? [In the organization as a whole]",
       "LABEL": "",
       "": "",
-      "sort order": ""
+      "sort order": 3
     },
     {
       "QUESTION ID": "02. If you had total autonomy to improve Collaborative Efficiency in your team/department/organization, what would you change?",
       "LABEL": "",
       "": "",
-      "sort order": ""
+      "sort order": 4
     },
     {
       "QUESTION ID": "03. ... I always know what I'm being asked to do specifically on each topic.”",
       "LABEL": "",
       "": "",
-      "sort order": ""
+      "sort order": 5
     },
     {
       "QUESTION ID": "04. ... in longer projects (&gt; 3 months) it's very clear where we want to go and what “It's done!” means”.",
       "LABEL": "",
       "": "",
-      "sort order": ""
+      "sort order": 6
     },
     {
       "QUESTION ID": "05. ...I always know the purpose of what I'm doing (\"what is it for?\") and that helps me keep motivated”.",
       "LABEL": "",
       "": "",
-      "sort order": ""
+      "sort order": 7
     },
     {
       "QUESTION ID": "06. ... there is good agility: decisions tend to be swift and matters are resolved quickly.\"",
       "LABEL": "",
       "": "",
-      "sort order": ""
+      "sort order": 8
     },
     {
       "QUESTION ID": "07. \"Overall my reporting system within the team is effective (meets objectives).\"",
       "LABEL": "",
       "": "",
-      "sort order": ""
+      "sort order": 9
     },
     {
       "QUESTION ID": "08. \"Overall my reporting system within the team is efficient (objectives achieved vs. resources invested).’",
       "LABEL": "",
       "": "",
-      "sort order": ""
+      "sort order": 10
     },
     {
       "QUESTION ID": "09. In collaborative projects or tasks, which tools do you use to manage/report progress? (who needs to do what, by when)",
       "LABEL": "",
       "": "",
-      "sort order": ""
+      "sort order": 11
     },
     {
       "QUESTION ID": "10. ... there's little doubt about who's left to do what. Any grey areas that arise in the division of responsibilities are quickly discussed and clarified.’",
       "LABEL": "",
       "": "",
-      "sort order": ""
+      "sort order": 12
     },
     {
       "QUESTION ID": "11. ... there is openness to renegotiate deadlines. Whenever something is predictably going to be delayed, they inform me in good time.\"",
       "LABEL": "",
       "": "",
-      "sort order": ""
+      "sort order": 13
     },
     {
       "QUESTION ID": "12. ... I rarely get stuck. I know exactly who to speak to in order to resolve the issue quickly.\"",
       "LABEL": "",
       "": "",
-      "sort order": ""
+      "sort order": 14
     },
     {
       "QUESTION ID": "13. ... there is a clear culture of commitment. No matter ‘falls through the cracks’ and if something goes wrong it's quickly signalled.\"",
       "LABEL": "",
       "": "",
-      "sort order": ""
+      "sort order": 15
     },
     {
       "QUESTION ID": "14. ... work distribution is efficient: there are very few situations in which a subject is being dealt redundantly by different people/areas.\"",
       "LABEL": "",
       "": "",
-      "sort order": ""
+      "sort order": 16
     },
     {
       "QUESTION ID": "15. ... internal processes are simple and efficient.\"",
       "LABEL": "",
       "": "",
-      "sort order": ""
+      "sort order": 17
     },
     {
       "QUESTION ID": "15. Regarding the use of EMAIL in your organisation: [The number of emails I receive every day is adequate.]",
       "LABEL": "",
       "": "",
-      "sort order": ""
+      "sort order": 18
     },
     {
       "QUESTION ID": "15. Regarding the use of EMAIL in your organisation: [The emails I receive are action-oriented. I know exactly what they want from me.]",
       "LABEL": "",
       "": "",
-      "sort order": ""
+      "sort order": 19
     },
     {
       "QUESTION ID": "15. Regarding the use of EMAIL in your organisation: [Emails are sent efficiently, in the sense that they only involve the strictly necessary people.]",
       "LABEL": "",
       "": "",
-      "sort order": ""
+      "sort order": 20
     },
     {
       "QUESTION ID": "15. Regarding the use of EMAIL in your organisation: [In general, EMAIL is used very productively.]",
       "LABEL": "",
       "": "",
-      "sort order": ""
+      "sort order": 21
     },
     {
       "QUESTION ID": "16. Regarding MEETINGS in your organisation: [Usually, I have an adequate number of meetings in my calendar.]",
       "LABEL": "",
       "": "",
-      "sort order": ""
+      "sort order": 22
     },
     {
       "QUESTION ID": "16. Regarding MEETINGS in your organisation: [The meetings I attend are usually action-oriented. When finished, everyone knows who needs to do what, by when.]",
       "LABEL": "",
       "": "",
-      "sort order": ""
+      "sort order": 23
     },
     {
       "QUESTION ID": "16. Regarding MEETINGS in your organisation: [Generally, meetings are carefully convened, with only the strictly necessary people present, and only for as long as necessary.]",
       "LABEL": "",
       "": "",
-      "sort order": ""
+      "sort order": 24
     },
     {
       "QUESTION ID": "16. Regarding MEETINGS in your organisation: [In general, I think MEETINGS are very productive.]",
       "LABEL": "",
       "": "",
-      "sort order": ""
+      "sort order": 25
     },
     {
       "QUESTION ID": "",

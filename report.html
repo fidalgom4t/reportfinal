@@ -134,10 +134,25 @@
       font-size:1rem; font-style:italic;
     }
 
+    .page.text-page .content {
+  display: flex;
+  align-items: flex-start;    /* stick the box at the top */
+  justify-content: center;    /* center it horizontally (optional) */
+}
+
+.page.text-page .content > .text-question {
+  height: auto;               /* size to its contents */
+  max-height: 320px;          /* don’t grow taller than this */
+  overflow-y: auto;           /* scroll if it exceeds 320px */
+  display: inline-block;      /* shrink width to content too */
+}
+
+
     /* HIDE HEADER/FOOTER ON HERO */
     .page.hero > .header,
     .page.hero > .footer { display:none; }
     .page.hero > .content { top:0; bottom:0; }
+    
 
     /* PDF BUTTON */
     #gerar-pdf {
@@ -145,6 +160,7 @@
       padding:8px 16px; background:#007c91; color:#fff;
       border:none; border-radius:4px; cursor:pointer;
     }
+    
   </style>
 </head>
 <body>

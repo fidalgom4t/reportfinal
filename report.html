@@ -78,6 +78,15 @@
       position:absolute; left:30px; bottom:20px;
       font-size:1.25rem; font-weight:500; color:#000; z-index:1;
     }
+    .banner-super {
+  font-size: 1rem;
+  color: #007c91;
+  font-weight: 400;      /* não bold */
+  opacity: 0.85;
+  margin-bottom: 6px;
+  letter-spacing: 0.03em;
+  font-style: italic;
+}
 
     /* PROGRAM DETAILS BOX */
    .banner-box {
@@ -352,6 +361,7 @@ info.innerHTML = `
     <div class="banner">
       <img class="banner-bg" src="${bannerImg}">
       <div class="banner-box">
+           div class="banner-super">corporate training</div>
           <h1>${pm.TÍTULO || prog}</h1>
           <div class="program-subtitle">${pm.SUBTÍTULO || ''}</div>
           <div class="meta-banner">

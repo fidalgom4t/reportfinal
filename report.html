@@ -149,7 +149,9 @@
     // 1) Textos estáticos e detecção de idioma
     const T = {
       pt: {
-        section: { assessment: 'Assessment', evaluation: 'Avaliação' },
+        gerarPdf: 'Gerar Relatório (PDF)',
+        corporateTraining: 'corporate training',
+        section: { assessment: 'Assessment', evaluation: 'Evaluation' },
         totalResponses: total => `Total de respostas: ${total}`,
         months: {
           '01':'janeiro','02':'fevereiro','03':'março','04':'abril',
@@ -158,6 +160,8 @@
         }
       },
       en: {
+        gerarPdf: 'Gerar Relatório (PDF)',
+        corporateTraining: 'corporate training',
         section: { assessment: 'Assessment', evaluation: 'Evaluation' },
         totalResponses: total => `Total responses: ${total}`,
         months: {
@@ -168,15 +172,35 @@
       }
     };
 
-    function detectLangFromQuestionTexts(questions = []) {
-      let enCount=0, ptCount=0;
-      questions.forEach(q => {
-        if (/[áàãâéêíóôõúç]/i.test(q)) ptCount++;
-        else enCount++;
-      });
-      return enCount>ptCount ? 'en' : 'pt';
-    }
+    /**
+ * Detecta 'pt' ou 'en' contando palavras-chave em cada pergunta.
+ * Se em mais perguntas houver mais keywords EN que PT, escolhe 'en', senão 'pt'.
+ */
+function detectLangFromQuestionTexts(questions = []) {
+  const ptKeywords = [
+    'como','qual','meu','minha','não','é','são','se','com','que'
+  ];
+  const enKeywords = [
+    'how','what','my','i','the','is','are','and','of','to'
+  ];
 
+  let ptCount = 0, enCount = 0;
+
+  questions.forEach(q => {
+    const txt = q.toLowerCase();
+    let localPt = 0, localEn = 0;
+
+    ptKeywords.forEach(w => { if (txt.includes(w)) localPt++; });
+    enKeywords.forEach(w => { if (txt.includes(w)) localEn++; });
+
+    if      (localEn > localPt) enCount++;
+    else if (localPt > localEn) ptCount++;
+    // se empate, ignora esta pergunta
+  });
+
+  // em caso de empate geral, cai em pt
+  return enCount > ptCount ? 'en' : 'pt';
+}
     // 2) Mapas de labels, IDs e ordenação
     function createLabelMap(labels, lang) {
       return labels.reduce((m,item) => {
@@ -272,9 +296,9 @@
 
     // 5) Construção do relatório
     async function build() {
-      const f = JSON.parse(localStorage.getItem('reportFilters')||'{}');
-      const lang = detectLangFromQuestionTexts(f.textQuestions||[]);
-      const tx = T[lang];
+    const f    = JSON.parse(localStorage.getItem('reportFilters') || '{}');
+    const lang = detectLangFromQuestionTexts(f.textQuestions || []);
+    const tx   = T[lang];
 
       document.getElementById('gerar-pdf').textContent = tx.gerarPdf;
 

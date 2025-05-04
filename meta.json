@@ -805,10 +805,10 @@
       "sort order": ""
     },
     {
-      "QUESTION ID": "01. What could change in your workplace that would improve your performance level and overall productivity?",
-      "LABEL": "01. What could change in your workplace that would improve your performance level and overall productivity?",
+      "QUESTION ID": "01. \"In my work environment, I am able to produce in a focused manner and with no major distractions.\"",
+      "LABEL": "02. \"In my case, I rarely manage many different issues simultaneously. The number of different topics that manage simultaneously is adequate, not excessive.\"",
       "": "01. What could change in your workplace that would improve your performance level and overall productivity?",
-      "sort order": "01. What could change in your workplace that would improve your performance level and overall productivity?"
+      "sort order": "05. \"I rarely procrastinate. I always respect the priorities I've defined on my to-do list.\""
     },
     {
       "QUESTION ID": "02. If your productivity and performance level were already higher, where and how would it be noticeable?",

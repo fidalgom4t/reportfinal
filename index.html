@@ -21,9 +21,11 @@
       background: var(--bg);
       color: #333;
     }
+    h2, h3, h4 {
+      color: var(--primary);
+    }
     h2 {
       text-align: center;
-      color: var(--primary);
       margin-bottom: 24px;
     }
     form {
@@ -36,11 +38,11 @@
       border-radius: var(--radius);
       padding: var(--gap);
     }
-    label {
-      font-weight: bold;
-      display: block;
-      margin-bottom: 4px;
+    /* Labels for selection lists without bold */
+    .checkbox-list label {
+      font-weight: normal;
     }
+    /* Keep bold for other labels if desired (e.g., input fields) */
     .checkbox-list {
       border: 1px solid var(--border);
       border-radius: var(--radius);
@@ -48,14 +50,6 @@
       background: #fff;
       max-height: 160px;
       overflow-y: auto;
-    }
-    .checkbox-list label {
-      display: flex;
-      align-items: center;
-      margin-bottom: 6px;
-    }
-    .checkbox-list input {
-      margin-right: 8px;
     }
     select, input[type="text"], input[type="month"] {
       width: 100%;
@@ -122,7 +116,6 @@
   </div>
 
   <script>
-    // Remover filtros de relatório anterior
     localStorage.removeItem('reportFilters');
     let data = [];
 
@@ -252,28 +245,49 @@
       const container = document.getElementById('textQuestionsBlock');
       container.innerHTML = '';
       const grouped = {};
-      const evaluation = new Set();
+      const evaluationSet = new Set();
       data.forEach(d => {
         if (!isNaN(+d.value)) return;
         const section = (d.section || '').toLowerCase();
         if (section.includes('evaluation')) {
-          evaluation.add(d.question);
+          evaluationSet.add(d.question);
         } else if (section.includes('assessment')) {
           if (!grouped[d.program]) grouped[d.program] = new Set();
           grouped[d.program].add(d.question);
         }
       });
+
+      // Ordenar perguntas de evaluation: números primeiro, depois alfabeticamente, com itens especiais no final
+      const specials = ['Reivention', 'clube rh', 'HR Club'];
+      function isDigitStart(s) { return /^\d/.test(s); }
+      function specialIndex(s) {
+        const idx = specials.indexOf(s);
+        return idx === -1 ? Infinity : idx;
+      }
+      const evaluation = Array.from(evaluationSet);
+      evaluation.sort((a, b) => {
+        const aNum = isDigitStart(a), bNum = isDigitStart(b);
+        if (aNum && !bNum) return -1;
+        if (!aNum && bNum) return 1;
+        if (aNum && bNum) return a.localeCompare(b, 'pt');
+        const aSpec = specialIndex(a), bSpec = specialIndex(b);
+        if (aSpec !== bSpec) return aSpec - bSpec;
+        if (aSpec !== Infinity) return 0;
+        return a.localeCompare(b, 'pt');
+      });
+
       const selected = new Set(loadFilters().textQuestions || []);
       const block = document.createElement('div');
       block.className = 'dynamic-block';
       const title = document.createElement('h3');
       title.textContent = 'Perguntas Abertas (por programa - assessment)';
       block.appendChild(title);
+
       Object.entries(grouped).forEach(([prog, questions]) => {
         const subtitle = document.createElement('h4');
         subtitle.textContent = prog;
         block.appendChild(subtitle);
-        questions.forEach(q => {
+        Array.from(questions).sort((a, b) => a.localeCompare(b, 'pt')).forEach(q => {
           const lbl = document.createElement('label');
           const cb = document.createElement('input'); cb.type = 'checkbox'; cb.value = q;
           cb.checked = selected.has(q);
@@ -285,7 +299,8 @@
           block.appendChild(lbl);
         });
       });
-      if (evaluation.size > 0) {
+
+      if (evaluation.length > 0) {
         const evalTitle = document.createElement('h3');
         evalTitle.textContent = 'Perguntas de Evaluation (iguais para todos os programas)';
         block.appendChild(evalTitle);

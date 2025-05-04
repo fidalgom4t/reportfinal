@@ -181,7 +181,7 @@
       programs.forEach(prog => {
         container.appendChild(renderBlock(client, prog, infos));
       });
-      renderTextQuestions(client, programs, infos);
+      renderTextQuestions();
       document.getElementById('viewReport').disabled = false;
       document.getElementById('downloadReport').disabled = false;
     }
@@ -202,39 +202,66 @@
       return block;
     }
 
-    function renderTextQuestions(client, programs, infos) {
-      const container = document.getElementById('textQuestionsBlock');
-      container.innerHTML = '';
-      const grouped = {};
-      data.forEach(d => {
-        if (isNaN(+d.value)) {
-          if (!grouped[d.program]) grouped[d.program] = new Set();
-          grouped[d.program].add(d.question);
-        }
-      });
-      const selected = new Set(loadFilters().textQuestions || []);
-      const block = document.createElement('div');
-      block.className = 'dynamic-block';
-      const title = document.createElement('h3');
-      title.textContent = 'Perguntas Abertas (comuns a todos os programas)';
-      block.appendChild(title);
-      Object.entries(grouped).forEach(([prog, questions]) => {
-        const subtitle = document.createElement('h4');
-        subtitle.textContent = prog;
-        block.appendChild(subtitle);
-        questions.forEach(q => {
-          const lbl = document.createElement('label');
-          const cb = document.createElement('input'); cb.type = 'checkbox'; cb.value = q;
-          cb.checked = selected.has(q);
-          cb.onchange = () => {
-            const all = Array.from(block.querySelectorAll('input:checked')).map(i => i.value);
-            updateFilter('textQuestions', all);
-          };
-          lbl.append(cb, q);
-          block.appendChild(lbl);
-        });
-      });
-      container.appendChild(block);
+    function renderTextQuestions() {
+  const container = document.getElementById('textQuestionsBlock');
+  container.innerHTML = '';
+  const grouped = {};
+  const evaluation = new Set();
+
+  data.forEach(d => {
+    if (!isNaN(+d.value)) return;
+    const section = (d.section || '').toLowerCase();
+    if (section.includes('evaluation')) {
+      evaluation.add(d.question);
+    } else if (section.includes('assessment')) {
+      if (!grouped[d.program]) grouped[d.program] = new Set();
+      grouped[d.program].add(d.question);
+    }
+  });
+
+  const selected = new Set(loadFilters().textQuestions || []);
+  const block = document.createElement('div');
+  block.className = 'dynamic-block';
+  const title = document.createElement('h3');
+  title.textContent = 'Perguntas Abertas (por programa - assessment)';
+  block.appendChild(title);
+
+  Object.entries(grouped).forEach(([prog, questions]) => {
+    const subtitle = document.createElement('h4');
+    subtitle.textContent = prog;
+    block.appendChild(subtitle);
+    questions.forEach(q => {
+      const lbl = document.createElement('label');
+      const cb = document.createElement('input'); cb.type = 'checkbox'; cb.value = q;
+      cb.checked = selected.has(q);
+      cb.onchange = () => {
+        const all = Array.from(block.querySelectorAll('input:checked')).map(i => i.value);
+        updateFilter('textQuestions', all);
+      };
+      lbl.append(cb, q);
+      block.appendChild(lbl);
+    });
+  });
+
+  if (evaluation.size > 0) {
+    const evalTitle = document.createElement('h3');
+    evalTitle.textContent = 'Perguntas de Evaluation (iguais para todos os programas)';
+    block.appendChild(evalTitle);
+    evaluation.forEach(q => {
+      const lbl = document.createElement('label');
+      const cb = document.createElement('input'); cb.type = 'checkbox'; cb.value = q;
+      cb.checked = selected.has(q);
+      cb.onchange = () => {
+        const all = Array.from(block.querySelectorAll('input:checked')).map(i => i.value);
+        updateFilter('textQuestions', all);
+      };
+      lbl.append(cb, q);
+      block.appendChild(lbl);
+    });
+  }
+
+  container.appendChild(block);
+}
     }
 
     function createInputField(label, prog, key) {

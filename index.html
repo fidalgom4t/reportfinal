@@ -32,11 +32,18 @@
       padding:var(--gap);
     }
     label { font-weight:bold; display:block; margin-bottom:4px; }
+    .checkbox-list {
+      max-height:120px; overflow-y:auto;
+      border:1px solid var(--border); background:#fafafa;
+      border-radius:var(--radius); padding:var(--gap);
+      margin-bottom:var(--gap);
+    }
+    .checkbox-list label { display:flex; align-items:center; margin-bottom:6px; }
+    .checkbox-list input { margin-right:8px; }
     select, input[type="text"], input[type="month"], button {
       width:100%; padding:8px; border:1px solid var(--border);
       border-radius:var(--radius); font-size:1rem;
     }
-    select[multiple] { height:120px; }
     select:disabled { background:#eee; }
     .dynamic-block {
       background:var(--card);
@@ -46,14 +53,6 @@
       margin-bottom:var(--gap);
     }
     .dynamic-block + .dynamic-block { margin-top:var(--gap); }
-    .checkbox-list {
-      max-height:120px; overflow-y:auto;
-      border:1px solid var(--border); background:#fafafa;
-      border-radius:var(--radius); padding:var(--gap);
-      margin-bottom:var(--gap);
-    }
-    .checkbox-list label { display:flex; align-items:center; margin-bottom:6px; }
-    .checkbox-list input { margin-right:8px; }
     .actions { text-align:center; margin-top:var(--gap); }
     .actions button {
       padding:10px 24px; margin:0 8px; background:var(--primary);
@@ -75,16 +74,12 @@
       </select>
     </div>
     <div>
-      <label for="programSelect">Programas</label>
-      <select id="programSelect" multiple disabled>
-        <option value="">– Selecione –</option>
-      </select>
+      <label>Programas</label>
+      <div id="programList" class="checkbox-list"></div>
     </div>
     <div>
-      <label for="infoSelect">Cliente Info</label>
-      <select id="infoSelect" disabled>
-        <option value="">– Selecione –</option>
-      </select>
+      <label>Cliente Info</label>
+      <div id="infoList" class="checkbox-list"></div>
     </div>
     <div></div>
   </form>
@@ -97,6 +92,9 @@
   </div>
 
   <script>
+    localStorage.removeItem('filters');
+    localStorage.removeItem('reportFilters');
+    
     let data = [];
 
     function loadFilters(){
@@ -107,113 +105,112 @@
 
     document.addEventListener('DOMContentLoaded', async()=>{
       data = await fetch('data.json').then(r=>r.json());
-      // populate clients
       const clients = [...new Set(data.map(d=>d.client))].sort();
       const csel = document.getElementById('clientSelect');
-      clients.forEach(c=>{
-        const o = document.createElement('option'); o.value=c; o.textContent=c;
-        csel.appendChild(o);
-      }); csel.disabled=false;
+      clients.forEach(c=>{ const o=document.createElement('option'); o.value=c; o.textContent=c; csel.appendChild(o); });
+      csel.disabled=false;
     });
 
     const clientSelect  = document.getElementById('clientSelect');
-    const programSelect = document.getElementById('programSelect');
-    const infoSelect    = document.getElementById('infoSelect');
+    const programList   = document.getElementById('programList');
+    const infoList      = document.getElementById('infoList');
     const dynamicBlocks = document.getElementById('dynamicBlocks');
     const viewBtn       = document.getElementById('viewReport');
     const downloadBtn   = document.getElementById('downloadReport');
 
     clientSelect.onchange = ()=>{
       const selC = clientSelect.value;
-      programSelect.innerHTML = ''; infoSelect.innerHTML=''; dynamicBlocks.innerHTML='';
+      programList.innerHTML = '';
+      infoList.innerHTML = '';
+      dynamicBlocks.innerHTML = '';
       viewBtn.disabled = downloadBtn.disabled = true;
-      if(!selC){ programSelect.disabled=true; infoSelect.disabled=true; updateFilter('clients',[]); return; }
+      if(!selC){ updateFilter('clients',[]); return; }
       updateFilter('clients',[selC]);
-      // programs
+
       const progs = [...new Set(data.filter(d=>d.client===selC).map(d=>d.program))].sort();
-      progs.forEach(p=>{
-        const o=document.createElement('option'); o.value=p; o.textContent=p;
-        programSelect.appendChild(o);
+      const infos = [...new Set(data.filter(d=>d.client===selC).map(d=>d.client_info))].sort();
+
+      buildCheckboxList(programList, progs, 'programs', refreshDynamic);
+      buildCheckboxList(infoList, infos, 'clientInfos', refreshDynamic);
+    };
+
+    function buildCheckboxList(container, options, storageKey, onChange){
+      container.innerHTML = '';
+      const stored = loadFilters()[storageKey] || [];
+      options.forEach(opt => {
+        const lbl = document.createElement('label');
+        const cb = document.createElement('input'); cb.type = 'checkbox'; cb.value = opt;
+        cb.checked = stored.includes(opt);
+        cb.onchange = ()=>{
+          const vals = Array.from(container.querySelectorAll('input:checked')).map(x=>x.value);
+          updateFilter(storageKey, vals);
+          if(onChange) onChange();
+        };
+        lbl.append(cb, opt);
+        container.appendChild(lbl);
       });
-      programSelect.disabled=false;
-    };
+    }
 
-    programSelect.onchange = ()=>{
-      const selC  = clientSelect.value;
-      const selPs = Array.from(programSelect.selectedOptions).map(o=>o.value);
-      infoSelect.innerHTML=''; dynamicBlocks.innerHTML='';
-      viewBtn.disabled = downloadBtn.disabled = true;
-      if(!selPs.length){ infoSelect.disabled=true; updateFilter('programs',[]); return; }
-      updateFilter('programs', selPs);
-      // infos
-      const infos = [...new Set(data.filter(d=>d.client===selC && selPs.includes(d.program)).map(d=>d.client_info))].sort();
-      infos.forEach(i=>{
-        const o=document.createElement('option'); o.value=i; o.textContent=i;
-        infoSelect.appendChild(o);
-      });
-      infoSelect.disabled=false;
-    };
+    function refreshDynamic(){
+      dynamicBlocks.innerHTML = '';
+      const f = loadFilters();
+      const selC = (f.clients||[])[0];
+      const selPs = f.programs || [];
+      const selIs = f.clientInfos || [];
+      if (!selC || !selPs.length || !selIs.length) {
+        viewBtn.disabled = downloadBtn.disabled = true;
+        return;
+      }
+      selPs.forEach(p => renderDynamic(selC, p, selIs));
+      viewBtn.disabled = downloadBtn.disabled = false;
+    }
 
-    infoSelect.onchange = ()=>{
-      const selI = infoSelect.value;
-      dynamicBlocks.innerHTML=''; viewBtn.disabled=downloadBtn.disabled=true;
-      if(!selI){ updateFilter('clientInfos',[]); return; }
-      updateFilter('clientInfos',[selI]);
-      // render dynamic blocks for each program
-      const selC  = clientSelect.value;
-      const selPs = loadFilters().programs;
-      selPs.forEach(p=> renderDynamic(selC,p,selI));
-      viewBtn.disabled=downloadBtn.disabled=false;
-    };
-
-    function renderDynamic(client,program,info){
-      // clear previous filter keys for this program
+    function renderDynamic(client, program, infos){
       updateFilter(`turmas_${program}`, []);
       updateFilter(`textQuestions_${program}`, []);
 
-      const block = document.createElement('div'); block.className='dynamic-block';
-      const h = document.createElement('h3'); h.textContent=`Programa: ${program}`; block.appendChild(h);
-      // trainer
-      block.appendChild(createTextField('Formador',program,'trainers'));
-      // dates
-      block.appendChild(createMonthField('Início',program,'starts'));
-      block.appendChild(createMonthField('Fim',program,'ends'));
-      // turmas
-      const turmas = [...new Set(data.filter(d=>d.client===client&&d.program===program&&d.client_info===info).map(d=>d.turma))];
-      block.appendChild(createCheckboxList('Turmas',turmas,`turmas_${program}`));
-      // perguntas
-      const perguntas = [...new Set(data.filter(d=>d.client===client&&d.program===program&&d.client_info===info&&isNaN(+d.value)).map(d=>d.question))];
-      block.appendChild(createCheckboxList('Perguntas Abertas',perguntas,`textQuestions_${program}`));
+      const block = document.createElement('div');
+      block.className = 'dynamic-block';
+      const h = document.createElement('h3'); h.textContent = `Programa: ${program}`;
+      block.appendChild(h);
+      block.appendChild(createTextField('Formador', program, 'trainers'));
+      block.appendChild(createMonthField('Início', program, 'starts'));
+      block.appendChild(createMonthField('Fim', program, 'ends'));
+
+      const turmas = [...new Set(data.filter(d=> d.client===client && d.program===program && infos.includes(d.client_info)).map(d=>d.turma))];
+      const perguntas = [...new Set(data.filter(d=> d.client===client && d.program===program && infos.includes(d.client_info) && isNaN(+d.value)).map(d=>d.question))];
+
+      block.appendChild(createCheckboxList('Turmas', turmas, `turmas_${program}`));
+      block.appendChild(createCheckboxList('Perguntas Abertas', perguntas, `textQuestions_${program}`));
+
       dynamicBlocks.appendChild(block);
     }
 
-    function createTextField(labelText,program,storageKey){
+    function createTextField(labelText, program, storageKey){
       const c=document.createElement('div');
       const lb=document.createElement('label'); lb.textContent=labelText;
       const inp=document.createElement('input'); inp.type='text';
       inp.value=(loadFilters()[storageKey]||{})[program]||'';
       inp.oninput=e=>{
-        const obj=loadFilters()[storageKey]||{};
-        obj[program]=e.target.value;
+        const obj=loadFilters()[storageKey]||{}; obj[program]=e.target.value;
         updateFilter(storageKey,obj);
       };
       c.append(lb,inp); return c;
     }
 
-    function createMonthField(labelText,program,storageKey){
+    function createMonthField(labelText, program, storageKey){
       const c=document.createElement('div');
       const lb=document.createElement('label'); lb.textContent=labelText;
       const inp=document.createElement('input'); inp.type='month';
       inp.value=((loadFilters()[storageKey]||{})[program]||'');
       inp.onchange=e=>{
-        const obj=loadFilters()[storageKey]||{};
-        obj[program]=e.target.value;
+        const obj=loadFilters()[storageKey]||{}; obj[program]=e.target.value;
         updateFilter(storageKey,obj);
       };
       c.append(lb,inp); return c;
     }
 
-    function createCheckboxList(labelText,options,storageKey){
+    function createCheckboxList(labelText, options, storageKey){
       const c=document.createElement('div');
       const lb=document.createElement('label'); lb.textContent=labelText;
       const list=document.createElement('div'); list.className='checkbox-list';
@@ -231,10 +228,8 @@
       c.append(lb,list); return c;
     }
 
-    // collect and navigate
     function applyAndGo(download){
-      const all=loadFilters();
-      localStorage.setItem('reportFilters', JSON.stringify(all));
+      localStorage.setItem('reportFilters', JSON.stringify(loadFilters()));
       window.location.href = 'report.html' + (download? '?download=true':'');
     }
     viewBtn.onclick     = ()=>applyAndGo(false);

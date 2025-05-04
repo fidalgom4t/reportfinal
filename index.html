@@ -58,10 +58,11 @@
       padding: var(--gap);
       margin-bottom: var(--gap);
     }
-    /* Espaçamento entre itens de listas */
+    /* Espaçamento entre itens de listas e remover numeração automática */
     .dynamic-block ol {
-      margin: 0 0 var(--gap) 20px;
-      padding: 0;
+      margin: 0 0 var(--gap) 0;
+      padding: 0 0 0 20px;
+      list-style: none;
     }
     .dynamic-block ol li {
       margin-bottom: 8px;
@@ -131,7 +132,7 @@
     async function init() {
       data = await fetch('data.json')
                 .then(r => r.json())
-                .catch(() => alert('Erro ao carregar dados.'));  
+                .catch(() => alert('Erro ao carregar dados.'));
       const clients = [...new Set(data.map(d => d.client))].sort();
       const clist = document.getElementById('clientList');
       clients.forEach(c => createListItem(clist, c, 'clients', initFilters));
@@ -150,7 +151,6 @@
     }
 
     function initFilters() {
-      // Reconstrói listas e limpa dynamic blocks
       const f = loadFilters();
       const client = f.clients && f.clients[0];
       if (!client) return refreshDynamic();
@@ -161,6 +161,35 @@
       const infoList = document.getElementById('infoList'); infoList.innerHTML = '';
       infos.forEach(i => createListItem(infoList, i, 'clientInfos', refreshDynamic));
       refreshDynamic();
+    }
+
+    // Adicionando funções faltantes para criar campos de input e month
+    function createInputField(label, prog, key) {
+      const wrapper = document.createElement('div');
+      const lbl = document.createElement('label'); lbl.textContent = label;
+      const inp = document.createElement('input'); inp.type = 'text';
+      inp.value = (loadFilters()[key] || {})[prog] || '';
+      inp.oninput = e => {
+        const obj = loadFilters()[key] || {};
+        obj[prog] = e.target.value;
+        updateFilter(key, obj);
+      };
+      wrapper.append(lbl, inp);
+      return wrapper;
+    }
+
+    function createMonthField(label, prog, key) {
+      const wrapper = document.createElement('div');
+      const lbl = document.createElement('label'); lbl.textContent = label;
+      const inp = document.createElement('input'); inp.type = 'month';
+      inp.value = (loadFilters()[key] || {})[prog] || '';
+      inp.onchange = e => {
+        const obj = loadFilters()[key] || {};
+        obj[prog] = e.target.value;
+        updateFilter(key, obj);
+      };
+      wrapper.append(lbl, inp);
+      return wrapper;
     }
 
     function buildCheckboxGroup(label, opts, key) {

@@ -141,14 +141,16 @@ localStorage.removeItem('reportFilters');
     }
 
     async function init() {
-  data = await fetch('data.json').then(r => r.json());
-  const clients = [...new Set(data.map(d => d.client))].sort();
-  const clientSelect = document.getElementById('clientSelect');
-  clients.forEach(c => {
-    const opt = document.createElement('option');
-    opt.value = c; opt.textContent = c;
-    clientSelect.appendChild(opt);
-  });
+      data = await fetch('data.json').then(r => r.json());
+      const clients = [...new Set(data.map(d => d.client))].sort();
+      const clientSelect = document.getElementById('clientSelect');
+      clients.forEach(c => {
+        const opt = document.createElement('option');
+        opt.value = c;
+        opt.textContent = c;
+        clientSelect.appendChild(opt);
+      });
+    }});
 }
         lbl.append(cb, opt);
         container.appendChild(lbl);

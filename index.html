@@ -21,16 +21,16 @@
       background: var(--bg);
       color: #333;
     }
-    h2 { text-align: center; color: var(--primary); margin-bottom: 24px; }
+    h2 {
+      text-align: center;
+      color: var(--primary);
+      margin-bottom: var(--gap);
+    }
     form {
       display: grid;
       grid-template-columns: repeat(3, 1fr);
       gap: var(--gap);
       margin-bottom: var(--gap);
-      background: var(--card);
-      border: 1px solid var(--border);
-      border-radius: var(--radius);
-      padding: var(--gap);
     }
     .checkbox-list {
       background: var(--card);
@@ -40,9 +40,9 @@
     }
     .checkbox-list label {
       font-weight: bold;
-      display: block;
-      margin-bottom: 8px;
       color: var(--primary);
+      margin-bottom: 8px;
+      display: block;
     }
     .styled-checkbox-list {
       list-style: none;
@@ -57,30 +57,13 @@
     .styled-checkbox-list input[type="checkbox"] {
       margin-right: 8px;
     }
-    .dynamic-block {
-      background: var(--card);
-      border: 1px solid var(--border);
-      border-radius: var(--radius);
-      padding: var(--gap);
-      margin-bottom: var(--gap);
+    .toggle-container,
+    .actions {
+      text-align: center;
+      margin-top: var(--gap);
     }
-    .dynamic-block h3, .dynamic-block h4 {
-      color: var(--primary);
-      margin: 0 0 8px 0;
-    }
-    .dynamic-block ol {
-      list-style: none;
-      margin: 0 0 var(--gap) 0;
-      padding: 0 0 0 20px;
-    }
-    .dynamic-block ol li {
-      margin-bottom: 8px;
-      line-height: 1.5;
-    }
-    .actions { text-align: center; margin-top: var(--gap); }
-    .actions button {
+    button {
       padding: 10px 24px;
-      margin: 0 8px;
       background: var(--primary);
       color: #fff;
       border: none;
@@ -88,12 +71,56 @@
       cursor: pointer;
       font-size: 1rem;
     }
-    .actions button:disabled { background: #999; cursor: not-allowed; }
+    button:disabled {
+      background: #999;
+      cursor: not-allowed;
+    }
+    .dynamic-block {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: var(--gap);
+      margin-bottom: var(--gap);
+    }
+    .dynamic-block h3,
+    .dynamic-block h4 {
+      color: var(--primary);
+      margin: 0 0 var(--gap) 0;
+      font-weight: bold;
+    }
+    .dynamic-block label {
+      display: block;
+      margin-bottom: 6px;
+      font-weight: normal;
+      color: #333;
+    }
+    .dynamic-block input[type="text"],
+    .dynamic-block input[type="month"] {
+      width: calc(100% - 12px);
+      padding: 6px;
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      font-size: 1rem;
+      margin-bottom: var(--gap);
+    }
+    .dynamic-block .styled-checkbox-list,
+    .dynamic-block ol {
+      list-style: none;
+      margin: 0;
+      padding: 0 0 0 20px;
+    }
+    .dynamic-block .styled-checkbox-list li,
+    .dynamic-block ol li {
+      margin-bottom: 8px;
+      line-height: 1.5;
+    }
+    .dynamic-block input[type="checkbox"] {
+      margin-right: 8px;
+    }
   </style>
 </head>
 <body>
   <h2>Gerar Relatório Dinâmico</h2>
-
   <form id="filtersForm" onsubmit="return false;">
     <div class="checkbox-list">
       <label>Cliente</label>
@@ -111,11 +138,8 @@
 
   <div id="dynamicBlocks"></div>
 
-  <div style="margin-bottom:20px; text-align:center;">
-    <button id="toggleQuestions" disabled
-      style="padding:8px 16px; background:var(--primary); color:#fff; border:none; border-radius:var(--radius); cursor:pointer;">
-      Mostrar / Esconder Perguntas Abertas
-    </button>
+  <div class="toggle-container">
+    <button id="toggleQuestions" disabled>Mostrar / Esconder Perguntas Abertas</button>
   </div>
   <div id="textQuestionsBlock" style="display:none;"></div>
 
@@ -134,14 +158,17 @@
       localStorage.setItem('filters', JSON.stringify(f));
     }
     function updateFilter(key, val) {
-      const f = loadFilters(); f[key] = val; saveFilters(f);
+      const f = loadFilters();
+      f[key] = val;
+      saveFilters(f);
     }
 
     async function init() {
       try {
         data = await fetch('data.json').then(r => r.json());
       } catch {
-        alert('Erro ao carregar dados.'); return;
+        alert('Erro ao carregar dados.');
+        return;
       }
       populateClients();
       initFilters();
@@ -149,7 +176,8 @@
 
     function populateClients() {
       const clients = [...new Set(data.map(d => d.client))].sort();
-      const list = document.getElementById('clientList'); list.innerHTML = '';
+      const list = document.getElementById('clientList');
+      list.innerHTML = '';
       clients.forEach(c => createListItem(list, c, 'clients', initFilters));
     }
 
@@ -157,7 +185,8 @@
       const li = document.createElement('li');
       const lbl = document.createElement('label');
       const cb = document.createElement('input');
-      cb.type = 'checkbox'; cb.value = text;
+      cb.type = 'checkbox';
+      cb.value = text;
       cb.checked = (loadFilters()[key] || []).includes(text);
       cb.onchange = () => {
         const vals = Array.from(container.querySelectorAll('input:checked')).map(i => i.value);
@@ -177,28 +206,43 @@
       refreshDynamic();
     }
 
-    function populateList(listId, items, key, callback) {
-      const list = document.getElementById(listId); list.innerHTML = '';
-      items.forEach(i => createListItem(list, i, key, callback));
+    function populateList(id, items, key, cb) {
+      const list = document.getElementById(id);
+      list.innerHTML = '';
+      items.forEach(i => createListItem(list, i, key, cb));
       updateFilter(key, []);
     }
 
     function createInputField(label, prog, key) {
       const w = document.createElement('div');
-      const l = document.createElement('label'); l.textContent = label;
-      const i = document.createElement('input'); i.type = 'text';
+      const l = document.createElement('label');
+      l.textContent = label;
+      const i = document.createElement('input');
+      i.type = 'text';
       i.value = (loadFilters()[key] || {})[prog] || '';
-      i.oninput = e => { const o = loadFilters()[key] || {}; o[prog] = e.target.value; updateFilter(key, o); };
-      w.append(l, i); return w;
+      i.oninput = e => {
+        const o = loadFilters()[key] || {};
+        o[prog] = e.target.value;
+        updateFilter(key, o);
+      };
+      w.append(l, i);
+      return w;
     }
 
     function createMonthField(label, prog, key) {
       const w = document.createElement('div');
-      const l = document.createElement('label'); l.textContent = label;
-      const i = document.createElement('input'); i.type = 'month';
+      const l = document.createElement('label');
+      l.textContent = label;
+      const i = document.createElement('input');
+      i.type = 'month';
       i.value = (loadFilters()[key] || {})[prog] || '';
-      i.onchange = e => { const o = loadFilters()[key] || {}; o[prog] = e.target.value; updateFilter(key, o); };
-      w.append(l, i); return w;
+      i.onchange = e => {
+        const o = loadFilters()[key] || {};
+        o[prog] = e.target.value;
+        updateFilter(key, o);
+      };
+      w.append(l, i);
+      return w;
     }
 
     function refreshDynamic() {
@@ -206,29 +250,38 @@
       const client = f.clients?.[0];
       const progs = f.programs || [];
       const infos = f.clientInfos || [];
-      const container = document.getElementById('dynamicBlocks'); container.innerHTML = '';
+      const db = document.getElementById('dynamicBlocks');
+      db.innerHTML = '';
       const vb = document.getElementById('viewReport');
       const tb = document.getElementById('toggleQuestions');
       if (!client || progs.length === 0 || infos.length === 0) {
-        vb.disabled = true; tb.disabled = true; return;
+        vb.disabled = true;
+        tb.disabled = true;
+        return;
       }
-      progs.forEach(p => container.appendChild(renderBlock(client, p, infos)));
-      renderTextQuestions(); vb.disabled = false; tb.disabled = false;
+      progs.forEach(p => db.appendChild(renderBlock(client, p, infos)));
+      renderTextQuestions();
+      vb.disabled = false;
+      tb.disabled = false;
     }
 
     function renderBlock(client, program, infos) {
-      const b = document.createElement('div'); b.className = 'dynamic-block';
-      const h = document.createElement('h3'); h.textContent = `Programa: ${program}`; b.appendChild(h);
-      b.appendChild(createInputField('Formador', program, 'trainers'));
-      b.appendChild(createMonthField('Início', program, 'starts'));
-      b.appendChild(createMonthField('Fim', program, 'ends'));
+      const block = document.createElement('div');
+      block.className = 'dynamic-block';
+      const h = document.createElement('h3');
+      h.textContent = `Programa: ${program}`;
+      block.appendChild(h);
+      block.appendChild(createInputField('Formador', program, 'trainers'));
+      block.appendChild(createMonthField('Início', program, 'starts'));
+      block.appendChild(createMonthField('Fim', program, 'ends'));
       const turmas = [...new Set(data.filter(d => d.client === client && d.program === program && infos.includes(d.client_info)).map(d => d.turma))];
-      b.appendChild(buildCheckboxGroup('Turmas', turmas, `turmas_${program}`));
-      return b;
+      block.appendChild(buildCheckboxGroup('Turmas', turmas, `turmas_${program}`));
+      return block;
     }
 
     function renderTextQuestions() {
-      const container = document.getElementById('textQuestionsBlock'); container.innerHTML = '';
+      const container = document.getElementById('textQuestionsBlock');
+      container.innerHTML = '';
       const grouped = {};
       const evalSet = new Set();
       data.forEach(d => {
@@ -241,61 +294,107 @@
         }
       });
       function isNum(s) { return /^\d/.test(s); }
-      const specials = ['Reivention','clube rh','HR Club'];
-      const specIdx = s => { const i = specials.indexOf(s); return i === -1 ? Infinity : i; };
-      const evalList = Array.from(evalSet).sort((a,b) => {
+      const specials = ['Reivention', 'clube rh', 'HR Club'];
+      const specIdx = s => {
+        const i = specials.indexOf(s);
+        return i === -1 ? Infinity : i;
+      };
+      const evalList = Array.from(evalSet).sort((a, b) => {
         const aN = isNum(a), bN = isNum(b);
         if (aN && !bN) return -1;
         if (!aN && bN) return 1;
-        if (aN && bN) return a.localeCompare(b,'pt');
+        if (aN && bN) return a.localeCompare(b, 'pt');
         const ai = specIdx(a), bi = specIdx(b);
         if (ai !== bi) return ai - bi;
-        return a.localeCompare(b,'pt');
+        return a.localeCompare(b, 'pt');
       });
       const sel = new Set(loadFilters().textQuestions || []);
-      const blk = document.createElement('div'); blk.className = 'dynamic-block';
-      const title = document.createElement('h3'); title.textContent = 'Perguntas Abertas (por programa - assessment)'; blk.appendChild(title);
+      const blk = document.createElement('div');
+      blk.className = 'dynamic-block';
+      const title = document.createElement('h3');
+      title.textContent = 'Perguntas Abertas (por programa - assessment)';
+      blk.appendChild(title);
       Object.entries(grouped).forEach(([prog, qs]) => {
-        const sub = document.createElement('h4'); sub.textContent = prog; blk.appendChild(sub);
+        const sub = document.createElement('h4');
+        sub.textContent = prog;
+        blk.appendChild(sub);
         const ol = document.createElement('ol');
-        Array.from(qs).sort((a,b) => { const aN=isNum(a), bN=isNum(b); if(aN&&!bN) return -1; if(!aN&&bN) return 1; return a.localeCompare(b,'pt'); }).forEach(q => {
+        Array.from(qs).sort((a, b) => {
+          const aN = isNum(a), bN = isNum(b);
+          if (aN && !bN) return -1;
+          if (!aN && bN) return 1;
+          return a.localeCompare(b, 'pt');
+        }).forEach(q => {
           const li = document.createElement('li');
           const lbl = document.createElement('label');
-          const cb = document.createElement('input'); cb.type='checkbox'; cb.value=q; cb.checked=sel.has(q);
-          cb.onchange = () => { const all=Array.from(blk.querySelectorAll('input:checked')).map(i=>i.value); updateFilter('textQuestions',all); };
-          lbl.append(cb,q); li.appendChild(lbl); ol.appendChild(li);
-        }); blk.appendChild(ol);
+          const cb = document.createElement('input');
+          cb.type = 'checkbox';
+          cb.value = q;
+          cb.checked = sel.has(q);
+          cb.onchange = () => {
+            const all = Array.from(blk.querySelectorAll('input:checked')).map(i => i.value);
+            updateFilter('textQuestions', all);
+          };
+          lbl.append(cb, q);
+          li.appendChild(lbl);
+          ol.appendChild(li);
+        });
+        blk.appendChild(ol);
       });
       if (evalList.length) {
-        const etit = document.createElement('h3'); etit.textContent='Perguntas de Evaluation (iguais para todos os programas)'; blk.appendChild(etit);
+        const etit = document.createElement('h3');
+        etit.textContent = 'Perguntas de Evaluation (iguais para todos os programas)';
+        blk.appendChild(etit);
         const eol = document.createElement('ol');
         evalList.forEach(q => {
           const li = document.createElement('li');
           const lbl = document.createElement('label');
-          const cb = document.createElement('input'); cb.type='checkbox'; cb.value=q; cb.checked=sel.has(q);
-          cb.onchange = () => { const all=Array.from(blk.querySelectorAll('input:checked')).map(i=>i.value); updateFilter('textQuestions',all); };
-          lbl.append(cb,q); li.appendChild(lbl); eol.appendChild(li);
-        }); blk.appendChild(eol);
+          const cb = document.createElement('input');
+          cb.type = 'checkbox';
+          cb.value = q;
+          cb.checked = sel.has(q);
+          cb.onchange = () => {
+            const all = Array.from(blk.querySelectorAll('input:checked')).map(i => i.value);
+            updateFilter('textQuestions', all);
+          };
+          lbl.append(cb, q);
+          li.appendChild(lbl);
+          eol.appendChild(li);
+        });
+        blk.appendChild(eol);
       }
       container.appendChild(blk);
     }
 
     function applyAndGo(download) {
-      const all = loadFilters(); localStorage.setItem('reportFilters', JSON.stringify(all));
+      const all = loadFilters();
+      localStorage.setItem('reportFilters', JSON.stringify(all));
       window.location.href = 'report.html' + (download ? '?download=true' : '');
     }
 
     function buildCheckboxGroup(label, opts, key) {
       const w = document.createElement('div');
-      const t = document.createElement('h4'); t.textContent=label; w.appendChild(t);
+      const t = document.createElement('h4');
+      t.textContent = label;
+      w.appendChild(t);
       const ol = document.createElement('ol');
       opts.forEach(o => {
         const li = document.createElement('li');
         const lbl = document.createElement('label');
-        const cb = document.createElement('input'); cb.type='checkbox'; cb.value=o; cb.checked=(loadFilters()[key]||[]).includes(o);
-        cb.onchange = () => { const v=Array.from(ol.querySelectorAll('input:checked')).map(i=>i.value); updateFilter(key,v); };
-        lbl.append(cb,o); li.appendChild(lbl); ol.appendChild(li);
-      }); w.appendChild(ol); return w;
+        const cb = document.createElement('input');
+        cb.type = 'checkbox';
+        cb.value = o;
+        cb.checked = (loadFilters()[key] || []).includes(o);
+        cb.onchange = () => {
+          const v = Array.from(ol.querySelectorAll('input:checked')).map(i => i.value);
+          updateFilter(key, v);
+        };
+        lbl.append(cb, o);
+        li.appendChild(lbl);
+        ol.appendChild(li);
+      });
+      w.appendChild(ol);
+      return w;
     }
 
     document.addEventListener('DOMContentLoaded', () => {

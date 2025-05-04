@@ -548,15 +548,22 @@ root.appendChild(info);
          scale: CANVAS_SCALE
        }).then(cnv => cnv.toDataURL('image/png', 1.0))
      ));
-      pdfMake.createPdf({
-        pageSize: { width:960, height:540 },
-        pageMargins: [0,0,0,0],
-        content: images.map((img,i)=>({
-          image: img, width: 960,
-          pageBreak: i<images.length-1 ? 'after' : undefined
-        }))
-      }).download('report.pdf');
-    }
+     const now = new Date();
+const monthsPT = [
+  'janeiro','fevereiro','março','abril','maio','junho',
+  'julho','agosto','setembro','outubro','novembro','dezembro'
+];
+const clientName = (f.clients && f.clients[0]) || 'cliente';
+const filename = `MIND4TIME ${clientName} report ${monthsPT[now.getMonth()]}.${now.getFullYear()}`;
+
+pdfMake.createPdf({
+  pageSize: { width:960, height:540 },
+  pageMargins: [0,0,0,0],
+  content: images.map((img,i)=>({
+    image: img, width: 960,
+    pageBreak: i<images.length-1 ? 'after' : undefined
+  }))
+}).download(`${filename}.pdf`);
 
     document.addEventListener('DOMContentLoaded', ()=>{
       document.getElementById('gerar-pdf').addEventListener('click', generatePdf);

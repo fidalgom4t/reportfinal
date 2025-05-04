@@ -174,28 +174,24 @@
   };
 
   // 2) Helpers for labels/IDs/order
-  function createLabelMap(labels, lang) {
-    return labels.reduce((m,item) => {
+  function createLabelMap(labels) {
+    return labels.reduce((m, item) => {
       const k = item.questionId || item['QUESTION ID'];
-      m[k] = lang==='en'
-        ? (item.label_en || item.label || item['LABEL'])
-        : (item.label_pt || item.label || item['LABEL_PT'] || item['LABEL']);
+      m[k] = item.label || item.LABEL;
       return m;
     }, {});
   }
-  function createIdMap(labels, lang) {
-    return labels.reduce((m,item) => {
+  function createIdMap(labels) {
+    return labels.reduce((m, item) => {
       const k = item.questionId || item['QUESTION ID'];
-      m[k] = lang==='en'
-        ? (item.questionId_en || k)
-        : (item.questionId_pt || k);
+      m[k] = k;
       return m;
     }, {});
   }
   function createSortMap(labels) {
     return labels.reduce((m,l) => {
       const k = l.questionId || l['QUESTION ID'];
-      m[k] = +(l.sortOrder || l['SORT ORDER'] || l.sort_order || 0);
+      m[k] = +(l.sortOrder||l['SORT ORDER']||l.sort_order||0);
       return m;
     }, {});
   }
@@ -207,20 +203,20 @@
   function computeAverages(rows, LM, OM) {
     const g = {};
     rows.forEach(r => (g[r.question] ||= []).push(+r.value));
-    return Object.entries(g).map(([q,vals]) => ({
-      question:q,
-      label: LM[q]||q,
-      avg:   +(vals.reduce((a,b)=>a+b,0)/vals.length).toFixed(1)
-    })).sort((a,b) => (OM[a.question]||0)-(OM[b.question]||0));
+    return Object.entries(g).map(([q, vals]) => ({
+      question: q,
+      label:     LM[q]||q,
+      avg:      +(vals.reduce((a,b)=>a+b,0)/vals.length).toFixed(1)
+    })).sort((a,b)=>(OM[a.question]||0)-(OM[b.question]||0));
   }
   function countUnique(rows, sec) {
     return new Set(
       rows.filter(d => String(d.section||'').toLowerCase().includes(sec))
-          .map(d=>d['Submission ID'])
+          .map(d => d['Submission ID'])
     ).size;
   }
   function formatMonthYear(v, lang) {
-    const [year,mon] = v.split('-');
+    const [year, mon] = v.split('-');
     return { month: T[lang].months[mon], year };
   }
 
@@ -232,21 +228,21 @@
       grid:{ top:80,left:'10%',right:'10%',bottom:120 },
       tooltip:{},
       xAxis:{ type:'category', data:data.map(d=>d.label),
-        axisLabel:{rotate:30,interval:0,margin:10}},
-      yAxis:{ type:'value',min:1,max:5,splitLine:{show:false},
-        axisLine:{show:false},axisTick:{show:false},axisLabel:{show:false}},
+        axisLabel:{ rotate:30, interval:0, margin:10 } },
+      yAxis:{ type:'value', min:1, max:5, splitLine:{show:false},
+        axisLine:{show:false}, axisTick:{show:false}, axisLabel:{show:false} },
       series:[{
         type:'bar',
         data:data.map(d=>d.avg),
-        label:{show:true,position:'top',formatter:'{c}'},
+        label:{ show:true, position:'top', formatter:'{c}' },
         itemStyle: uniform
-          ? {color:'#6A99D0'}
-          : {color:p=>p.value<3?'#EA3323':p.value<4?'#6A99D0':'#9FCE63'}
+          ? { color:'#6A99D0' }
+          : { color:p=>p.value<3?'#EA3323':p.value<4?'#6A99D0':'#9FCE63' }
       }]
     });
     chart.resize();
   }
-  function createTextPage(secTitle, displayId) {
+  function createTextPage(secTitle, displayId, showTitle) {
     const tp = document.createElement('div');
     tp.className = 'page text-page';
     tp.innerHTML = `
@@ -256,7 +252,7 @@
       </div>
       <div class="content">
         <div class="text-question">
-          <div class="text-question-title">${displayId}</div>
+          ${ showTitle ? `<div class="text-question-title">${displayId}</div>` : '' }
           <ul class="answer-list"></ul>
         </div>
       </div>
@@ -271,71 +267,73 @@
   async function build() {
     const f = JSON.parse(localStorage.getItem('reportFilters')||'{}');
 
-    // fetch everything
-    const [data,meta] = await Promise.all([
+    // fetch data + meta
+    const [data, meta] = await Promise.all([
       fetch('data.json').then(r=>r.json()),
       fetch('meta.json').then(r=>r.json())
     ]);
 
-    // detect lang from data.json
-    const lang = (data[0] && data[0].lang==='en') ? 'en' : 'pt';
-    const tx   = T[lang];
+    // one-time wire up of button (will update per-program too)
+    document.getElementById('gerar-pdf').textContent = T.pt.gerarPdf; 
 
-    // wire up button
-    document.getElementById('gerar-pdf').textContent = tx.gerarPdf;
-
-    // label/id/sort maps
-    const LM = createLabelMap(meta.labels, lang);
-    const IM = createIdMap(meta.labels,   lang);
+    // maps
+    const LM = createLabelMap(meta.labels);
+    const IM = createIdMap(meta.labels);
     const OM = createSortMap(meta.labels);
 
-    // clear report
+    // clear out
     const root = document.getElementById('report');
-    root.innerHTML='';
+    root.innerHTML = '';
 
     // loop programs
     for (const prog of f.programs||[]) {
-      // compute timeScope
+      // isolate this program’s rows & detect its language
+      const progRows  = data.filter(d => d.program === prog);
+      const progLang  = (progRows[0] && progRows[0].lang==='en') ? 'en' : 'pt';
+      const txProg    = T[progLang];
+
+      // update button label to the last program’s lang (optional)
+      document.getElementById('gerar-pdf').textContent = txProg.gerarPdf;
+
+      // TIME SCOPE
       let timeScope = '';
       const start = (f.starts||{})[prog], end = (f.ends||{})[prog];
       if (start && end) {
-        const s = formatMonthYear(start,lang),
-              e = formatMonthYear(end,  lang);
+        const s = formatMonthYear(start, progLang),
+              e = formatMonthYear(end,   progLang);
         timeScope = `${s.month} – ${e.month} ${e.year}`;
       }
 
       // HERO
       const hero = document.createElement('div');
-      hero.className='page hero';
-      hero.innerHTML=`
+      hero.className = 'page hero';
+      hero.innerHTML = `
         <div class="hero">
           <img class="bg" src="hourglass-bg.jpg">
           <div class="hero-content">
-            <h1>${tx.title}</h1>
+            <h1>${txProg.title}</h1>
             <div class="subtitle">${timeScope}</div>
           </div>
           <img class="hero-logo" src="Logo.png">
         </div>`;
       root.appendChild(hero);
 
-      // Program banner
-      const pm = meta.titles.find(t=>t.program_id===prog)||{};
+      // PROGRAM DETAILS
+      const pm = meta.titles.find(t=>t.program_id===prog) || {};
       const title    = pm.title || pm.TÍTULO || prog;
-      const subtitle = lang==='en'
-  ? (pm.subtitle_en|| pm.SUBTITLE|| '')
-  : (pm.subtitle_pt|| pm.SUBTÍTULO|| '');
-      
-      const bannerImg = prog.toLowerCase()==='colab365'
-        ? 'colab365-banner.png'
-        : 'p365-banner.png';
-      const info = document.createElement('div'); info.className='page';
-      info.innerHTML=`
-        <div class="header"><img src="mind4time-logo.png"><div></div></div>
+      const subtitle = pm.subtitle || pm.subtitulo || '';
+      const bannerImg = prog.toLowerCase()==='colab365' ? 'colab365-banner.png' : 'p365-banner.png';
+      const info = document.createElement('div');
+      info.className = 'page';
+      info.innerHTML = `
+        <div class="header">
+          <img src="mind4time-logo.png"><div></div>
+        </div>
         <div class="content">
           <div class="banner">
             <img class="banner-bg" src="${bannerImg}">
             <div class="banner-box">
-              <div class="banner-super">${tx.corporateTraining}</div>
+              <div class="banner-super">${txProg.corporateTraining}</div>
               <h1>${title}</h1>
               <div class="program-subtitle">${subtitle}</div>
               <div class="meta-banner">
@@ -345,59 +343,84 @@
             </div>
           </div>
         </div>
-        <div class="footer"><div>www.MIND4TIME.com</div><div>© MIND4TIME ${currentYear}</div></div>`;
+        <div class="footer">
+          <div>www.MIND4TIME.com</div>
+          <div>© MIND4TIME ${currentYear}</div>
+        </div>`;
       root.appendChild(info);
 
-      // sections loop
+      // SECTIONS
       for (const sec of ['assessment','evaluation']) {
-        const secTitle = tx.section[sec];
-        const rows = data.filter(d =>
-          (f.clients||[]).includes(d.client) &&
-          d.program===prog &&
-          (f[`turmas_${prog}`]||[]).includes(d.turma)
+        const secTitle = txProg.section[sec];
+        const rows     = progRows.filter(d =>
+          String(d.section||'').toLowerCase().includes(sec)
         );
-        const total   = countUnique(rows, sec);
-        const numeric = rows.filter(d =>
-          String(d.section||'').toLowerCase().includes(sec) &&
-          /^\d+(\.\d+)?$/.test(String(d.value).trim())
-        );
-        const byT = Object.entries(groupBy(numeric,'turma'));
+        const total    = countUnique(rows, sec);
+        const numeric  = rows.filter(d=> /^\d+(\.\d+)?$/.test(String(d.value).trim()));
+        const byT      = Object.entries(groupBy(numeric,'turma'));
 
-        // section banner
-        const ban = document.createElement('div'); ban.className='page';
-        ban.innerHTML=`
+        // SECTION BANNER
+        const ban = document.createElement('div');
+        ban.className = 'page';
+        ban.innerHTML = `
           <div class="header"><img src="mind4time-logo.png"></div>
           <div class="content">
             <div class="banner">
               <img class="banner-bg" src="${sec}-bg.jpg">
-              <div class="banner-text">${tx.totalResponses(total)}</div>
+              <div class="banner-text">${txProg.totalResponses(total)}</div>
             </div>
           </div>
-          <div class="footer"><div>www.MIND4TIME.com</div><div>© MIND4TIME ${currentYear}</div></div>`;
+          <div class="footer">
+            <div>www.MIND4TIME.com</div>
+            <div>© MIND4TIME ${currentYear}</div>
+          </div>`;
         root.appendChild(ban);
 
-        // global chart
+        // GLOBAL CHART
         if (numeric.length) {
-          const gp = document.createElement('div'); gp.className='page';
-          gp.innerHTML=`
-            <div class="header"><img src="mind4time-logo.png"><div class="section-title">${secTitle}</div></div>
-            <div class="content"><div class="chart-fullpage"><div class="chart-full" id="chart-global-${prog}-${sec}"></div></div></div>
-            <div class="footer"><div>www.MIND4TIME.com</div><div>© MIND4TIME ${currentYear}</div></div>`;
+          const gp = document.createElement('div');
+          gp.className = 'page';
+          gp.innerHTML = `
+            <div class="header">
+              <img src="mind4time-logo.png">
+              <div class="section-title">${secTitle}</div>
+            </div>
+            <div class="content">
+              <div class="chart-fullpage">
+                <div class="chart-full" id="chart-global-${prog}-${sec}"></div>
+              </div>
+            </div>
+            <div class="footer">
+              <div>www.MIND4TIME.com</div>
+              <div>© MIND4TIME ${currentYear}</div>
+            </div>`;
           root.appendChild(gp);
-          createBarChart(gp.querySelector('.chart-full'), 'Global', computeAverages(numeric,LM,OM), sec==='evaluation');
+          createBarChart(
+            gp.querySelector('.chart-full'),
+            'Global',
+            computeAverages(numeric,LM,OM),
+            sec==='evaluation'
+          );
         }
 
-        // grid of charts
-        if (byT.length>1) {
-          for (let i=0; i<byT.length; i+=2) {
-            const gp2 = document.createElement('div'); gp2.className='page';
-            const boxes = byT.slice(i,i+2).map(([,v],j)=>
-              `<div class="chart-box" id="chart-${prog}-${sec}-grid-${i+j}"></div>`
-            ).join('');
-            gp2.innerHTML=`
-              <div class="header"><img src="mind4time-logo.png"><div class="section-title">${secTitle}</div></div>
+        // GRID CHARTS
+        if (byT.length > 1) {
+          for (let i = 0; i < byT.length; i += 2) {
+            const gp2 = document.createElement('div');
+            gp2.className = 'page';
+            const boxes = byT.slice(i,i+2)
+              .map(([,v],j)=>`<div class="chart-box" id="chart-${prog}-${sec}-grid-${i+j}"></div>`)
+              .join('');
+            gp2.innerHTML = `
+              <div class="header">
+                <img src="mind4time-logo.png">
+                <div class="section-title">${secTitle}</div>
+              </div>
               <div class="content"><div class="chart-grid">${boxes}</div></div>
-              <div class="footer"><div>www.MIND4TIME.com</div><div>© MIND4TIME ${currentYear}</div></div>`;
+              <div class="footer">
+                <div>www.MIND4TIME.com</div>
+                <div>© MIND4TIME ${currentYear}</div>
+              </div>`;
             root.appendChild(gp2);
             byT.slice(i,i+2).forEach(([,v],j) => {
               createBarChart(
@@ -410,76 +433,57 @@
           }
         }
 
-        // text answers
-        (f.textQuestions||[]).forEach(qid => {
-          const ans = data.filter(d =>
-            (f.clients||[]).includes(d.client) &&
-            d.program===prog &&
-            d.question===qid &&
-            String(d.section||'').toLowerCase().includes(sec) &&
-            isNaN(+d.value)
-          );
-          if (!ans.length) return;
-          const pages=[]; 
-          let page = createTextPage(secTitle, IM[qid]||qid);
-          let listEl = page.querySelector('.answer-list');
-          root.appendChild(page);
-          pages.push(page);
+        // TEXT ANSWERS WITH spill‐and‐showTitle logic
+        (f.textQuestions||[]).forEach(qid=>{
+          const ans = rows.filter(d=>d.question===qid && isNaN(+d.value));
+          if(!ans.length) return;
+          let first = true;
           ans.forEach(a=>{
-            const li=document.createElement('li');
-            li.textContent=a.value;
-            listEl.appendChild(li);
-            const tq=page.querySelector('.text-question');
-            if (tq.scrollHeight>tq.clientHeight) {
-              listEl.removeChild(li);
-              page=createTextPage(secTitle, IM[qid]||qid);
-              listEl=page.querySelector('.answer-list');
-              root.appendChild(page);
-              pages.push(page);
-              listEl.appendChild(li);
-            }
+            const page = createTextPage(secTitle, IM[qid]||qid, first);
+            const listEl = page.querySelector('.answer-list');
+            root.appendChild(page);
+            listEl.insertAdjacentHTML('beforeend', `<li>${a.value}</li>`);
+            first = false;
           });
-          pages.forEach(pg => {
-            const tq=pg.querySelector('.text-question');
-            tq.style.height=tq.scrollHeight+'px';
+          // adjust height
+          document.querySelectorAll('.text-page .text-question').forEach(tq=>{
+            tq.style.height = tq.scrollHeight+'px';
           });
         });
+      }
+    }
 
-      } // end sections
-
-    } // end programs
-
-    // final cover
-    const endPage = document.createElement('div'); endPage.className='page hero';
-    endPage.innerHTML=`<div class="hero"><img class="bg" src="endpage-bg.png"></div>`;
-    document.getElementById('report').appendChild(endPage);
-
-  } // end build
+    // FINAL COVER
+    const endPage = document.createElement('div');
+    endPage.className = 'page hero';
+    endPage.innerHTML = `<div class="hero"><img class="bg" src="endpage-bg.png"></div>`;
+    root.appendChild(endPage);
+  }
 
   // 6) Generate PDF
   async function generatePdf() {
     await build();
     document.querySelectorAll('.chart-full, .chart-box').forEach(el=>{
-      const c=echarts.getInstanceByDom(el);
+      const c = echarts.getInstanceByDom(el);
       if(c) c.resize();
     });
     await new Promise(r=>setTimeout(r,100));
-    const pages=Array.from(document.querySelectorAll('.page'));
-    const images=await Promise.all(pages.map(pg=>
+    const pages = Array.from(document.querySelectorAll('.page'));
+    const images = await Promise.all(pages.map(pg=>
       html2canvas(pg,{backgroundColor:'#fff',useCORS:true,scale:4})
         .then(cv=>cv.toDataURL('image/png',1.0))
     ));
     pdfMake.createPdf({
       pageSize:{width:960,height:540},
       pageMargins:[0,0,0,0],
-      content:images.map((img,i)=>({
-        image:img,width:960,
-        pageBreak:i<images.length-1?'after':undefined
+      content: images.map((img,i)=>({
+        image: img, width:960,
+        pageBreak: i<pages.length-1?'after':undefined
       }))
     }).download('report.pdf');
   }
 
-  document.addEventListener('DOMContentLoaded', ()=>{
+  document.addEventListener('DOMContentLoaded',()=>{
     document.getElementById('gerar-pdf').addEventListener('click', generatePdf);
     build();
   });

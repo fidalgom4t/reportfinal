@@ -347,11 +347,6 @@ localStorage.setItem('filters', JSON.stringify(previous));
 }
     document.getElementById('viewReport').onclick = () => applyAndGo(false);
     
-  function applyAndGo(download) {
-  const all = loadFilters();
-  localStorage.setItem('reportFilters', JSON.stringify(all));
-  window.location.href = 'report.html' + (download ? '?download=true' : '');
-}
 </script>
 </body>
 </html>

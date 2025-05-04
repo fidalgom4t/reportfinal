@@ -213,7 +213,166 @@
   </form>
 
   <script>
-    // (mantém o JS existente para lógica e renderização)
+    // ===== Variáveis Globais =====
+    let rawData = [];
+
+    const getStorage = () => JSON.parse(localStorage.getItem('filters') || '{}');
+    const saveStorage = (key, val) => {
+      const s = getStorage(); s[key] = val;
+      localStorage.setItem('filters', JSON.stringify(s));
+    };
+    const load = key => getStorage()[key] || [];
+    const getChecked = id => Array.from(document.querySelectorAll(`#${id} input:checked`)).map(i => i.value);
+    const updateBox = (boxId, vals, placeholder) => {
+      const box = document.getElementById(boxId);
+      box.textContent = vals.length ? vals.join(', ') : placeholder;
+    };
+
+    // ===== Helpers UI =====
+    function toggleDropdown(id) {
+      document.querySelectorAll('.dropdown-multiselect').forEach(el => {
+        if (el.id !== id) el.classList.remove('open');
+      });
+      document.getElementById(id).classList.toggle('open');
+    }
+
+    function attachDropdownListeners(keys) {
+      keys.forEach(k => {
+        const wrap = document.getElementById(`${k}Wrapper`);
+        wrap.querySelector('.select-box').addEventListener('click', e => {
+          e.stopPropagation(); toggleDropdown(`${k}Wrapper`);
+        });
+      });
+      document.addEventListener('click', e => {
+        if (!e.target.closest('.dropdown-multiselect'))
+          document.querySelectorAll('.dropdown-multiselect').forEach(el => el.classList.remove('open'));
+      });
+    }
+
+    function populateCheckboxes({containerId, boxId, items, storageKey, placeholder, onChange}) {
+      const cont = document.getElementById(containerId);
+      cont.innerHTML = '';
+      ['Selecionar tudo','Desmarcar tudo'].forEach((txt,i) => {
+        const btn = document.createElement('button'); btn.type='button'; btn.className='select-all'; btn.textContent=txt;
+        btn.addEventListener('click', e => { e.stopPropagation(); saveStorage(storageKey, i===0? [...items]: []); onChange(); });
+        cont.appendChild(btn);
+      });
+      const stored = load(storageKey);
+      items.forEach(it => {
+        const lbl = document.createElement('label');
+        const cb = document.createElement('input'); cb.type='checkbox'; cb.value=it; cb.checked = stored.includes(it);
+        cb.addEventListener('change', () => { saveStorage(storageKey, getChecked(containerId)); onChange(); });
+        lbl.append(cb, ` ${it}`);
+        cont.appendChild(lbl);
+      });
+      updateBox(boxId, stored, placeholder);
+    }
+
+    // ===== Filtros Principais =====
+    function populateClients() {
+      const clients = [...new Set(rawData.map(d=>d.client))].sort();
+      populateCheckboxes({ containerId:'clientChecks', boxId:'clientBox', items:clients, storageKey:'clients', placeholder:'Selecionar cliente(s)', onChange: refreshAll });
+    }
+    function populatePrograms() {
+      const sel = load('clients');
+      const progs = [...new Set(rawData.filter(d=>sel.includes(d.client)).map(d=>d.program))].sort();
+      populateCheckboxes({ containerId:'programChecks', boxId:'programBox', items:progs, storageKey:'programs', placeholder:'Selecionar programa(s)', onChange: refreshAll });
+    }
+    function populateClientInfos() {
+      const selC = load('clients'), selP = load('programs');
+      const infos = [...new Set(rawData.filter(d=>selC.includes(d.client)&&selP.includes(d.program)).map(d=>d.client_info))].sort();
+      populateCheckboxes({ containerId:'clientInfoChecks', boxId:'clientInfoBox', items:infos, storageKey:'clientInfos', placeholder:'Selecionar info(s)', onChange: refreshAll });
+    }
+
+    // ===== Perguntas Abertas =====
+    function getTextQuestionsFor(program) {
+      const f = getStorage();
+      return [...new Set(
+        rawData.filter(d=> f.clients?.includes(d.client) && f.clientInfos?.includes(d.client_info) && d.program===program && isNaN(+d.value))
+               .map(d=>d.question)
+      )].sort();
+    }
+
+    // ===== Criação de Dropdown Dinâmico =====
+    function createDropdownField(labelText, wrapperId, boxId, checksId, placeholder) {
+      const lbl = document.createElement('label'); lbl.textContent = `${labelText}:`;
+      const wrap = document.createElement('div'); wrap.className='dropdown-multiselect'; wrap.id=wrapperId;
+      const box = document.createElement('div'); box.className='select-box'; box.id=boxId; box.dataset.placeholder=placeholder; box.textContent=placeholder;
+      const chks = document.createElement('div'); chks.className='checkboxes'; chks.id=checksId;
+      wrap.append(box,chks);
+      return [lbl, wrap];
+    }
+
+    function setupDropdown(wrapperId, items, storageKey) {
+      const wrap = document.getElementById(wrapperId);
+      const box = wrap.querySelector('.select-box');
+      const chks = wrap.querySelector('.checkboxes');
+      box.addEventListener('click', e => { e.stopPropagation(); toggleDropdown(wrapperId); });
+      populateCheckboxes({ containerId: chks.id, boxId: box.id, items, storageKey, placeholder: box.dataset.placeholder, onChange: () => updateBox(box.id, getChecked(chks.id), box.dataset.placeholder) });
+    }
+
+    // ===== Renderização Dinâmica =====
+    function renderProgramBlocks() {
+      const container = document.getElementById('programsContainer'); container.innerHTML='';
+      const filter = getStorage();
+      (filter.programs||[]).forEach(prog=>{
+        const block = document.createElement('div'); block.className='program-block';
+        const hdr = document.createElement('div'); hdr.className='program-header'; hdr.textContent=`Programa: ${prog}`;
+        block.appendChild(hdr);
+        const grid = document.createElement('div'); grid.className='program-grid';
+
+        // Formador
+        const lblT=document.createElement('label'); lblT.textContent='Formador:';
+        const inpT=document.createElement('input');
+        inpT.type='text'; inpT.placeholder='Nome do formador'; inpT.value=(filter.trainers||{})[prog]||'';
+        inpT.addEventListener('input',()=>{ const s=getStorage(); s.trainers=s.trainers||{}; s.trainers[prog]=inpT.value; localStorage.setItem('filters',JSON.stringify(s)); });
+        grid.append(lblT,inpT);
+
+        // Datas
+        ['start','end'].forEach(k=>{
+          const lblD=document.createElement('label'); lblD.textContent=k==='start'?'Início:':'Fim:';
+          const inpD=document.createElement('input'); inpD.type='month'; inpD.value=((f=>f[`${k}s`]||{})(filter))[prog]||'';
+          inpD.addEventListener('change',()=>{ const s=getStorage(); s[`${k}s`]=s[`${k}s`]||{}; s[`${k}s`][prog]=inpD.value; localStorage.setItem('filters',JSON.stringify(s)); });
+          grid.append(lblD,inpD);
+        });
+
+        // Turmas
+        const [lblU, tw] = createDropdownField('Turmas', `turmaWrapper_${prog}`, `turmaBox_${prog}`, `turmaChecks_${prog}`, 'Selecionar turma(s)');
+        grid.append(lblU, tw);
+        // Perguntas Abertas
+        const [lblQ, qw] = createDropdownField('Perguntas Abertas', `textWrapper_${prog}`, `textBox_${prog}`, `textChecks_${prog}`, 'Selecionar perguntas');
+        grid.append(lblQ, qw);
+
+        block.appendChild(grid);
+        container.appendChild(block);
+
+        // Setup dinamico
+        setupDropdown(`turmaWrapper_${prog}`, [...new Set(rawData.filter(d=>d.program===prog && filter.clients?.includes(d.client) && filter.clientInfos?.includes(d.client_info)).map(d=>d.turma))].sort(), `turmas_${prog}`);
+        setupDropdown(`textWrapper_${prog}`, getTextQuestionsFor(prog), `textQuestions_${prog}`);
+      });
+    }
+
+    // ===== Atualização Geral =====
+    function refreshAll() { populatePrograms(); populateClientInfos(); renderProgramBlocks(); }
+
+    // ===== Navegação =====
+    function navigateToReport(download) {
+      localStorage.setItem('reportFilters', JSON.stringify(getStorage()));
+      window.location.href = `report.html${download?'?download=true':''}`;
+    }
+
+    // ===== Inicialização =====
+    function init() {
+      attachDropdownListeners(['client','program','clientInfo']);
+      fetch('data.json').then(r=>r.json()).then(data=>{
+        rawData = data;
+        populateClients();
+        refreshAll();
+        document.getElementById('viewReport').addEventListener('click',()=>navigateToReport(false));
+        document.getElementById('downloadReport').addEventListener('click',()=>navigateToReport(true));
+      }).catch(err=>console.error('Erro carregando data.json:',err));
+    }
+    document.addEventListener('DOMContentLoaded', init);
   </script>
 </body>
 </html>

@@ -189,7 +189,7 @@
       data.forEach(d=>{ if(!isNaN(+d.value)) return; const s=(d.section||'').toLowerCase(); if(s.includes('evaluation')) evalSet.add(d.question); else if(s.includes('assessment')){ grouped[d.program]=grouped[d.program]||new Set(); grouped[d.program].add(d.question);} });
       const isNum=s=>/^\d/.test(s);
       const specials=['Reivention','clube rh','HR Club']; const specialIdx=s=>{const i=specials.indexOf(s);return i===-1?Infinity:i;};
-      const evaluation=Array.from(evalSet).sort((a,b)=>{const aN=isNum(a),bN=isNum(b); if(aN&&!bN)return-1; if(!aN&&bN)return1; if(aN&&bN)return a.localeCompare(b,'pt'); const ai=specialIdx(a),bi=specialIdx(b); if(ai!==bi)return ai-bi; return a.localeCompare(b,'pt');});
+      const evaluation=Array.from(evalSet).sort((a,b)=>{const aN=isNum(a),bN=isNum(b); if(aN&&!bN)return -1; if(!aN&&bN)return 1; if(aN&&bN)return a.localeCompare(b,'pt'); const ai=specialIdx(a),bi=specialIdx(b); if(ai!==bi)return ai-bi; return a.localeCompare(b,'pt');});
       const sel=new Set(loadFilters().textQuestions||[]);
       const blk=document.createElement('div'); blk.className='dynamic-block';
       const tit=document.createElement('h3'); tit.textContent='Perguntas Abertas (por programa - assessment)'; blk.appendChild(tit);

@@ -229,6 +229,8 @@
         const infs=[...new Set(data.filter(d=>d.client===c).map(d=>d.client_info))].sort();
         buildCheckboxList(document.getElementById('programList'),progs,'programs',refreshDynamic);
         buildCheckboxList(document.getElementById('infoList'),infs,'clientInfos',refreshDynamic);
+        // Atualizar dynamic blocks após reconstruir listas
+        refreshDynamic();
       });
       init().then(refreshDynamic);
     });

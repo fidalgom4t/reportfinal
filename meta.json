@@ -190,43 +190,43 @@
       "QUESTION ID": "01. De uma forma geral, como classificaria o nível atual de Eficiência Colaborativa: [Na sua equipa direta]",
       "LABEL": "",
       "": "",
-      "sort order": ""
+      "sort order": 1
     },
     {
       "QUESTION ID": "01. De uma forma geral, como classificaria o nível atual de Eficiência Colaborativa: [Inter-equipas (departamentos com que articula regularmente)]",
       "LABEL": "",
       "": "",
-      "sort order": ""
+      "sort order": 2
     },
     {
       "QUESTION ID": "01. De uma forma geral, como classificaria o nível atual de Eficiência Colaborativa: [Na organização como um todo]",
       "LABEL": "",
       "": "",
-      "sort order": ""
+      "sort order": 3
     },
     {
       "QUESTION ID": "02. Se tivesse total autonomia para melhorar a Eficiência Colaborativa na sua equipa / departamento / organização o que mudava?",
       "LABEL": "",
       "": "",
-      "sort order": ""
+      "sort order": 4
     },
     {
       "QUESTION ID": "03. ... sei sempre o que é me é pedido para fazer, em concreto, sobre cada assunto.\"",
       "LABEL": "",
       "": "",
-      "sort order": ""
+      "sort order": 5
     },
     {
       "QUESTION ID": "04. ... nos projetos mais longos (&gt; 3 meses) é muito claro onde queremos chegar e o que significa \"Está feito!\"\".",
       "LABEL": "",
       "": "",
-      "sort order": ""
+      "sort order": 6
     },
     {
       "QUESTION ID": "05. ...sei sempre para que serve / qual o propósito do que estou a fazer e isso ajuda-me a manter a motivação\".",
       "LABEL": "",
       "": "",
-      "sort order": ""
+      "sort order": 7
     },
     {
       "QUESTION ID": "06. ... há boa agilidade: as decisões tendem a ser céleres e os assuntos resolvem-se com rapidez.\"",

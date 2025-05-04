@@ -329,9 +329,7 @@ function detectLangFromQuestionTexts(questions = []) {
   // 6️⃣ Limpa e começa a montar o relatório
   const root = document.getElementById('report');
   root.innerHTML = '';
-
-  for (const prog of f.programs || []) {
-
+      
       for (const prog of f.programs||[]) {
         // TimeScope
         let timeScope='';

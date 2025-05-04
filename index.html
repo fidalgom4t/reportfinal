@@ -196,7 +196,7 @@
       Object.entries(grouped).forEach(([prog,qs])=>{
         const sub=document.createElement('h4'); sub.textContent=prog; blk.appendChild(sub);
         const ol=document.createElement('ol');
-        Array.from(qs).sort((a,b)=>{const aN=isNum(a),bN=isNum(b); if(aN&&!bN)return-1; if(!aN&&bN)return1; return a.localeCompare(b,'pt');}).forEach(q=>{
+        Array.from(qs).sort((a,b)=>{const aN=isNum(a),bN=isNum(b); if(aN&&!bN)return -1; if(!aN&&bN)return 1; return a.localeCompare(b,'pt');}).forEach(q=>{
           const li=document.createElement('li');
           const lbl=document.createElement('label');
           const cb=document.createElement('input');cb.type='checkbox';cb.value=q;cb.checked=sel.has(q);

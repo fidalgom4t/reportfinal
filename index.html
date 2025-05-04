@@ -181,27 +181,26 @@
       document.getElementById('viewReport').disabled = false;
       document.getElementById('downloadReport').disabled = false;
     }
+    
+function renderBlock(client, program, infos) {
+  const block = document.createElement('div');
+  block.className = 'dynamic-block';
+  const h = document.createElement('h3');
+  h.textContent = `Programa: ${program}`;
+  block.appendChild(h);
 
-    function renderBlock(client, program, infos) {
-      updateFilter(`turmas_${program}`, []);
-      updateFilter(`textQuestions_${program}`, []);
-      const block = document.createElement('div');
-      block.className = 'dynamic-block';
-      const h = document.createElement('h3');
-      h.textContent = `Programa: ${program}`;
-      block.appendChild(h);
-      block.appendChild(createInputField('Formador', program, 'trainers'));
-      block.appendChild(createMonthField('Início', program, 'starts'));
-      block.appendChild(createMonthField('Fim', program, 'ends'));
+  block.appendChild(createInputField('Formador', program, 'trainers'));
+  block.appendChild(createMonthField('Início', program, 'starts'));
+  block.appendChild(createMonthField('Fim', program, 'ends'));
 
-      const turmas = [...new Set(data.filter(d => d.client === client && d.program === program && infos.includes(d.client_info)).map(d => d.turma))];
-      const perguntas = [...new Set(data.filter(d => d.client === client && d.program === program && infos.includes(d.client_info) && isNaN(+d.value)).map(d => d.question))];
+  const turmas = [...new Set(data.filter(d => d.client === client && d.program === program && infos.includes(d.client_info)).map(d => d.turma))];
+  const perguntas = [...new Set(data.filter(d => d.client === client && d.program === program && infos.includes(d.client_info) && isNaN(+d.value)).map(d => d.question))];
 
-      block.appendChild(createCheckboxGroup('Turmas', turmas, `turmas_${program}`));
-      block.appendChild(createCheckboxGroup('Perguntas Abertas', perguntas, `textQuestions_${program}`));
+  block.appendChild(createCheckboxGroup('Turmas', turmas, `turmas_${program}`));
+  block.appendChild(createCheckboxGroup('Perguntas Abertas', perguntas, `textQuestions_${program}`));
 
-      return block;
-    }
+  return block;
+}
 
     function createInputField(label, prog, key) {
       const wrapper = document.createElement('div');

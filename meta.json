@@ -92,31 +92,31 @@
     },
     {
       "QUESTION ID": "",
-      "LABEL": "FOCUS",
+      "LABEL": "",
       "": "",
       "sort order": 1
     },
     {
       "QUESTION ID": "01. \"In my work environment, I am able to produce in a focused manner and with no major distractions.\"",
-      "LABEL": "DIVERSITY",
+      "LABEL": "FOCUS",
       "": "",
       "sort order": 2
     },
     {
       "QUESTION ID": "02. \"In my case, I rarely manage many different issues simultaneously. The number of different topics that manage simultaneously is adequate, not excessive.\"",
-      "LABEL": "CONTROL",
+      "LABEL": "DIVERSITY",
       "": "",
       "sort order": 3
     },
     {
       "QUESTION ID": "04. \"I organize my work methodically and efficiently, and I feel everything is under control.\"",
-      "LABEL": "PRIORITIES",
+      "LABEL": "CONTROL",
       "": "",
       "sort order": 4
     },
     {
       "QUESTION ID": "05. \"I rarely procrastinate. I always respect the priorities I've defined on my to-do list.\"",
-      "LABEL": "",
+      "LABEL": "PRIORITIES",
       "": "",
       "sort order": 5
     },

@@ -244,13 +244,13 @@
       "QUESTION ID": "08. \"Globalmente o meu sistema de reporte com a equipa é eficiente (objetivos atingidos vs recursos investidos).\"",
       "LABEL": "",
       "": "",
-      "sort order": ""
+      "sort order": 10
     },
     {
       "QUESTION ID": "09. Nos assuntos que envolvem várias pessoas, que ferramentas usa para gerir quem ficou de fazer, o quê, quando? (software específico, ficheiros partilhados, papel, quadros, …)",
       "LABEL": "",
       "": "",
-      "sort order": ""
+      "sort order": 11
     },
     {
       "QUESTION ID": "10. ... há poucas dúvidas sobre quem ficou de fazer o quê. Eventuais áreas cinzentas que surjam na divisão de responsabilidades são rapidamente discutidas e clarificadas.\"",

@@ -296,23 +296,41 @@ function detectLangFromQuestionTexts(questions = []) {
 
     // 5) Construção do relatório
     async function build() {
-    const f    = JSON.parse(localStorage.getItem('reportFilters') || '{}');
-    const lang = detectLangFromQuestionTexts(f.textQuestions || []);
-    const tx   = T[lang];
+  const f = JSON.parse(localStorage.getItem('reportFilters') || '{}');
 
-      document.getElementById('gerar-pdf').textContent = tx.gerarPdf;
+  // 1️⃣ Carrega dados e meta antes de detectar o idioma
+  const [data, meta] = await Promise.all([
+    fetch('data.json').then(r => r.json()),
+    fetch('meta.json').then(r => r.json())
+  ]);
 
-      const [data,meta] = await Promise.all([
-        fetch('data.json').then(r=>r.json()),
-        fetch('meta.json').then(r=>r.json())
-      ]);
+  // 2️⃣ Extrai do meta.labels os textos das perguntas selecionadas
+  const selectedLabels = (f.textQuestions || [])
+    .map(qid => {
+      const entry = meta.labels.find(l =>
+        (l.questionId || l['QUESTION ID']) === qid
+      );
+      return entry ? (entry.label || entry['LABEL']) : '';
+    })
+    .filter(txt => txt);
 
-      const LM = createLabelMap(meta.labels,lang);
-      const IM = createIdMap(meta.labels,lang);
-      const OM = createSortMap(meta.labels);
+  // 3️⃣ Agora sim, detecta o idioma com base nos textos
+  const lang = detectLangFromQuestionTexts(selectedLabels);
+  const tx   = T[lang];
 
-      const root = document.getElementById('report');
-      root.innerHTML='';
+  // 4️⃣ Atualiza o botão
+  document.getElementById('gerar-pdf').textContent = tx.gerarPdf;
+
+  // 5️⃣ Cria os mapas de labels, IDs e sortOrder
+  const LM = createLabelMap(meta.labels, lang);
+  const IM = createIdMap(meta.labels,   lang);
+  const OM = createSortMap(meta.labels);
+
+  // 6️⃣ Limpa e começa a montar o relatório
+  const root = document.getElementById('report');
+  root.innerHTML = '';
+
+  for (const prog of f.programs || []) {
 
       for (const prog of f.programs||[]) {
         // TimeScope

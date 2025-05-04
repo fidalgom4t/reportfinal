@@ -217,10 +217,11 @@
 
     // CHART
     function createBarChart(container, title, data, uniform) {
-      // Use SVG renderer for perfect sharpness (or switch to high-DPI canvas via devicePixelRatio)
       const chart = echarts.init(container, null, {
-        renderer: 'svg'
-      });
+      renderer: 'svg'
+       // alternatively for canvas at 2× DPI:
+       // devicePixelRatio: window.devicePixelRatio
+     });
 
       chart.setOption({
         title:{text:title,left:'center',textStyle:{fontSize:20}},
@@ -474,14 +475,14 @@
       await new Promise(r=>setTimeout(r,100));
 
       const pages  = Array.from(document.querySelectorAll('.page'));
-      const images = await Promise.all(pages.map(pg=>
-        html2canvas(pg, {
-          backgroundColor:'#fff',
-          useCORS:true,
-          scale: window.devicePixelRatio
-        }).then(cnv=>cnv.toDataURL('image/png',1.0))
-      ));
-
+      const CANVAS_SCALE = 4;
+      const images = await Promise.all(pages.map(pg =>
+      html2canvas(pg, {
+        backgroundColor: '#fff',
+         useCORS: true,
+         scale: CANVAS_SCALE
+       }).then(cnv => cnv.toDataURL('image/png', 1.0))
+     ));
       pdfMake.createPdf({
         pageSize: { width:960, height:540 },
         pageMargins: [0,0,0,0],

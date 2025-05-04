@@ -80,15 +80,18 @@
     }
 
     /* PROGRAM DETAILS BOX */
-    .banner-box {
-      position:absolute; top:50%; left:50%;
-      transform:translate(-50%,-50%);
-      background:rgba(240,248,249,0.9);
-      padding:30px 50px; box-sizing:border-box;
-      border-left:6px solid #007c91;
-      box-shadow:0 2px 6px rgba(0,0,0,0.1);
-      color:#000;
-    }
+   .banner-box {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  color: #000;
+  text-align: left;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  padding: 0 30px;
+}
     .banner-box h1 { margin:0 0 12px; color:#007c91; font-size:2.5rem; }
     .banner-box .meta { display:flex; gap:20px; font-size:1rem; }
     .banner-box .meta span,
@@ -158,11 +161,18 @@
       padding:8px 16px; background:#007c91; color:#fff;
       border:none; border-radius:4px; cursor:pointer;
     }
+    
+  .program-subtitle {
+  font-size: 1.25rem;
+  opacity: 0.85;
+}
   </style>
 </head>
 <body>
   <button id="gerar-pdf">Gerar Relatório (PDF)</button>
   <div id="report"></div>
+
+
 
   <script>
     const currentYear = new Date().getFullYear();
@@ -315,28 +325,25 @@
     : 'assessment-bg.jpg';
         
         const info = document.createElement('div');
-        info.className = 'page';
-        info.innerHTML = `
-          <div class="header">
-            <img src="mind4time-logo.png"><div></div>
-          </div>
-          <div class="content">
-            <div class="banner">
-              <img class="banner-bg" src="${bannerImg}">
-              <div class="banner-box">
-                <h1>Detalhes do Programa</h1>
-                <div class="meta">
-                  <span>Time Scope:</span><strong>${timeScope}</strong>
-                  <span>Trainers:</span><strong>${(f.trainers||{})[prog]||'N/A'}</strong>
-                </div>
-              </div>
-            </div>
-          </div>
-          <div class="footer">
-            <div>www.MIND4TIME.com</div>
-            <div>© MIND4TIME ${currentYear}</div>
-          </div>`;
-        root.appendChild(info);
+info.className = 'page';
+info.innerHTML = `
+  <div class="header">
+    <img src="mind4time-logo.png"><div></div>
+  </div>
+  <div class="content">
+    <div class="banner">
+      <img class="banner-bg" src="${bannerImg}">
+      <div class="banner-box">
+        <h1>${pm.TÍTULO || prog}</h1>
+        <div class="program-subtitle">${pm.SUBTÍTULO || ''}</div>
+      </div>
+    </div>
+  </div>
+  <div class="footer">
+    <div>www.MIND4TIME.com</div>
+    <div>© MIND4TIME ${currentYear}</div>
+  </div>`;
+root.appendChild(info);
 
         // Sections
         for (const sec of ['assessment','evaluation']) {

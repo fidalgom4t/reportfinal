@@ -120,7 +120,7 @@
 
   <div class="actions">
     <button id="viewReport" disabled>Ver Relatório</button>
-    <button id="downloadReport" disabled>Download Relatório</button>
+    
   </div>
 
   <script>
@@ -323,6 +323,13 @@
     const block = document.getElementById('textQuestionsBlock');
     block.style.display = block.style.display === 'none' ? 'block' : 'none';
   });
+
+  document.getElementById('viewReport').onclick = () => applyAndGo(false);
+  
+  document.getElementById('toggleQuestions').addEventListener('click', () => {
+    const block = document.getElementById('textQuestionsBlock');
+    block.style.display = block.style.display === 'none' ? 'block' : 'none';
+  });
       init().then(() => refreshDynamic());
       document.getElementById('clientSelect').addEventListener('change', e => {
         const client = e.target.value;
@@ -351,6 +358,11 @@ localStorage.setItem('filters', JSON.stringify(previous));
     }
     document.getElementById('viewReport').onclick = () => applyAndGo(false);
     document.getElementById('downloadReport').onclick = () => applyAndGo(true);
-  </script>
+  function applyAndGo(download) {
+  const all = loadFilters();
+  localStorage.setItem('reportFilters', JSON.stringify(all));
+  window.location.href = 'report.html' + (download ? '?download=true' : '');
+}
+</script>
 </body>
 </html>

@@ -250,25 +250,30 @@
       return w;
     }
 
-    function refreshDynamic() {
-      const f = loadFilters();
-      const client = f.clients?.[0];
-      const progs = f.programs || [];
-      const infos = f.clientInfos || [];
-      const db = document.getElementById('dynamicBlocks');
-      db.innerHTML = '';
-      const vb = document.getElementById('viewReport');
-      const tb = document.getElementById('toggleQuestions');
-      if (!client || progs.length === 0 || infos.length === 0) {
-        vb.disabled = true;
-        tb.disabled = true;
-        return;
-      }
-      progs.forEach(p => db.appendChild(renderBlock(client, p, infos)));
-      renderTextQuestions();
-      vb.disabled = false;
-      tb.disabled = false;
-    }
+    ffunction refreshDynamic() {
+  const f = loadFilters();
+  const client = f.clients?.[0];
+  const progs = f.programs || [];
+  const infos = f.clientInfos || [];
+  const db = document.getElementById('dynamicBlocks');
+  db.innerHTML = '';
+  const vb = document.getElementById('viewReport');
+  const tb = document.getElementById('toggleQuestions');
+
+  // Always enable the “Mostrar / Esconder Perguntas Abertas” button
+  tb.disabled = false;
+  // Only enable “Ver Relatório” when all filters are filled
+  vb.disabled = (!client || progs.length === 0 || infos.length === 0);
+
+  // If filters are incomplete, bail after clearing blocks
+  if (!client || progs.length === 0 || infos.length === 0) {
+    return;
+  }
+
+  // Otherwise render all dynamic blocks and questions
+  progs.forEach(p => db.appendChild(renderBlock(client, p, infos)));
+  renderTextQuestions();
+}
 
     function renderBlock(client, program, infos) {
       const b = document.createElement('div');

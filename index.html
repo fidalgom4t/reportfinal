@@ -14,70 +14,45 @@
     }
     *, *::before, *::after { box-sizing: border-box; }
     body {
-      margin: 40px auto;
-      padding: 0 var(--gap);
+      margin: 40px auto; padding:0 var(--gap);
       max-width: 900px;
       font-family: 'Segoe UI', sans-serif;
-      background: var(--bg);
-      color: #333;
+      background: var(--bg); color: #333;
     }
-    h2 { text-align: center; color: var(--primary); margin-bottom: 24px; }
+    h2 { text-align:center; color:var(--primary); margin-bottom:24px; }
     form {
-      display: grid;
-      grid-template-columns: 200px 1fr;
-      gap: var(--gap);
-      margin-bottom: var(--gap);
-      background: var(--card);
-      border: 1px solid var(--border);
-      border-radius: var(--radius);
-      padding: var(--gap);
+      display:grid; grid-template-columns:200px 1fr; gap:var(--gap);
+      background:var(--card); border:1px solid var(--border);
+      border-radius:var(--radius); padding:var(--gap);
+      margin-bottom:var(--gap);
     }
-    label { font-weight: bold; display: block; margin-bottom: 4px; }
+    label { font-weight:bold; display:block; margin-bottom:4px; }
     select, input[type="text"], input[type="month"], button {
-      width: 100%;
-      padding: 8px;
-      border: 1px solid var(--border);
-      border-radius: var(--radius);
-      font-size: 1rem;
+      width:100%; padding:8px; border:1px solid var(--border);
+      border-radius:var(--radius); font-size:1rem;
     }
-    select:disabled { background: #eee; }
+    select[multiple] { height: 120px; }
+    select:disabled { background:#eee; }
     .dynamic-block {
-      background: var(--card);
-      border: 1px solid var(--border);
-      border-radius: var(--radius);
-      padding: var(--gap);
-      margin-bottom: var(--gap);
+      background:var(--card); border:1px solid var(--border);
+      border-radius:var(--radius); padding:var(--gap);
+      margin-bottom:var(--gap);
     }
-    .dynamic-block + .dynamic-block { margin-top: var(--gap); }
     .checkbox-list {
-      max-height: 120px;
-      overflow-y: auto;
-      border: 1px solid var(--border);
-      background: #fafafa;
-      border-radius: var(--radius);
-      padding: var(--gap);
-      margin-bottom: var(--gap);
+      max-height:120px; overflow-y:auto;
+      border:1px solid var(--border); background:#fafafa;
+      border-radius:var(--radius); padding:var(--gap);
+      margin-bottom:var(--gap);
     }
-    .checkbox-list label { display: flex; align-items: center; margin-bottom: 6px; }
-    .checkbox-list input { margin-right: 8px; }
-    .actions {
-      text-align: center;
-      margin-top: var(--gap);
-    }
+    .checkbox-list label { display:flex; align-items:center; margin-bottom:6px; }
+    .checkbox-list input { margin-right:8px; }
+    .actions { text-align:center; margin-top:var(--gap); }
     .actions button {
-      padding: 10px 24px;
-      margin: 0 8px;
-      background: var(--primary);
-      color: #fff;
-      border: none;
-      border-radius: var(--radius);
-      cursor: pointer;
-      font-size: 1rem;
+      padding:10px 24px; margin:0 8px; background:var(--primary);
+      color:#fff; border:none; border-radius:var(--radius);
+      cursor:pointer; font-size:1rem;
     }
-    .actions button:disabled {
-      background: #999;
-      cursor: default;
-    }
+    .actions button:disabled { background:#999; cursor:default; }
   </style>
 </head>
 <body>
@@ -93,7 +68,7 @@
     </div>
     <div>
       <label for="programSelect">Programas</label>
-      <select id="programSelect" disabled>
+      <select id="programSelect" multiple disabled>
         <option value="">– Selecione –</option>
       </select>
     </div>
@@ -116,7 +91,7 @@
   <script>
     let data = [];
 
-    // -- Storage helpers --
+    // --- Storage Helpers ---
     function loadFilters() {
       return JSON.parse(localStorage.getItem('filters') || '{}');
     }
@@ -129,23 +104,22 @@
       saveFilters(f);
     }
 
-    // -- Initialization --
+    // --- init ---
     document.addEventListener('DOMContentLoaded', async () => {
       data = await fetch('data.json').then(r => r.json());
 
-      // Populate Cliente select
+      // Populate cliente
       const clients = [...new Set(data.map(d => d.client))].sort();
       const csel = document.getElementById('clientSelect');
       clients.forEach(c => {
-        const opt = document.createElement('option');
-        opt.value = c;
-        opt.textContent = c;
-        csel.appendChild(opt);
+        const o = document.createElement('option');
+        o.value = c; o.textContent = c;
+        csel.appendChild(o);
       });
       csel.disabled = false;
     });
 
-    // -- Element refs --
+    // --- Refs ---
     const clientSelect  = document.getElementById('clientSelect');
     const programSelect = document.getElementById('programSelect');
     const infoSelect    = document.getElementById('infoSelect');
@@ -153,51 +127,56 @@
     const viewBtn       = document.getElementById('viewReport');
     const downloadBtn   = document.getElementById('downloadReport');
 
-    // -- Handlers --
+    // --- Handlers ---
     clientSelect.onchange = () => {
       const selC = clientSelect.value;
       // reset downstream
-      programSelect.innerHTML = '<option value="">– Selecione –</option>';
-      infoSelect   .innerHTML = '<option value="">– Selecione –</option>';
-      programSelect.disabled = !selC;
-      infoSelect.disabled    = true;
+      programSelect.innerHTML = '';
+      infoSelect.innerHTML    = '';
       dynamicBlocks.innerHTML = '';
       viewBtn.disabled = downloadBtn.disabled = true;
 
-      updateFilter('clients', selC ? [selC] : []);
+      if (!selC) {
+        programSelect.disabled = true;
+        infoSelect.disabled    = true;
+        return;
+      }
 
-      if (!selC) return;
-      const progs = [...new Set(data.filter(d => d.client === selC).map(d => d.program))].sort();
-      progs.forEach(p => {
-        const o = document.createElement('option');
-        o.value = p;
-        o.textContent = p;
-        programSelect.appendChild(o);
-      });
+      updateFilter('clients', [selC]);
+
+      // populate multi-select programs
+      const progs = [...new Set(
+        data.filter(d => d.client === selC).map(d => d.program)
+      )].sort();
+      programSelect.innerHTML = progs.map(p =>
+        `<option value="${p}">${p}</option>`).join('');
+      programSelect.disabled = false;
     };
 
     programSelect.onchange = () => {
       const selC = clientSelect.value;
-      const selP = programSelect.value;
-
-      infoSelect.innerHTML = '<option value="">– Selecione –</option>';
-      infoSelect.disabled  = !selP;
+      const selPs= Array.from(programSelect.selectedOptions).map(o=>o.value);
+      infoSelect.innerHTML    = '';
       dynamicBlocks.innerHTML = '';
       viewBtn.disabled = downloadBtn.disabled = true;
 
-      updateFilter('programs', selP ? [selP] : []);
+      if (!selPs.length) {
+        infoSelect.disabled = true;
+        updateFilter('programs', []);
+        return;
+      }
 
-      if (!selP) return;
+      updateFilter('programs', selPs);
+
+      // populate infoSelect
       const infos = [...new Set(
-        data.filter(d => d.client===selC && d.program===selP)
-            .map(d => d.client_info)
+        data.filter(d =>
+          d.client===selC && selPs.includes(d.program)
+        ).map(d=>d.client_info)
       )].sort();
-      infos.forEach(i => {
-        const o = document.createElement('option');
-        o.value = i;
-        o.textContent = i;
-        infoSelect.appendChild(o);
-      });
+      infoSelect.innerHTML = infos.map(i =>
+        `<option value="${i}">${i}</option>`).join('');
+      infoSelect.disabled = false;
     };
 
     infoSelect.onchange = () => {
@@ -205,113 +184,121 @@
       dynamicBlocks.innerHTML = '';
       viewBtn.disabled = downloadBtn.disabled = true;
 
-      updateFilter('clientInfos', selI ? [selI] : []);
+      if (!selI) {
+        updateFilter('clientInfos', []);
+        return;
+      }
+      updateFilter('clientInfos', [selI]);
 
-      if (!selI) return;
-      renderDynamic(
-        clientSelect.value,
-        programSelect.value,
-        selI
-      );
+      // render a block for each selected program
+      const selC = clientSelect.value;
+      const selPs= loadFilters().programs;
+      selPs.forEach(prog => renderDynamic(selC, prog, selI));
+
       viewBtn.disabled = downloadBtn.disabled = false;
     };
 
-    // -- Renders the per-program block --
+    // --- Render one dynamic-block per program ---
     function renderDynamic(client, program, info) {
       const block = document.createElement('div');
       block.className = 'dynamic-block';
 
-      // Formador
-      const lbT = document.createElement('label');
-      lbT.textContent = 'Formador';
-      const inT = document.createElement('input');
-      inT.type = 'text';
-      inT.addEventListener('input', e => {
-        const t = e.target.value;
-        const obj = loadFilters().trainers || {};
-        obj[program] = t;
-        updateFilter('trainers', obj);
-      });
-      block.append(lbT, inT);
+      // header
+      const h = document.createElement('h3');
+      h.textContent = `Programa: ${program}`;
+      block.appendChild(h);
 
-      // Datas
-      ['Início','Fim'].forEach(lbl => {
-        const l = document.createElement('label');
-        l.textContent = lbl;
-        const inp = document.createElement('input');
-        inp.type = 'month';
-        inp.addEventListener('change', e => {
-          const val = e.target.value;
-          const key = lbl.toLowerCase() + 's'; // 'início'→ 'iníci{"?' but your report.html expects 'starts' and 'ends'
-          // For consistency with your existing keys use 'starts' and 'ends':
-          const storageKey = lbl === 'Início' ? 'starts' : 'ends';
-          const obj = loadFilters()[storageKey] || {};
-          obj[program] = val;
-          updateFilter(storageKey, obj);
-        });
-        block.append(l, inp);
-      });
+      // Trainer
+      block.appendChild(createTextField('Formador', program, 'trainers'));
 
-      // Turmas checkbox list
+      // Dates
+      block.appendChild(createMonthField('Início', program, 'starts'));
+      block.appendChild(createMonthField('Fim',    program, 'ends'));
+
+      // Turmas checkboxes
       const turmas = [...new Set(
-        data.filter(d => d.client===client && d.program===program && d.client_info===info)
-            .map(d => d.turma)
+        data.filter(d =>
+          d.client===client &&
+          d.program===program &&
+          d.client_info===info
+        ).map(d=>d.turma)
       )];
-      block.append(createCheckboxList(
-        'Turmas',
-        turmas,
-        `turmas_${program}`
-      ));
+      block.appendChild(createCheckboxList('Turmas', turmas, `turmas_${program}`));
 
-      // Perguntas Abertas checkbox list
+      // Perguntas Abertas checkboxes
       const perguntas = [...new Set(
-        data.filter(d => d.client===client && d.program===program && d.client_info===info && isNaN(+d.value))
-            .map(d => d.question)
+        data.filter(d =>
+          d.client===client &&
+          d.program===program &&
+          d.client_info===info &&
+          isNaN(+d.value)
+        ).map(d=>d.question)
       )];
-      block.append(createCheckboxList(
-        'Perguntas Abertas',
-        perguntas,
-        `textQuestions_${program}`
-      ));
+      block.appendChild(createCheckboxList('Perguntas Abertas', perguntas, `textQuestions_${program}`));
 
       dynamicBlocks.appendChild(block);
     }
 
-    // -- Builds a label + checkbox-list and wire updates to storageKey --
+    function createTextField(labelText, program, storageKey) {
+      const container = document.createElement('div');
+      const lb = document.createElement('label'); lb.textContent = labelText;
+      const inp = document.createElement('input'); inp.type = 'text';
+      inp.value = (loadFilters()[storageKey]||{})[program] || '';
+      inp.oninput = e => {
+        const obj = loadFilters()[storageKey]||{};
+        obj[program] = e.target.value;
+        updateFilter(storageKey, obj);
+      };
+      container.append(lb, inp);
+      return container;
+    }
+
+    function createMonthField(labelText, program, storageKey) {
+      const container = document.createElement('div');
+      const lb = document.createElement('label'); lb.textContent = labelText;
+      const inp = document.createElement('input'); inp.type = 'month';
+      inp.value = ((loadFilters()[storageKey]||{})[program] || '');
+      inp.onchange = e => {
+        const obj = loadFilters()[storageKey]||{};
+        obj[program] = e.target.value;
+        updateFilter(storageKey, obj);
+      };
+      container.append(lb, inp);
+      return container;
+    }
+
     function createCheckboxList(labelText, options, storageKey) {
       const c = document.createElement('div');
-      const lb = document.createElement('label');
-      lb.textContent = labelText;
-      const list = document.createElement('div');
-      list.className = 'checkbox-list';
-
+      const lb = document.createElement('label'); lb.textContent = labelText;
+      const list = document.createElement('div'); list.className = 'checkbox-list';
+      const stored = loadFilters()[storageKey] || [];
       options.forEach(o => {
         const lbl = document.createElement('label');
         const cb = document.createElement('input');
-        cb.type = 'checkbox';
-        cb.value = o;
-        cb.checked = (loadFilters()[storageKey] || []).includes(o);
-        cb.addEventListener('change', () => {
-          const vals = Array.from(list.querySelectorAll('input:checked')).map(x=>x.value);
+        cb.type = 'checkbox'; cb.value = o;
+        cb.checked = stored.includes(o);
+        cb.onchange = () => {
+          const vals = Array.from(
+            list.querySelectorAll('input:checked')
+          ).map(x=>x.value);
           updateFilter(storageKey, vals);
-        });
+        };
         lbl.append(cb, o);
         list.append(lbl);
       });
-
       c.append(lb, list);
       return c;
     }
 
-    // -- Apply & navigate --
+    // --- Apply & Redirect ---
     function applyAndGo(download) {
       const all = loadFilters();
-      // snapshot full filters into reportFilters
       localStorage.setItem('reportFilters', JSON.stringify(all));
-      window.location.href = 'report.html' + (download ? '?download=true' : '');
+      window.location.href = 'report.html' + (download? '?download=true':'' );
     }
     viewBtn.onclick     = () => applyAndGo(false);
     downloadBtn.onclick = () => applyAndGo(true);
+
   </script>
 
 </body>

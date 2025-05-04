@@ -290,38 +290,37 @@
       return tp;
     }
 
-    // MAIN BUILD
-    async function build() {
-      const f = JSON.parse(localStorage.getItem('reportFilters')||'{}');
-      const [data, meta] = await Promise.all([
-        fetch('data.json').then(r=>r.json()),
-        fetch('meta.json').then(r=>r.json())
-      ]);
-      const LM = createLabelMap(meta.labels),
-            OM = createSortMap(meta.labels);
-      const root = document.getElementById('report');
-      root.innerHTML = '';
+  async function build() {
+  const f = JSON.parse(localStorage.getItem('reportFilters') || '{}');
+  const [data, meta] = await Promise.all([
+    fetch('data.json').then(r => r.json()),
+    fetch('meta.json').then(r => r.json())
+  ]);
+  const LM = createLabelMap(meta.labels),
+        OM = createSortMap(meta.labels);
+  const root = document.getElementById('report');
+  root.innerHTML = '';
 
-      // compute timeScope
-     let timeScope = '';
-const start = (f.starts || {})[prog];
-const end = (f.ends || {})[prog];
+  // Agora DENTRO do ciclo
+  for (const prog of f.programs || []) {
+    // 👇 cálculo do timeScope aqui dentro
+    let timeScope = '';
+    const start = (f.starts || {})[prog];
+    const end   = (f.ends || {})[prog];
 
-if (start && end) {
-  const s = formatMonthYear(start),
-        e = formatMonthYear(end);
-  timeScope = `${s.month} – ${e.month} ${e.year}`;
-}
+    if (start && end) {
+      const s = formatMonthYear(start),
+            e = formatMonthYear(end);
+      timeScope = `${s.month} – ${e.month} ${e.year}`;
+    }
 
-      for (const prog of f.programs||[]) {
-        const selTur = f[`turmas_${prog}`]||[];
-        const rows   = data.filter(d=>
-          (f.clients||[]).includes(d.client) &&
-          d.program===prog &&
-          selTur.includes(d.turma)
-        );
-        const pm     = meta.titles.find(t=>t.program_id===prog)||{};
-
+    const selTur = f[`turmas_${prog}`] || [];
+    const rows = data.filter(d =>
+      (f.clients || []).includes(d.client) &&
+      d.program === prog &&
+      selTur.includes(d.turma)
+    );
+    const pm = meta.titles.find(t => t.program_id === prog) || {};
         // Hero
         const hero = document.createElement('div');
         hero.className = 'page hero';

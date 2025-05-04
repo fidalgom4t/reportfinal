@@ -111,7 +111,7 @@
       padding:10px; 
       box-sizing:border-box;
       max-width:calc(100% - 40px);
-      max-height:360px;          /* clamp the question box */
+      max-height:360px;
       overflow:visible;
       page-break-inside:avoid; break-inside:avoid;
       margin:20px auto 20px auto
@@ -124,7 +124,7 @@
     }
     .text-question li { margin-bottom:8px; }
     .page.text-page .answer-list {
-      max-height:100%; /* inherits 320px cap from parent */
+      max-height:100%;
       overflow:hidden;
     }
 
@@ -136,24 +136,21 @@
     }
 
     .page.text-page .content {
-  display: flex;
-  align-items: flex-start;    /* stick the box at the top */
-  justify-content: center;    /* center it horizontally (optional) */
-}
-
-.page.text-page .content > .text-question {
-  height: auto;               /* size to its contents */
-  max-height: 360px;          /* don’t grow taller than this */
-  overflow-y: auto;           /* scroll if it exceeds 320px */
-  display: inline-block;      /* shrink width to content too */
-}
-
+      display: flex;
+      align-items: flex-start;
+      justify-content: center;
+    }
+    .page.text-page .content > .text-question {
+      height: auto;
+      max-height: 360px;
+      overflow-y: auto;
+      display: inline-block;
+    }
 
     /* HIDE HEADER/FOOTER ON HERO */
     .page.hero > .header,
     .page.hero > .footer { display:none; }
     .page.hero > .content { top:0; bottom:0; }
-    
 
     /* PDF BUTTON */
     #gerar-pdf {
@@ -161,7 +158,6 @@
       padding:8px 16px; background:#007c91; color:#fff;
       border:none; border-radius:4px; cursor:pointer;
     }
-    
   </style>
 </head>
 <body>
@@ -221,7 +217,11 @@
 
     // CHART
     function createBarChart(container, title, data, uniform) {
-      const chart = echarts.init(container);
+      // Use SVG renderer for perfect sharpness (or switch to high-DPI canvas via devicePixelRatio)
+      const chart = echarts.init(container, null, {
+        renderer: 'svg'
+      });
+
       chart.setOption({
         title:{text:title,left:'center',textStyle:{fontSize:20}},
         grid:{top:80,left:'10%',right:'10%',bottom:120},
@@ -417,19 +417,17 @@
           }
 
           // — TEXT ANSWERS WITH SPILL + FIT‑TO‑SHRINK —
-        const selQs = f.textQuestions || [];
-
-selQs.forEach(qid => {
-  const ans = data.filter(d =>
-    (f.clients || []).includes(d.client) &&
-    d.program === prog &&
-    (f.clientInfos || []).includes(d.client_info) &&
-    (f[`turmas_${prog}`] || []).includes(d.turma) &&
-    String(d.section || '').toLowerCase().includes(sec) &&
-    d.question === qid &&
-    isNaN(+d.value)
-  );
-
+          const selQs = f.textQuestions || [];
+          selQs.forEach(qid => {
+            const ans = data.filter(d =>
+              (f.clients || []).includes(d.client) &&
+              d.program === prog &&
+              (f.clientInfos || []).includes(d.client_info) &&
+              (f[`turmas_${prog}`] || []).includes(d.turma) &&
+              String(d.section || '').toLowerCase().includes(sec) &&
+              d.question === qid &&
+              isNaN(+d.value)
+            );
             if (!ans.length) return;
 
             const pagesForThisQ = [];
@@ -443,7 +441,7 @@ selQs.forEach(qid => {
               li.textContent = a.value;
               listEl.appendChild(li);
 
-              // if it overflows the 320px cap of .text-question
+              // overflow spill logic
               const tq = page.querySelector('.text-question');
               if (tq.scrollHeight > tq.clientHeight) {
                 listEl.removeChild(li);
@@ -455,7 +453,7 @@ selQs.forEach(qid => {
               }
             });
 
-            // now shrink each grey box to fit its actual content
+            // shrink each grey box
             pagesForThisQ.forEach(pg => {
               const tq = pg.querySelector('.text-question');
               tq.style.height = tq.scrollHeight + 'px';
@@ -477,8 +475,11 @@ selQs.forEach(qid => {
 
       const pages  = Array.from(document.querySelectorAll('.page'));
       const images = await Promise.all(pages.map(pg=>
-        html2canvas(pg, { backgroundColor:'#fff', useCORS:true, scale:4 })
-          .then(cnv=>cnv.toDataURL('image/png',1.0))
+        html2canvas(pg, {
+          backgroundColor:'#fff',
+          useCORS:true,
+          scale: window.devicePixelRatio
+        }).then(cnv=>cnv.toDataURL('image/png',1.0))
       ));
 
       pdfMake.createPdf({

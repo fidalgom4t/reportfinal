@@ -327,7 +327,16 @@
       document.getElementById('clientSelect').addEventListener('change', e => {
         const client = e.target.value;
         if (!client) return;
-        updateFilter('clients', [client]);
+        const previous = loadFilters();
+previous.clients = [client];
+delete previous.programs;
+delete previous.clientInfos;
+for (const key in previous) {
+  if (key.startsWith('turmas_') || key === 'starts' || key === 'ends' || key === 'trainers') {
+    delete previous[key];
+  }
+}
+localStorage.setItem('filters', JSON.stringify(previous));
         const progs = [...new Set(data.filter(d => d.client === client).map(d => d.program))].sort();
         const infos = [...new Set(data.filter(d => d.client === client).map(d => d.client_info))].sort();
         buildCheckboxList(document.getElementById('programList'), progs, 'programs', refreshDynamic);

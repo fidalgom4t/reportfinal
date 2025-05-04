@@ -477,7 +477,7 @@ selQs.forEach(qid => {
 
       const pages  = Array.from(document.querySelectorAll('.page'));
       const images = await Promise.all(pages.map(pg=>
-        html2canvas(pg, { backgroundColor:'#fff', useCORS:true, scale:3 })
+        html2canvas(pg, { backgroundColor:'#fff', useCORS:true, scale:4 })
           .then(cnv=>cnv.toDataURL('image/png',1.0))
       ));
 

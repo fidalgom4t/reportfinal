@@ -149,6 +149,8 @@
 
   <script>
     localStorage.removeItem('reportFilters');
+    // Reset filters on page load
+    localStorage.removeItem('filters');
     let data = [];
 
     function loadFilters() {

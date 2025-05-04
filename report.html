@@ -107,11 +107,11 @@
     .text-page { padding:20px; box-sizing:border-box; }
     .text-question {
       background:#f9f9f9;
-      border:1px solid #007c91; border-left:6px solid #007c91;
+      border:1px solid #007c91;
       padding:10px; margin:20px auto;
       box-sizing:border-box;
       max-width:calc(100% - 40px);
-      max-height:320px;          /* clamp the question box */
+      max-height:340px;          /* clamp the question box */
       overflow:visible;
       page-break-inside:avoid; break-inside:avoid;
     }
@@ -142,7 +142,7 @@
 
 .page.text-page .content > .text-question {
   height: auto;               /* size to its contents */
-  max-height: 320px;          /* don’t grow taller than this */
+  max-height: 340px;          /* don’t grow taller than this */
   overflow-y: auto;           /* scroll if it exceeds 320px */
   display: inline-block;      /* shrink width to content too */
 }

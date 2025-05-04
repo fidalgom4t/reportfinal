@@ -287,6 +287,14 @@
       wrapper.append(lbl, inp);
       return wrapper;
     }
+    
+    function resetClientFilters() {
+  const current = loadFilters();
+  const preserved = { textQuestions: current.textQuestions || [] };
+  localStorage.setItem('filters', JSON.stringify(preserved));
+  location.reload();
+}
+
 
     function createCheckboxGroup(labelText, options, storageKey) {
       const wrapper = document.createElement('div');
@@ -331,6 +339,7 @@
     }
     document.getElementById('viewReport').onclick = () => applyAndGo(false);
     document.getElementById('downloadReport').onclick = () => applyAndGo(true);
+    
   </script>
 </body>
 </html>

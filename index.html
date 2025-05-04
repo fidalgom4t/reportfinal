@@ -110,7 +110,6 @@
   </form>
 
   <div id="dynamicBlocks"></div>
-
   <div id="textQuestionsBlock"></div>
 
   <div class="actions">
@@ -136,15 +135,14 @@
     }
 
     async function init() {
-  data = await fetch('data.json').then(r => r.json());
-  const clients = [...new Set(data.map(d => d.client))].sort();
-  const clientSelect = document.getElementById('clientSelect');
-  clients.forEach(c => {
-    const opt = document.createElement('option');
-    opt.value = c; opt.textContent = c;
-    clientSelect.appendChild(opt);
-  });
-});
+      data = await fetch('data.json').then(r => r.json());
+      const clients = [...new Set(data.map(d => d.client))].sort();
+      const clientSelect = document.getElementById('clientSelect');
+      clients.forEach(c => {
+        const opt = document.createElement('option');
+        opt.value = c; opt.textContent = c;
+        clientSelect.appendChild(opt);
+      });
     }
 
     function buildCheckboxList(container, options, storageKey, onChange) {
@@ -176,13 +174,11 @@
       if (!client || programs.length === 0 || infos.length === 0) {
         document.getElementById('viewReport').disabled = true;
         document.getElementById('downloadReport').disabled = true;
-        document.getElementById('textQuestionsBlock').innerHTML = '';
         return;
       }
       programs.forEach(prog => {
         container.appendChild(renderBlock(client, prog, infos));
       });
-      renderTextQuestions();
       document.getElementById('viewReport').disabled = false;
       document.getElementById('downloadReport').disabled = false;
     }
@@ -204,65 +200,64 @@
     }
 
     function renderTextQuestions() {
-  const container = document.getElementById('textQuestionsBlock');
-  container.innerHTML = '';
-  const grouped = {};
-  const evaluation = new Set();
+      const container = document.getElementById('textQuestionsBlock');
+      container.innerHTML = '';
+      const grouped = {};
+      const evaluation = new Set();
 
-  data.forEach(d => {
-    if (!isNaN(+d.value)) return;
-    const section = (d.section || '').toLowerCase();
-    if (section.includes('evaluation')) {
-      evaluation.add(d.question);
-    } else if (section.includes('assessment')) {
-      if (!grouped[d.program]) grouped[d.program] = new Set();
-      grouped[d.program].add(d.question);
-    }
-  });
+      data.forEach(d => {
+        if (!isNaN(+d.value)) return;
+        const section = (d.section || '').toLowerCase();
+        if (section.includes('evaluation')) {
+          evaluation.add(d.question);
+        } else if (section.includes('assessment')) {
+          if (!grouped[d.program]) grouped[d.program] = new Set();
+          grouped[d.program].add(d.question);
+        }
+      });
 
-  const selected = new Set(loadFilters().textQuestions || []);
-  const block = document.createElement('div');
-  block.className = 'dynamic-block';
-  const title = document.createElement('h3');
-  title.textContent = 'Perguntas Abertas (por programa - assessment)';
-  block.appendChild(title);
+      const selected = new Set(loadFilters().textQuestions || []);
+      const block = document.createElement('div');
+      block.className = 'dynamic-block';
+      const title = document.createElement('h3');
+      title.textContent = 'Perguntas Abertas (por programa - assessment)';
+      block.appendChild(title);
 
-  Object.entries(grouped).forEach(([prog, questions]) => {
-    const subtitle = document.createElement('h4');
-    subtitle.textContent = prog;
-    block.appendChild(subtitle);
-    questions.forEach(q => {
-      const lbl = document.createElement('label');
-      const cb = document.createElement('input'); cb.type = 'checkbox'; cb.value = q;
-      cb.checked = selected.has(q);
-      cb.onchange = () => {
-        const all = Array.from(block.querySelectorAll('input:checked')).map(i => i.value);
-        updateFilter('textQuestions', all);
-      };
-      lbl.append(cb, q);
-      block.appendChild(lbl);
-    });
-  });
+      Object.entries(grouped).forEach(([prog, questions]) => {
+        const subtitle = document.createElement('h4');
+        subtitle.textContent = prog;
+        block.appendChild(subtitle);
+        questions.forEach(q => {
+          const lbl = document.createElement('label');
+          const cb = document.createElement('input'); cb.type = 'checkbox'; cb.value = q;
+          cb.checked = selected.has(q);
+          cb.onchange = () => {
+            const all = Array.from(block.querySelectorAll('input:checked')).map(i => i.value);
+            updateFilter('textQuestions', all);
+          };
+          lbl.append(cb, q);
+          block.appendChild(lbl);
+        });
+      });
 
-  if (evaluation.size > 0) {
-    const evalTitle = document.createElement('h3');
-    evalTitle.textContent = 'Perguntas de Evaluation (iguais para todos os programas)';
-    block.appendChild(evalTitle);
-    evaluation.forEach(q => {
-      const lbl = document.createElement('label');
-      const cb = document.createElement('input'); cb.type = 'checkbox'; cb.value = q;
-      cb.checked = selected.has(q);
-      cb.onchange = () => {
-        const all = Array.from(block.querySelectorAll('input:checked')).map(i => i.value);
-        updateFilter('textQuestions', all);
-      };
-      lbl.append(cb, q);
-      block.appendChild(lbl);
-    });
-  }
+      if (evaluation.size > 0) {
+        const evalTitle = document.createElement('h3');
+        evalTitle.textContent = 'Perguntas de Evaluation (iguais para todos os programas)';
+        block.appendChild(evalTitle);
+        evaluation.forEach(q => {
+          const lbl = document.createElement('label');
+          const cb = document.createElement('input'); cb.type = 'checkbox'; cb.value = q;
+          cb.checked = selected.has(q);
+          cb.onchange = () => {
+            const all = Array.from(block.querySelectorAll('input:checked')).map(i => i.value);
+            updateFilter('textQuestions', all);
+          };
+          lbl.append(cb, q);
+          block.appendChild(lbl);
+        });
+      }
 
-  container.appendChild(block);
-}
+      container.appendChild(block);
     }
 
     function createInputField(label, prog, key) {
@@ -314,7 +309,10 @@
     }
 
     document.addEventListener('DOMContentLoaded', () => {
-      init().then(() => refreshDynamic());
+      init().then(() => {
+        renderTextQuestions();
+      });
+
       document.getElementById('clientSelect').addEventListener('change', e => {
         const client = e.target.value;
         if (!client) return;

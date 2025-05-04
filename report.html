@@ -70,6 +70,13 @@
     }
     .hero-content h1 { font-size:3.5rem; margin:0; }
     .hero-content .subtitle { font-size:1rem; margin-top:0px; opacity:.85; font-style:italic; padding-left:3px }
+    .hero-logo {
+  position: absolute;
+  bottom: 30px;
+  right: 30px;
+  height: 40px; /* ajusta conforme necessário */
+  opacity: 0.9;
+}
 
     /* BANNERS */
     .banner { position:relative; overflow:hidden; }
@@ -341,6 +348,7 @@
               <h1>TRAINING REPORT</h1>
               <div class="subtitle">${timeScope}</div>
             </div>
+              <img class="hero-logo" src="Logo.png">
           </div>`;
         root.appendChild(hero);
 

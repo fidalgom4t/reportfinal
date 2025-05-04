@@ -303,12 +303,15 @@
       root.innerHTML = '';
 
       // compute timeScope
-      let timeScope = '';
-      if (f.start && f.end) {
-        const s = formatMonthYear(f.start),
-              e = formatMonthYear(f.end);
-        timeScope = `${s.month} – ${e.month} ${e.year}`;
-      }
+     let timeScope = '';
+const start = (f.starts || {})[prog];
+const end = (f.ends || {})[prog];
+
+if (start && end) {
+  const s = formatMonthYear(start),
+        e = formatMonthYear(end);
+  timeScope = `${s.month} – ${e.month} ${e.year}`;
+}
 
       for (const prog of f.programs||[]) {
         const selTur = f[`turmas_${prog}`]||[];

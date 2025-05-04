@@ -65,8 +65,8 @@
     }
     .hero-content {
       position:relative; z-index:1;
-      display:flex; flex-direction:column; align-items:center; justify-content:center;
-      color:#fff; text-align:center; padding:0 30px; box-sizing:border-box;
+      display:flex; flex-direction:column; align-items:left-aligned; justify-content:center;
+      color:#fff; text-align:left; padding:0 30px; box-sizing:border-box;
     }
     .hero-content h1 { font-size:3.5rem; margin:0; }
     .hero-content .subtitle { font-size:1.5rem; margin-top:12px; opacity:.85; }
@@ -337,8 +337,8 @@
           <div class="hero">
             <img class="bg" src="hourglass-bg.jpg">
             <div class="hero-content">
-              <h1>${pm.TÍTULO||prog}</h1>
-              <div class="subtitle">${pm.SUBTÍTULO||''}</div>
+              <h1>TRAINING REPORT</h1>
+              <div class="subtitle">${timeScope}</div>
             </div>
           </div>`;
         root.appendChild(hero);
@@ -361,7 +361,7 @@ info.innerHTML = `
     <div class="banner">
       <img class="banner-bg" src="${bannerImg}">
       <div class="banner-box">
-          <div> class="banner-super">corporate training</div>
+          <div class="banner-super">corporate training</div>
           <h1>${pm.TÍTULO || prog}</h1>
           <div class="program-subtitle">${pm.SUBTÍTULO || ''}</div>
           <div class="meta-banner">

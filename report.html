@@ -417,13 +417,19 @@
           }
 
           // — TEXT ANSWERS WITH SPILL + FIT‑TO‑SHRINK —
-          const selQs = f.textQuestions || [];
-          selQs.forEach(qid => {
-            const ans = rows.filter(d =>
-              String(d.section||'').toLowerCase().includes(sec) &&
-              d.question === qid &&
-              isNaN(+d.value)
-            );
+        const selQs = f.textQuestions || [];
+
+selQs.forEach(qid => {
+  const ans = data.filter(d =>
+    (f.clients || []).includes(d.client) &&
+    d.program === prog &&
+    (f.clientInfos || []).includes(d.client_info) &&
+    (f[`turmas_${prog}`] || []).includes(d.turma) &&
+    String(d.section || '').toLowerCase().includes(sec) &&
+    d.question === qid &&
+    isNaN(+d.value)
+  );
+
             if (!ans.length) return;
 
             const pagesForThisQ = [];

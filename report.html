@@ -215,357 +215,407 @@
 
 
   <script>
-    const currentYear = new Date().getFullYear();
+  // ─── 1. i18n SETUP ─────────────────────────────────────────────────────────
+  // default language (falls back to Portuguese)
+  let lang = 'pt';
 
-    // UTILITIES
-    function createLabelMap(labels) {
-      return labels.reduce((m, l) => {
-        const k = l.questionId || l['QUESTION ID'];
-        m[k] = l.label || l['LABEL'];
-        return m;
-      }, {});
+  // translation dictionary
+  const translations = {
+    pt: {
+      generate_pdf:       'Gerar Relatório (PDF)',
+      training_report:    'RELATÓRIO DE TREINO',
+      corporate_training: 'treino corporativo',
+      scope_temporal:     'Escopo temporal:',
+      trainers:           'Formadores:',
+      total_responses:    'Total de respostas:',
+      assessment:         'Assessment',
+      evaluation:         'Evaluation'
+    },
+    en: {
+      generate_pdf:       'Generate Report (PDF)',
+      training_report:    'TRAINING REPORT',
+      corporate_training: 'corporate training',
+      scope_temporal:     'Time frame:',
+      trainers:           'Trainers:',
+      total_responses:    'Total responses:',
+      assessment:         'Assessment',
+      evaluation:         'Evaluation'
     }
-    function createSortMap(labels) {
-      return labels.reduce((m, l) => {
-        const k = l.questionId || l['QUESTION ID'];
-        m[k] = +(l.sortOrder || l['SORT ORDER'] || l.sort_order);
-        return m;
-      }, {});
-    }
-    function groupBy(arr, key) {
-      return arr.reduce((o, i) => {
-        (o[i[key]] ||= []).push(i);
-        return o;
-      }, {});
-    }
-    function computeAverages(rows, LM, OM) {
-      const g = {};
-      rows.forEach(r => (g[r.question] ||= []).push(+r.value));
-      return Object.entries(g)
-        .map(([q, vals]) => ({
-          question: q,
-          label: LM[q] || q,
-          avg: +(vals.reduce((a,b)=>a+b,0)/vals.length).toFixed(1)
-        }))
-        .sort((a,b) => (OM[a.question]||0) - (OM[b.question]||0));
-    }
-    function countUnique(rows, sec) {
-      return new Set(
-        rows.filter(d => String(d.section||'').toLowerCase().includes(sec))
-            .map(d => d['Submission ID'])
-      ).size;
-    }
-    function formatMonthYear(v) {
-      const names = {
+  };
+
+  // lookup helper
+  function t(key) {
+    return (translations[lang] && translations[lang][key]) || key;
+  }
+  // ────────────────────────────────────────────────────────────────────────────
+
+  const currentYear = new Date().getFullYear();
+
+  // ─── UTILITIES ─────────────────────────────────────────────────────────────
+  function createLabelMap(labels) {
+    return labels.reduce((m, l) => {
+      const k = l.questionId || l['QUESTION ID'];
+      m[k] = l.label || l['LABEL'];
+      return m;
+    }, {});
+  }
+
+  function createSortMap(labels) {
+    return labels.reduce((m, l) => {
+      const k = l.questionId || l['QUESTION ID'];
+      m[k] = +(l.sortOrder || l['SORT ORDER'] || l.sort_order || 0);
+      return m;
+    }, {});
+  }
+
+  function groupBy(arr, key) {
+    return arr.reduce((o, i) => {
+      (o[i[key]] ||= []).push(i);
+      return o;
+    }, {});
+  }
+
+  function computeAverages(rows, LM, OM) {
+    const g = {};
+    rows.forEach(r => (g[r.question] ||= []).push(+r.value));
+    return Object.entries(g)
+      .map(([q, vals]) => ({
+        question: q,
+        label: LM[q] || q,
+        avg: +(vals.reduce((a,b)=>a+b,0)/vals.length).toFixed(1)
+      }))
+      .sort((a,b) => (OM[a.question]||0) - (OM[b.question]||0));
+  }
+
+  function countUnique(rows, sec) {
+    return new Set(
+      rows.filter(d => String(d.section||'').toLowerCase().includes(sec))
+          .map(d => d['Submission ID'])
+    ).size;
+  }
+
+  function formatMonthYear(v) {
+    const monthNames = {
+      pt: {
         '01':'janeiro','02':'fevereiro','03':'março','04':'abril',
         '05':'maio','06':'junho','07':'julho','08':'agosto',
         '09':'setembro','10':'outubro','11':'novembro','12':'dezembro'
-      };
-      const [y,m] = v.split('-');
-      return { month:names[m], year:y };
+      },
+      en: {
+        '01':'January','02':'February','03':'March','04':'April',
+        '05':'May','06':'June','07':'July','08':'August',
+        '09':'September','10':'October','11':'November','12':'December'
+      }
+    }[lang];
+    const [year, month] = v.split('-');
+    return { month: monthNames[month], year };
+  }
+  // ────────────────────────────────────────────────────────────────────────────
+
+  // ─── CHART RENDERER ─────────────────────────────────────────────────────────
+  function createBarChart(container, title, data, uniform) {
+    const chart = echarts.init(container, null, { renderer: 'svg' });
+    chart.setOption({
+      title:{text:title,left:'center',textStyle:{fontSize:20}},
+      grid:{top:80,left:'10%',right:'10%',bottom:120},
+      tooltip:{},
+      xAxis:{type:'category',data:data.map(d=>d.label),
+             axisLabel:{rotate:30,interval:0,margin:10}},
+      yAxis:{type:'value',min:1,max:5,
+             splitLine:{show:false},axisLine:{show:false},
+             axisTick:{show:false},axisLabel:{show:false}},
+      series:[{type:'bar',data:data.map(d=>d.avg),
+        label:{show:true,position:'top',formatter:'{c}'},
+        itemStyle: uniform
+          ? {color:'#6A99D0'}
+          : {color:p=>p.value<3?'#EA3323':p.value<4?'#6A99D0':'#9FCE63'}
+      }]
+    });
+    chart.resize();
+  }
+  // ────────────────────────────────────────────────────────────────────────────
+
+  // ─── TEXT PAGE BUILDER ──────────────────────────────────────────────────────
+  function createTextPage(prog, sec, qid, showTitle) {
+    const tp = document.createElement('div');
+    tp.className = 'page text-page';
+    tp.innerHTML = `
+      <div class="header">
+        <img src="mind4time-logo.png">
+        <div class="section-title">${ sec==='assessment' ? t('assessment') : t('evaluation') }</div>
+      </div>
+      <div class="content">
+        <div class="text-question">
+          ${ showTitle ? `<div class="text-question-title">${qid}</div>` : '' }
+          <ul class="answer-list"></ul>
+        </div>
+      </div>
+      <div class="footer">
+        <div>www.MIND4TIME.com</div>
+        <div>© MIND4TIME ${currentYear}</div>
+      </div>`;
+    return tp;
+  }
+  // ────────────────────────────────────────────────────────────────────────────
+
+  // ─── MAIN BUILD FUNCTION ────────────────────────────────────────────────────
+  async function build() {
+    // 1. fetch data.json & set lang
+    let raw = await fetch('data.json').then(r => r.json());
+    if (raw.lang) {
+      lang = raw.lang === 'en' ? 'en' : 'pt';
+      var data = raw.data;
+    } else {
+      var data = raw;
     }
+    // filter out rows not matching this lang
+    data = data.filter(d => d.lang === lang);
 
-    // CHART
-    function createBarChart(container, title, data, uniform) {
-      const chart = echarts.init(container, null, {
-      renderer: 'svg'
-       // alternatively for canvas at 2× DPI:
-       // devicePixelRatio: window.devicePixelRatio
-     });
+    // 2. set the PDF button text
+    document.getElementById('gerar-pdf').textContent = t('generate_pdf');
 
-      chart.setOption({
-        title:{text:title,left:'center',textStyle:{fontSize:20}},
-        grid:{top:80,left:'10%',right:'10%',bottom:120},
-        tooltip:{},
-        xAxis:{type:'category',data:data.map(d=>d.label),
-               axisLabel:{rotate:30,interval:0,margin:10}},
-        yAxis:{type:'value',min:1,max:5,
-               splitLine:{show:false},axisLine:{show:false},
-               axisTick:{show:false},axisLabel:{show:false}},
-        series:[{type:'bar',data:data.map(d=>d.avg),
-          label:{show:true,position:'top',formatter:'{c}'},
-          itemStyle: uniform
-            ? {color:'#6A99D0'}
-            : {color:p=>p.value<3?'#EA3323':p.value<4?'#6A99D0':'#9FCE63'}
-        }]
-      });
-      chart.resize();
-    }
+    // 3. fetch meta.json
+    const meta = await fetch('meta.json').then(r => r.json());
+    const LM   = createLabelMap(meta.labels),
+          OM   = createSortMap(meta.labels);
 
-    // TEXT PAGE BUILDER
-    function createTextPage(prog, sec, qid, showTitle) {
-      const tp = document.createElement('div');
-      tp.className = 'page text-page';
-      tp.innerHTML = `
+    // 4. load filters and clear report container
+    const f    = JSON.parse(localStorage.getItem('reportFilters') || '{}');
+    const root = document.getElementById('report');
+    root.innerHTML = '';
+
+    // 5. iterate programs
+    for (const prog of f.programs || []) {
+      // compute timeScope
+      let timeScope = '';
+      const start = (f.starts||{})[prog];
+      const end   = (f.ends  ||{})[prog];
+      if (start && end) {
+        const s = formatMonthYear(start),
+              e = formatMonthYear(end);
+        timeScope = `${s.month} – ${e.month} ${e.year}`;
+      }
+
+      // filter rows for this program & turma
+      const selTur = f[`turmas_${prog}`] || [];
+      const rows   = data.filter(d =>
+        (f.clients || []).includes(d.client) &&
+        d.program === prog &&
+        selTur.includes(d.turma)
+      );
+
+      const pm = meta.titles.find(t => t.program_id === prog) || {};
+
+      // 5a. Hero page
+      const hero = document.createElement('div');
+      hero.className = 'page hero';
+      hero.innerHTML = `
+        <div class="hero">
+          <img class="bg" src="hourglass-bg.jpg">
+          <div class="hero-content">
+            <h1>${t('training_report')}</h1>
+            <div class="subtitle">${timeScope}</div>
+          </div>
+          <img class="hero-logo" src="Logo.png">
+        </div>`;
+      root.appendChild(hero);
+
+      // 5b. Program details banner
+      const bannerImg = prog.toLowerCase()==='p365' ? 'p365-banner.png'
+                       : prog.toLowerCase()==='colab365' ? 'colab365-banner.png'
+                       : 'p365-banner.png';
+      const info = document.createElement('div');
+      info.className = 'page';
+      info.innerHTML = `
         <div class="header">
-          <img src="mind4time-logo.png">
-          <div class="section-title">${sec==='assessment'?'Assessment':'Evaluation'}</div>
+          <img src="mind4time-logo.png"><div></div>
         </div>
         <div class="content">
-          <div class="text-question">
-            ${showTitle?`<div class="text-question-title">${qid}</div>`:``}
-            <ul class="answer-list"></ul>
+          <div class="banner">
+            <img class="banner-bg" src="${bannerImg}">
+            <div class="banner-box">
+              <div class="banner-super">${t('corporate_training')}</div>
+              <h1>${pm.TÍTULO || prog}</h1>
+              <div class="program-subtitle">${pm.SUBTÍTULO || ''}</div>
+              <div class="meta-banner">
+                <div class="meta-line">${t('scope_temporal')}<span class="meta-value">${timeScope}</span></div>
+                <div class="meta-line">${t('trainers')}<span class="meta-value">${(f.trainers||{})[prog]||'N/A'}</span></div>
+              </div>
+            </div>
           </div>
         </div>
         <div class="footer">
           <div>www.MIND4TIME.com</div>
           <div>© MIND4TIME ${currentYear}</div>
         </div>`;
-      return tp;
-    }
+      root.appendChild(info);
 
-  async function build() {
-  const f = JSON.parse(localStorage.getItem('reportFilters') || '{}');
-  const [data, meta] = await Promise.all([
-    fetch('data.json').then(r => r.json()),
-    fetch('meta.json').then(r => r.json())
-  ]);
-  const LM = createLabelMap(meta.labels),
-        OM = createSortMap(meta.labels);
-  const root = document.getElementById('report');
-  root.innerHTML = '';
+      // 5c. Sections (Assessment & Evaluation)
+      for (const sec of ['assessment','evaluation']) {
+        const name    = t(sec);
+        const total   = countUnique(rows, sec);
+        const numeric = rows.filter(d =>
+          String(d.section||'').toLowerCase().includes(sec) &&
+          /^\d+(\.\d+)?$/.test(String(d.value).trim())
+        );
+        const byT     = Object.entries(groupBy(numeric,'turma'));
 
-  // Agora DENTRO do ciclo
-  for (const prog of f.programs || []) {
-    // 👇 cálculo do timeScope aqui dentro
-    let timeScope = '';
-    const start = (f.starts || {})[prog];
-    const end   = (f.ends || {})[prog];
-
-    if (start && end) {
-      const s = formatMonthYear(start),
-            e = formatMonthYear(end);
-      timeScope = `${s.month} – ${e.month} ${e.year}`;
-    }
-
-    const selTur = f[`turmas_${prog}`] || [];
-    const rows = data.filter(d =>
-      (f.clients || []).includes(d.client) &&
-      d.program === prog &&
-      selTur.includes(d.turma)
-    );
-    const pm = meta.titles.find(t => t.program_id === prog) || {};
-        // Hero
-        const hero = document.createElement('div');
-        hero.className = 'page hero';
-        hero.innerHTML = `
-          <div class="hero">
-            <img class="bg" src="hourglass-bg.jpg">
-            <div class="hero-content">
-              <h1>TRAINING REPORT</h1>
-              <div class="subtitle">${timeScope}</div>
+        // banner with total responses
+        const ban = document.createElement('div');
+        ban.className = 'page';
+        ban.innerHTML = `
+          <div class="header">
+            <img src="mind4time-logo.png">
+            <div class="section-title">${name}</div>
+          </div>
+          <div class="content">
+            <div class="banner">
+              <img class="banner-bg" src="${sec}-bg.jpg">
+              <div class="banner-text">${t('total_responses')} ${total}</div>
             </div>
-              <img class="hero-logo" src="Logo.png">
+          </div>
+          <div class="footer">
+            <div>www.MIND4TIME.com</div>
+            <div>© MIND4TIME ${currentYear}</div>
           </div>`;
-        root.appendChild(hero);
+        root.appendChild(ban);
 
-        // Program details
-        const bannerImg =
-  prog.toLowerCase() === 'p365'
-    ? 'p365-banner.png'
-    : prog.toLowerCase() === 'colab365'
-    ? 'colab365-banner.png'
-    : 'p365-banner.png';
-        
-        const info = document.createElement('div');
-info.className = 'page';
-info.innerHTML = `
-  <div class="header">
-    <img src="mind4time-logo.png"><div></div>
-  </div>
-  <div class="content">
-    <div class="banner">
-      <img class="banner-bg" src="${bannerImg}">
-      <div class="banner-box">
-          <div class="banner-super">corporate training</div>
-          <h1>${pm.TÍTULO || prog}</h1>
-          <div class="program-subtitle">${pm.SUBTÍTULO || ''}</div>
-          <div class="meta-banner">
-    <div class="meta-line">Scope temporal:<span class="meta-value"> ${timeScope}</span></div>
-    <div class="meta-line">Trainers:<span class="meta-value"> ${(f.trainers || {})[prog] || 'N/A'}</span></div>
-  </div>
-</div>
-    </div>
-  </div>
-  <div class="footer">
-    <div>www.MIND4TIME.com</div>
-    <div>© MIND4TIME ${currentYear}</div>
-  </div>`;
-root.appendChild(info);
-
-        // Sections
-        for (const sec of ['assessment','evaluation']) {
-          const name    = sec==='assessment'?'Assessment':'Evaluation';
-          const total   = countUnique(rows, sec);
-          const numeric = rows.filter(d=>
-            String(d.section||'').toLowerCase().includes(sec) &&
-            /^\d+(\.\d+)?$/.test(String(d.value).trim())
-          );
-          const byT     = Object.entries(groupBy(numeric,'turma'));
-
-          // banner
-          const ban = document.createElement('div'); ban.className='page';
-          ban.innerHTML = `
+        // global chart
+        if (numeric.length) {
+          const gp = document.createElement('div');
+          gp.className = 'page';
+          gp.innerHTML = `
             <div class="header">
               <img src="mind4time-logo.png">
               <div class="section-title">${name}</div>
             </div>
             <div class="content">
-              <div class="banner">
-                <img class="banner-bg" src="${sec}-bg.jpg">
-                <div class="banner-text">Total de respostas: ${total}</div>
+              <div class="chart-fullpage">
+                <div class="chart-full" id="chart-global-${prog}-${sec}"></div>
               </div>
             </div>
             <div class="footer">
               <div>www.MIND4TIME.com</div>
               <div>© MIND4TIME ${currentYear}</div>
             </div>`;
-          root.appendChild(ban);
+          root.appendChild(gp);
+          createBarChart(
+            gp.querySelector('.chart-full'),
+            'Global',
+            computeAverages(numeric, LM, OM),
+            sec === 'evaluation'
+          );
+        }
 
-          // global chart
-          if (numeric.length) {
-            const gp = document.createElement('div'); gp.className='page';
-            gp.innerHTML = `
+        // 2‑chart grid by turma
+        if (byT.length > 1) {
+          for (let i = 0; i < byT.length; i += 2) {
+            const gp2 = document.createElement('div');
+            gp2.className = 'page';
+            const boxes = byT.slice(i, i + 2)
+              .map(([,v], j) => `<div class="chart-box" id="chart-${prog}-grid-${i+j}"></div>`)
+              .join('');
+            gp2.innerHTML = `
               <div class="header">
                 <img src="mind4time-logo.png">
                 <div class="section-title">${name}</div>
               </div>
               <div class="content">
-                <div class="chart-fullpage">
-                  <div class="chart-full" id="chart-global-${prog}-${sec}"></div>
-                </div>
+                <div class="chart-grid">${boxes}</div>
               </div>
               <div class="footer">
                 <div>www.MIND4TIME.com</div>
                 <div>© MIND4TIME ${currentYear}</div>
               </div>`;
-            root.appendChild(gp);
-            createBarChart(
-              gp.querySelector('.chart-full'),
-              `Global`,
-              computeAverages(numeric, LM, OM),
-              sec==='evaluation'
-            );
+            root.appendChild(gp2);
+            byT.slice(i, i + 2).forEach(([,v], j) => {
+              createBarChart(
+                document.getElementById(`chart-${prog}-grid-${i+j}`),
+                byT[i+j][0],
+                computeAverages(v, LM, OM),
+                sec === 'evaluation'
+              );
+            });
           }
+        }
 
-          // 2‑chart grid
-          if (byT.length>1) {
-            for (let i=0; i<byT.length; i+=2) {
-              const gp2 = document.createElement('div'); gp2.className='page';
-              const boxes = byT.slice(i,i+2)
-                .map(([,v],j)=>`<div class="chart-box" id="chart-${prog}-grid-${i+j}"></div>`)
-                .join('');
-              gp2.innerHTML = `
-                <div class="header">
-                  <img src="mind4time-logo.png">
-                  <div class="section-title">${name}</div>
-                </div>
-                <div class="content">
-                  <div class="chart-grid">${boxes}</div>
-                </div>
-                <div class="footer">
-                  <div>www.MIND4TIME.com</div>
-                  <div>© MIND4TIME ${currentYear}</div>
-                </div>`;
-              root.appendChild(gp2);
-              byT.slice(i,i+2).forEach(([,v],j)=>{
-                createBarChart(
-                  document.getElementById(`chart-${prog}-grid-${i+j}`),
-                  byT[i+j][0],
-                  computeAverages(v, LM, OM),
-                  sec==='evaluation'
-                );
-              });
-            }
-          }
+        // free-text answers
+        const selQs = f.textQuestions || [];
+        selQs.forEach(qid => {
+          const ans = data.filter(d =>
+            (f.clients     || []).includes(d.client) &&
+            d.program       === prog &&
+            (f.clientInfos || []).includes(d.client_info) &&
+            (f[`turmas_${prog}`] || []).includes(d.turma) &&
+            String(d.section || '').toLowerCase().includes(sec) &&
+            d.question      === qid &&
+            isNaN(+d.value)
+          );
+          if (!ans.length) return;
 
-          // — TEXT ANSWERS WITH SPILL + FIT‑TO‑SHRINK —
-          const selQs = f.textQuestions || [];
-          selQs.forEach(qid => {
-            const ans = data.filter(d =>
-              (f.clients || []).includes(d.client) &&
-              d.program === prog &&
-              (f.clientInfos || []).includes(d.client_info) &&
-              (f[`turmas_${prog}`] || []).includes(d.turma) &&
-              String(d.section || '').toLowerCase().includes(sec) &&
-              d.question === qid &&
-              isNaN(+d.value)
-            );
-            if (!ans.length) return;
+          const pagesForThisQ = [];
+          let page   = createTextPage(prog, sec, qid, true);
+          let listEl = page.querySelector('.answer-list');
+          root.appendChild(page);
+          pagesForThisQ.push(page);
 
-            const pagesForThisQ = [];
-            let page   = createTextPage(prog, sec, qid, true);
-            let listEl = page.querySelector('.answer-list');
-            root.appendChild(page);
-            pagesForThisQ.push(page);
+          ans.forEach(a => {
+            const li = document.createElement('li');
+            li.textContent = a.value;
+            listEl.appendChild(li);
 
-            ans.forEach(a => {
-              const li = document.createElement('li');
-              li.textContent = a.value;
+            const tq = page.querySelector('.text-question');
+            if (tq.scrollHeight > tq.clientHeight) {
+              listEl.removeChild(li);
+              page   = createTextPage(prog, sec, qid, false);
+              listEl = page.querySelector('.answer-list');
+              root.appendChild(page);
+              pagesForThisQ.push(page);
               listEl.appendChild(li);
-
-              // overflow spill logic
-              const tq = page.querySelector('.text-question');
-              if (tq.scrollHeight > tq.clientHeight) {
-                listEl.removeChild(li);
-                page   = createTextPage(prog, sec, qid, false);
-                listEl = page.querySelector('.answer-list');
-                root.appendChild(page);
-                pagesForThisQ.push(page);
-                listEl.appendChild(li);
-              }
-            });
-
-            // shrink each grey box
-            pagesForThisQ.forEach(pg => {
-              const tq = pg.querySelector('.text-question');
-              tq.style.height = tq.scrollHeight + 'px';
-            });
+            }
           });
 
-        } // end for sec
-      }   // end for prog
-    
-      // ADD FINAL COVER PAGE
+          pagesForThisQ.forEach(pg => {
+            const tq = pg.querySelector('.text-question');
+            tq.style.height = tq.scrollHeight + 'px';
+          });
+        });
+      }
+
+      // final cover page
       const endPage = document.createElement('div');
       endPage.className = 'page hero';
-      endPage.innerHTML = `
-        <div class="hero">
-          <img class="bg" src="endpage-bg.png">
-        </div>`;
+      endPage.innerHTML = `<div class="hero"><img class="bg" src="endpage-bg.png"></div>`;
       root.appendChild(endPage);
     }
-   
 
-    // PDF
+    // ─── PDF GENERATION ────────────────────────────────────────────────────────
     async function generatePdf() {
       await build();
-      document.querySelectorAll('.chart-full, .chart-box').forEach(el=>{
+      document.querySelectorAll('.chart-full, .chart-box').forEach(el => {
         const c = echarts.getInstanceByDom(el);
         if (c) c.resize();
       });
-      await new Promise(r=>setTimeout(r,100));
+      await new Promise(r => setTimeout(r, 100));
 
-      const pages  = Array.from(document.querySelectorAll('.page'));
+      const pages = Array.from(document.querySelectorAll('.page'));
       const CANVAS_SCALE = 4;
       const images = await Promise.all(pages.map(pg =>
-      html2canvas(pg, {
-        backgroundColor: '#fff',
-         useCORS: true,
-         scale: CANVAS_SCALE
-       }).then(cnv => cnv.toDataURL('image/png', 1.0))
-     ));
+        html2canvas(pg, { backgroundColor: '#fff', useCORS: true, scale: CANVAS_SCALE })
+          .then(cnv => cnv.toDataURL('image/png', 1.0))
+      ));
       pdfMake.createPdf({
-        pageSize: { width:960, height:540 },
-        pageMargins: [0,0,0,0],
-        content: images.map((img,i)=>({
-          image: img, width: 960,
-          pageBreak: i<images.length-1 ? 'after' : undefined
+        pageSize: { width: 960, height: 540 },
+        pageMargins: [0, 0, 0, 0],
+        content: images.map((img, i) => ({
+          image: img,
+          width: 960,
+          pageBreak: i < images.length - 1 ? 'after' : undefined
         }))
       }).download('report.pdf');
     }
 
-    document.addEventListener('DOMContentLoaded', ()=>{
+    document.addEventListener('DOMContentLoaded', () => {
       document.getElementById('gerar-pdf').addEventListener('click', generatePdf);
       build();
     });

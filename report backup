@@ -80,19 +80,34 @@
     }
 
     /* PROGRAM DETAILS BOX */
-    .banner-box {
-      position:absolute; top:50%; left:50%;
-      transform:translate(-50%,-50%);
-      background:rgba(240,248,249,0.9);
-      padding:30px 50px; box-sizing:border-box;
-      border-left:6px solid #007c91;
-      box-shadow:0 2px 6px rgba(0,0,0,0.1);
-      color:#000;
-    }
-    .banner-box h1 { margin:0 0 12px; color:#007c91; font-size:2.5rem; }
-    .banner-box .meta { display:flex; gap:20px; font-size:1rem; }
+   .banner-box {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  color: #000;
+  text-align: left;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  padding: 0 30px;
+}
+  .banner-box h1 {
+  margin: 0;
+  font-size: 3.5rem;
+  color: #007c91;
+  font-weight: 700;
+  text-transform: uppercase;
+    white-space: nowrap;
+}
+    .banner-box .meta { display:flex; gap:20px; font-size:1.5rem; opacity:.85; }
     .banner-box .meta span,
-    .banner-box .meta strong { color:#000; }
+    .banner-box .meta strong { color:#007c91; }
+    .meta-banner {
+  margin-top: 24px;
+  font-size: 1rem;
+  line-height: 1.6;
+}
 
     /* CHARTS */
     .chart-fullpage { display:flex; align-items:center; justify-content:center; padding:20px; box-sizing:border-box; }
@@ -158,11 +173,22 @@
       padding:8px 16px; background:#007c91; color:#fff;
       border:none; border-radius:4px; cursor:pointer;
     }
+    
+  .program-subtitle {
+   margin-top: 8px;
+  font-size: 1.25rem;
+  font-style: italic;
+  color: #007c91;
+  opacity: 0.7;
+  white-space: nowrap;
+}
   </style>
 </head>
 <body>
   <button id="gerar-pdf">Gerar Relatório (PDF)</button>
   <div id="report"></div>
+
+
 
   <script>
     const currentYear = new Date().getFullYear();
@@ -307,29 +333,37 @@
         root.appendChild(hero);
 
         // Program details
+        const bannerImg =
+  prog.toLowerCase() === 'p365'
+    ? 'p365-banner.png'
+    : prog.toLowerCase() === 'colab365'
+    ? 'colab365-banner.png'
+    : 'assessment-bg.jpg';
+        
         const info = document.createElement('div');
-        info.className = 'page';
-        info.innerHTML = `
-          <div class="header">
-            <img src="mind4time-logo.png"><div></div>
-          </div>
-          <div class="content">
-            <div class="banner">
-              <img class="banner-bg" src="assessment-bg.jpg">
-              <div class="banner-box">
-                <h1>Detalhes do Programa</h1>
-                <div class="meta">
-                  <span>Time Scope:</span><strong>${timeScope}</strong>
-                  <span>Trainers:</span><strong>${(f.trainers||{})[prog]||'N/A'}</strong>
-                </div>
-              </div>
-            </div>
-          </div>
-          <div class="footer">
-            <div>www.MIND4TIME.com</div>
-            <div>© MIND4TIME ${currentYear}</div>
-          </div>`;
-        root.appendChild(info);
+info.className = 'page';
+info.innerHTML = `
+  <div class="header">
+    <img src="mind4time-logo.png"><div></div>
+  </div>
+  <div class="content">
+    <div class="banner">
+      <img class="banner-bg" src="${bannerImg}">
+      <div class="banner-box">
+          <h1>${pm.TÍTULO || prog}</h1>
+          <div class="program-subtitle">${pm.SUBTÍTULO || ''}</div>
+          <div class="meta-banner">
+    <div><strong>Scope temporal:</strong> ${timeScope}</div>
+    <div><strong>Trainers:</strong> ${(f.trainers || {})[prog] || 'N/A'}</div>
+  </div>
+</div>
+    </div>
+  </div>
+  <div class="footer">
+    <div>www.MIND4TIME.com</div>
+    <div>© MIND4TIME ${currentYear}</div>
+  </div>`;
+root.appendChild(info);
 
         // Sections
         for (const sec of ['assessment','evaluation']) {

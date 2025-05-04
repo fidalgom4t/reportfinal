@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="pt">
+
 <head>
   <meta charset="UTF-8" />
   <title>Gerar Relatório Dinâmico</title>
@@ -12,7 +13,11 @@
       --radius: 6px;
       --gap: 12px;
     }
-    *, *::before, *::after { box-sizing: border-box; }
+
+    *, *::before, *::after {
+      box-sizing: border-box;
+    }
+
     body {
       margin: 40px auto;
       padding: 0 var(--gap);
@@ -21,13 +26,18 @@
       background: var(--bg);
       color: #333;
     }
-    h2, h3, h4 {
+
+    h2,
+    h3,
+    h4 {
       color: var(--primary);
     }
+
     h2 {
       text-align: center;
       margin-bottom: 24px;
     }
+
     form {
       display: grid;
       grid-template-columns: 200px 1fr;
@@ -38,11 +48,12 @@
       border-radius: var(--radius);
       padding: var(--gap);
     }
-    /* Labels for selection lists without bold */
+
+    /* Remover negrito dos labels em listas de seleção */
     .checkbox-list label {
       font-weight: normal;
     }
-    /* Keep bold for other labels if desired (e.g., input fields) */
+
     .checkbox-list {
       border: 1px solid var(--border);
       border-radius: var(--radius);
@@ -51,13 +62,17 @@
       max-height: 160px;
       overflow-y: auto;
     }
-    select, input[type="text"], input[type="month"] {
+
+    select,
+    input[type="text"],
+    input[type="month"] {
       width: 100%;
       padding: 8px;
       border: 1px solid var(--border);
       border-radius: var(--radius);
       font-size: 1rem;
     }
+
     .dynamic-block {
       background: var(--card);
       border: 1px solid var(--border);
@@ -65,10 +80,12 @@
       padding: var(--gap);
       margin-bottom: var(--gap);
     }
+
     .actions {
       text-align: center;
       margin-top: var(--gap);
     }
+
     .actions button {
       padding: 10px 24px;
       margin: 0 8px;
@@ -79,23 +96,30 @@
       cursor: pointer;
       font-size: 1rem;
     }
+
     .actions button:disabled {
       background: #999;
       cursor: not-allowed;
     }
   </style>
 </head>
+
 <body>
   <h2>Gerar Relatório Dinâmico</h2>
+
   <form id="filtersForm" onsubmit="return false;">
     <div>
       <label for="clientSelect">Cliente</label>
-      <select id="clientSelect"><option value="">– Selecione –</option></select>
+      <select id="clientSelect">
+        <option value="">– Selecione –</option>
+      </select>
     </div>
+
     <div>
       <label>Programas</label>
       <div id="programList" class="checkbox-list"></div>
     </div>
+
     <div>
       <label>Cliente Info</label>
       <div id="infoList" class="checkbox-list"></div>
@@ -105,10 +129,12 @@
   <div id="dynamicBlocks"></div>
 
   <div style="margin-bottom:20px;">
-    <button id="toggleQuestions" disabled style="padding:8px 16px; background:#007c91; color:white; border:none; border-radius:4px; cursor:pointer;">
+    <button id="toggleQuestions" disabled
+      style="padding:8px 16px; background:var(--primary); color:white; border:none; border-radius:var(--radius); cursor:pointer;">
       Mostrar / Esconder Perguntas Abertas
     </button>
   </div>
+
   <div id="textQuestionsBlock" style="display:none;"></div>
 
   <div class="actions">
@@ -116,15 +142,18 @@
   </div>
 
   <script>
+    // Limpar filtros de relatório anteriores
     localStorage.removeItem('reportFilters');
     let data = [];
 
     function loadFilters() {
       return JSON.parse(localStorage.getItem('filters') || '{}');
     }
+
     function saveFilters(f) {
       localStorage.setItem('filters', JSON.stringify(f));
     }
+
     function updateFilter(key, val) {
       const f = loadFilters();
       f[key] = val;
@@ -171,14 +200,17 @@
       container.innerHTML = '';
       const viewBtn = document.getElementById('viewReport');
       const toggleBtn = document.getElementById('toggleQuestions');
+
       if (!client || programs.length === 0 || infos.length === 0) {
         viewBtn.disabled = true;
         toggleBtn.disabled = true;
         return;
       }
+
       programs.forEach(prog => {
         container.appendChild(renderBlock(client, prog, infos));
       });
+
       renderTextQuestions();
       viewBtn.disabled = false;
       toggleBtn.disabled = false;
@@ -187,27 +219,32 @@
     function renderBlock(client, program, infos) {
       const block = document.createElement('div');
       block.className = 'dynamic-block';
+
       const h = document.createElement('h3');
       h.textContent = `Programa: ${program}`;
       block.appendChild(h);
+
       block.appendChild(createInputField('Formador', program, 'trainers'));
       block.appendChild(createMonthField('Início', program, 'starts'));
       block.appendChild(createMonthField('Fim', program, 'ends'));
+
       const turmas = [...new Set(
         data
           .filter(d => d.client === client && d.program === program && infos.includes(d.client_info))
           .map(d => d.turma)
       )];
+
       block.appendChild(createCheckboxGroup('Turmas', turmas, `turmas_${program}`));
       return block;
     }
 
     function createInputField(labelText, prog, key) {
       const wrapper = document.createElement('div');
-      const lbl = document.createElement('label'); lbl.textContent = labelText;
-      const inp = document.createElement('input'); inp.type = 'text';
-      const stored = loadFilters()[key] || {};
-      inp.value = stored[prog] || '';
+      const lbl = document.createElement('label');
+      lbl.textContent = labelText;
+      const inp = document.createElement('input');
+      inp.type = 'text';
+      inp.value = (loadFilters()[key] || {})[prog] || '';
       inp.oninput = e => {
         const obj = loadFilters()[key] || {};
         obj[prog] = e.target.value;
@@ -219,10 +256,11 @@
 
     function createMonthField(labelText, prog, key) {
       const wrapper = document.createElement('div');
-      const lbl = document.createElement('label'); lbl.textContent = labelText;
-      const inp = document.createElement('input'); inp.type = 'month';
-      const stored = loadFilters()[key] || {};
-      inp.value = stored[prog] || '';
+      const lbl = document.createElement('label');
+      lbl.textContent = labelText;
+      const inp = document.createElement('input');
+      inp.type = 'month';
+      inp.value = (loadFilters()[key] || {})[prog] || '';
       inp.onchange = e => {
         const obj = loadFilters()[key] || {};
         obj[prog] = e.target.value;
@@ -234,8 +272,10 @@
 
     function createCheckboxGroup(labelText, options, storageKey) {
       const wrapper = document.createElement('div');
-      const lbl = document.createElement('label'); lbl.textContent = labelText;
-      const list = document.createElement('div'); list.className = 'checkbox-list';
+      const lbl = document.createElement('label');
+      lbl.textContent = labelText;
+      const list = document.createElement('div');
+      list.className = 'checkbox-list';
       buildCheckboxList(list, options, storageKey, null);
       wrapper.append(lbl, list);
       return wrapper;
@@ -244,8 +284,10 @@
     function renderTextQuestions() {
       const container = document.getElementById('textQuestionsBlock');
       container.innerHTML = '';
+
       const grouped = {};
       const evaluationSet = new Set();
+
       data.forEach(d => {
         if (!isNaN(+d.value)) return;
         const section = (d.section || '').toLowerCase();
@@ -257,13 +299,16 @@
         }
       });
 
-      // Ordenar perguntas de evaluation: números primeiro, depois alfabeticamente, com itens especiais no final
+      function isDigitStart(s) {
+        return /^\d/.test(s);
+      }
+
       const specials = ['Reivention', 'clube rh', 'HR Club'];
-      function isDigitStart(s) { return /^\d/.test(s); }
       function specialIndex(s) {
         const idx = specials.indexOf(s);
         return idx === -1 ? Infinity : idx;
       }
+
       const evaluation = Array.from(evaluationSet);
       evaluation.sort((a, b) => {
         const aNum = isDigitStart(a), bNum = isDigitStart(b);
@@ -272,13 +317,13 @@
         if (aNum && bNum) return a.localeCompare(b, 'pt');
         const aSpec = specialIndex(a), bSpec = specialIndex(b);
         if (aSpec !== bSpec) return aSpec - bSpec;
-        if (aSpec !== Infinity) return 0;
         return a.localeCompare(b, 'pt');
       });
 
       const selected = new Set(loadFilters().textQuestions || []);
       const block = document.createElement('div');
       block.className = 'dynamic-block';
+
       const title = document.createElement('h3');
       title.textContent = 'Perguntas Abertas (por programa - assessment)';
       block.appendChild(title);
@@ -287,26 +332,39 @@
         const subtitle = document.createElement('h4');
         subtitle.textContent = prog;
         block.appendChild(subtitle);
-        Array.from(questions).sort((a, b) => a.localeCompare(b, 'pt')).forEach(q => {
-          const lbl = document.createElement('label');
-          const cb = document.createElement('input'); cb.type = 'checkbox'; cb.value = q;
-          cb.checked = selected.has(q);
-          cb.onchange = () => {
-            const all = Array.from(block.querySelectorAll('input:checked')).map(i => i.value);
-            updateFilter('textQuestions', all);
-          };
-          lbl.append(cb, q);
-          block.appendChild(lbl);
-        });
+
+        Array.from(questions)
+          .sort((a, b) => {
+            const aNum = isDigitStart(a), bNum = isDigitStart(b);
+            if (aNum && !bNum) return -1;
+            if (!aNum && bNum) return 1;
+            return a.localeCompare(b, 'pt');
+          })
+          .forEach(q => {
+            const lbl = document.createElement('label');
+            const cb = document.createElement('input');
+            cb.type = 'checkbox';
+            cb.value = q;
+            cb.checked = selected.has(q);
+            cb.onchange = () => {
+              const all = Array.from(block.querySelectorAll('input:checked')).map(i => i.value);
+              updateFilter('textQuestions', all);
+            };
+            lbl.append(cb, q);
+            block.appendChild(lbl);
+          });
       });
 
       if (evaluation.length > 0) {
         const evalTitle = document.createElement('h3');
         evalTitle.textContent = 'Perguntas de Evaluation (iguais para todos os programas)';
         block.appendChild(evalTitle);
+
         evaluation.forEach(q => {
           const lbl = document.createElement('label');
-          const cb = document.createElement('input'); cb.type = 'checkbox'; cb.value = q;
+          const cb = document.createElement('input');
+          cb.type = 'checkbox';
+          cb.value = q;
           cb.checked = selected.has(q);
           cb.onchange = () => {
             const all = Array.from(block.querySelectorAll('input:checked')).map(i => i.value);
@@ -316,6 +374,7 @@
           block.appendChild(lbl);
         });
       }
+
       container.appendChild(block);
     }
 
@@ -330,7 +389,9 @@
         const block = document.getElementById('textQuestionsBlock');
         block.style.display = block.style.display === 'none' ? 'block' : 'none';
       });
+
       document.getElementById('viewReport').addEventListener('click', () => applyAndGo(false));
+
       document.getElementById('clientSelect').addEventListener('change', e => {
         const client = e.target.value;
         if (!client) return;
@@ -349,8 +410,10 @@
         buildCheckboxList(document.getElementById('programList'), progs, 'programs', refreshDynamic);
         buildCheckboxList(document.getElementById('infoList'), infos, 'clientInfos', refreshDynamic);
       });
+
       init().then(refreshDynamic);
     });
   </script>
 </body>
+
 </html>

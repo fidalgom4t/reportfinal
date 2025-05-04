@@ -65,11 +65,17 @@
     }
     .hero-content {
       position:relative; z-index:1;
-      display:flex; flex-direction:column; align-items:center; justify-content:center;
-      color:#fff; text-align:center; padding:0 30px; box-sizing:border-box;
+      display:flex; flex-direction:column; align-items:left-aligned; justify-content:center;
+      color:#fff; text-align:left; padding:0 30px; box-sizing:border-box;
     }
     .hero-content h1 { font-size:3.5rem; margin:0; }
-    .hero-content .subtitle { font-size:1.5rem; margin-top:12px; opacity:.85; }
+    .hero-content .subtitle { font-size:1rem; margin-top:0px; opacity:.85; font-style:italic; padding-left:3px }
+    .hero-logo {
+  position: absolute;
+  bottom: 30px;
+  right: 30px;
+  height: 100px; /* ajusta conforme necessário */
+}
 
     /* BANNERS */
     .banner { position:relative; overflow:hidden; }
@@ -78,6 +84,15 @@
       position:absolute; left:30px; bottom:20px;
       font-size:1.25rem; font-weight:500; color:#000; z-index:1;
     }
+    .banner-super {
+  font-size: 1rem;
+  color: #007c91;
+  font-weight: 400;      /* não bold */
+  opacity: 0.85;
+  margin-bottom: 6px;
+  letter-spacing: 0.03em;
+  font-style: italic;
+}
 
     /* PROGRAM DETAILS BOX */
    .banner-box {
@@ -102,11 +117,12 @@
 }
     .banner-box .meta { display:flex; gap:20px; font-size:1.5rem; opacity:.85; }
     .banner-box .meta span,
-    .banner-box .meta strong { color:#007c91; }
-    .meta-banner {
-  margin-top: 24px;
+    .banner-box .meta strong { color: #4C4C4C; }
+   .meta-banner {
+  margin-top: 70px;         /* aumenta o espaçamento acima */
   font-size: 1rem;
-  line-height: 1.6;
+  line-height: 1.6;          /* mais espaçamento vertical entre linhas */
+  
 }
 
     /* CHARTS */
@@ -175,7 +191,7 @@
     }
     
   .program-subtitle {
-   margin-top: 8px;
+   margin-top: 3px;
   font-size: 1.25rem;
   font-style: italic;
   color: #007c91;
@@ -290,35 +306,37 @@
       return tp;
     }
 
-    // MAIN BUILD
-    async function build() {
-      const f = JSON.parse(localStorage.getItem('reportFilters')||'{}');
-      const [data, meta] = await Promise.all([
-        fetch('data.json').then(r=>r.json()),
-        fetch('meta.json').then(r=>r.json())
-      ]);
-      const LM = createLabelMap(meta.labels),
-            OM = createSortMap(meta.labels);
-      const root = document.getElementById('report');
-      root.innerHTML = '';
+  async function build() {
+  const f = JSON.parse(localStorage.getItem('reportFilters') || '{}');
+  const [data, meta] = await Promise.all([
+    fetch('data.json').then(r => r.json()),
+    fetch('meta.json').then(r => r.json())
+  ]);
+  const LM = createLabelMap(meta.labels),
+        OM = createSortMap(meta.labels);
+  const root = document.getElementById('report');
+  root.innerHTML = '';
 
-      // compute timeScope
-      let timeScope = '';
-      if (f.start && f.end) {
-        const s = formatMonthYear(f.start),
-              e = formatMonthYear(f.end);
-        timeScope = `${s.month} – ${e.month} ${e.year}`;
-      }
+  // Agora DENTRO do ciclo
+  for (const prog of f.programs || []) {
+    // 👇 cálculo do timeScope aqui dentro
+    let timeScope = '';
+    const start = (f.starts || {})[prog];
+    const end   = (f.ends || {})[prog];
 
-      for (const prog of f.programs||[]) {
-        const selTur = f[`turmas_${prog}`]||[];
-        const rows   = data.filter(d=>
-          (f.clients||[]).includes(d.client) &&
-          d.program===prog &&
-          selTur.includes(d.turma)
-        );
-        const pm     = meta.titles.find(t=>t.program_id===prog)||{};
+    if (start && end) {
+      const s = formatMonthYear(start),
+            e = formatMonthYear(end);
+      timeScope = `${s.month} – ${e.month} ${e.year}`;
+    }
 
+    const selTur = f[`turmas_${prog}`] || [];
+    const rows = data.filter(d =>
+      (f.clients || []).includes(d.client) &&
+      d.program === prog &&
+      selTur.includes(d.turma)
+    );
+    const pm = meta.titles.find(t => t.program_id === prog) || {};
         // Hero
         const hero = document.createElement('div');
         hero.className = 'page hero';
@@ -326,9 +344,10 @@
           <div class="hero">
             <img class="bg" src="hourglass-bg.jpg">
             <div class="hero-content">
-              <h1>${pm.TÍTULO||prog}</h1>
-              <div class="subtitle">${pm.SUBTÍTULO||''}</div>
+              <h1>TRAINING REPORT</h1>
+              <div class="subtitle">${timeScope}</div>
             </div>
+              <img class="hero-logo" src="Logo.png">
           </div>`;
         root.appendChild(hero);
 
@@ -350,6 +369,7 @@ info.innerHTML = `
     <div class="banner">
       <img class="banner-bg" src="${bannerImg}">
       <div class="banner-box">
+          <div class="banner-super">corporate training</div>
           <h1>${pm.TÍTULO || prog}</h1>
           <div class="program-subtitle">${pm.SUBTÍTULO || ''}</div>
           <div class="meta-banner">
@@ -497,7 +517,17 @@ root.appendChild(info);
 
         } // end for sec
       }   // end for prog
+    
+      // ADD FINAL COVER PAGE
+      const endPage = document.createElement('div');
+      endPage.className = 'page hero';
+      endPage.innerHTML = `
+        <div class="hero">
+          <img class="bg" src="endpage-bg.png">
+        </div>`;
+      root.appendChild(endPage);
     }
+   
 
     // PDF
     async function generatePdf() {

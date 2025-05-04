@@ -215,22 +215,6 @@
 
 
   <script>
-    const T = {
-  pt: {
-    gerarPdf: 'Gerar Relatório (PDF)',
-    title:    'TRAINING REPORT',
-    corporateTraining: 'corporate training',
-    section: { assessment: 'Assessment', evaluation: 'Avaliação' },
-    totalResponses: t => `Total de respostas: ${t}`
-  },
-  en: {
-    gerarPdf: 'Generate Report (PDF)',
-    title:    'TRAINING REPORT',
-    corporateTraining: 'corporate training',
-    section: { assessment: 'Assessment', evaluation: 'Evaluation' },
-    totalResponses: t => `Total responses: ${t}`
-  }
-};
     const currentYear = new Date().getFullYear();
 
     // UTILITIES
@@ -343,12 +327,6 @@
 
   // Agora DENTRO do ciclo
   for (const prog of f.programs || []) {
-        // ── per‑program language detection ─────────────────────────────────
-    const progRows = data.filter(d => d.program === prog);
-    const progLang = (progRows[0] && progRows[0].lang === 'en') ? 'en' : 'pt';
-    const txProg   = T[progLang];
-    // ─────────────────────────────────────────────────────────────────
-
     // 👇 cálculo do timeScope aqui dentro
     let timeScope = '';
     const start = (f.starts || {})[prog];
@@ -417,7 +395,7 @@ root.appendChild(info);
 
         // Sections
         for (const sec of ['assessment','evaluation']) {
-          const name    = txProg.section[sec];
+          const name    = sec==='assessment'?'Assessment':'Evaluation';
           const total   = countUnique(rows, sec);
           const numeric = rows.filter(d=>
             String(d.section||'').toLowerCase().includes(sec) &&
@@ -435,7 +413,7 @@ root.appendChild(info);
             <div class="content">
               <div class="banner">
                 <img class="banner-bg" src="${sec}-bg.jpg">
-                <div class="banner-text">${txProg.totalResponses(total)}:${total}</div>
+                <div class="banner-text">Total de respostas: ${total}</div>
               </div>
             </div>
             <div class="footer">

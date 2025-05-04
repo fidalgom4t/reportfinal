@@ -371,6 +371,36 @@
       "LABEL": "This learning experience has given me an opportunity to think about and gain new perspectives about my work.",
       "sort order": "This program has been useful for my professional and personal development.",
       "": "How likely are you to recommend this training program to a colleague within your organization or professional network?"
+    },
+    {
+      "QUESTION ID": "",
+      "LABEL": "",
+      "sort order": "",
+      "": ""
+    },
+    {
+      "QUESTION ID": "The trainer demonstrated both the experience and the right skills to approach the theme and led the program productively.",
+      "LABEL": "",
+      "sort order": "",
+      "": ""
+    },
+    {
+      "QUESTION ID": "This learning experience has given me an opportunity to think about and gain new perspectives about my work.",
+      "LABEL": "",
+      "sort order": "",
+      "": ""
+    },
+    {
+      "QUESTION ID": "This program has been useful for my professional and personal development.",
+      "LABEL": "",
+      "sort order": "",
+      "": ""
+    },
+    {
+      "QUESTION ID": "How likely are you to recommend this training program to a colleague within your organization or professional network?",
+      "LABEL": "",
+      "sort order": "",
+      "": ""
     }
   ],
   "titles": [

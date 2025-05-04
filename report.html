@@ -413,31 +413,52 @@
             }
           }
 
-          // text answers spill pages
-          const selQs = f.textQuestions||[];
-          selQs.forEach(qid=>{
-            const ans = rows.filter(d=>
-              String(d.section||'').toLowerCase().includes(sec) &&
-              d.question===qid && isNaN(+d.value)
-            );
-            if (!ans.length) return;
+              // … inside build(), in place of your old selQs.forEach(…) block:
 
-            let page   = createTextPage(prog, sec, qid, true);
-            let listEl = page.querySelector('.answer-list');
-            root.appendChild(page);
+    // — TEXT ANSWERS WITH SPILL + FIT‑TO‑SHRINK —
+    selQs.forEach(qid => {
+      const ans = rows.filter(d =>
+        String(d.section||'').toLowerCase().includes(sec) &&
+        d.question === qid &&
+        isNaN(+d.value)
+      );
+      if (!ans.length) return;
 
-            ans.forEach(a=>{
-              const li = document.createElement('li');
-              li.textContent = a.value;
-              listEl.appendChild(li);
+      // keep track of every page we create for this question
+      const pagesForThisQ = [];
 
-              // overflow detection
-              if (listEl.scrollHeight > listEl.clientHeight) {
-                listEl.removeChild(li);
-                page   = createTextPage(prog, sec, qid, false);
-                listEl = page.querySelector('.answer-list');
-                root.appendChild(page);
-                listEl.appendChild(li);
+      // first page (with title)
+      let page = createTextPage(prog, sec, qid, true);
+      let listEl = page.querySelector('.answer-list');
+      root.appendChild(page);
+      pagesForThisQ.push(page);
+
+      ans.forEach(a => {
+        const li = document.createElement('li');
+        li.textContent = a.value;
+        listEl.appendChild(li);
+
+        // if it overflows its parent .text-question (max‑height:320px)
+        const tq = page.querySelector('.text-question');
+        if (tq.scrollHeight > tq.clientHeight) {
+          // remove the last <li>, create a new page (no title), and retry
+          listEl.removeChild(li);
+          page = createTextPage(prog, sec, qid, false);
+          listEl = page.querySelector('.answer-list');
+          root.appendChild(page);
+          pagesForThisQ.push(page);
+          listEl.appendChild(li);
+        }
+      });
+
+      // now force each .text-question to shrink to its content height
+      pagesForThisQ.forEach(pg => {
+        const tq = pg.querySelector('.text-question');
+        // measure its true content height, then lock it down
+        tq.style.height = tq.scrollHeight + 'px';
+      });
+    });
+
               }
             });
           });

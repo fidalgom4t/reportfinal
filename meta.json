@@ -371,6 +371,24 @@
       "LABEL": "This learning experience has given me an opportunity to think about and gain new perspectives about my work.",
       "sort order": "This program has been useful for my professional and personal development.",
       "": "How likely are you to recommend this training program to a colleague within your organization or professional network?"
+    },
+    {
+      "QUESTION ID": "01. O/a formador/a reunia a experiência e a competência certas para abordar a temática em questão e liderou produtivamente o programa no tempo de que dispôs.",
+      "LABEL": "02. Esta experiência de aprendizagem deu-me a oportunidade de pensar e obter novas perspetivas sobre o meu trabalho.",
+      "sort order": "03. O programa foi útil para o meu desenvolvimento pessoal/profissional.",
+      "": "04. Qual a probabilidade de recomendar este programa a um colega ou amigo?"
+    },
+    {
+      "QUESTION ID": "FORMADOR ",
+      "LABEL": "PERSPETIVAS",
+      "sort order": "DESENVOLVIMENTO",
+      "": "RECOMENDARIA?"
+    },
+    {
+      "QUESTION ID": 1,
+      "LABEL": 2,
+      "sort order": 3,
+      "": 4
     }
   ],
   "titles": [

@@ -272,9 +272,10 @@
   const getChecked = id => Array.from(document.querySelectorAll(`#${id} input:checked`)).map(cb => cb.value);
 
   // Atualiza texto do box
-  function updateBox(boxId, placeholder) {
+    // Atualiza o texto exibido na select-box a partir do storageKey
+  function updateBox(boxId, storageKey, placeholder) {
     const f = loadFilters();
-    const arr = f[boxId] || [];
+    const arr = f[storageKey] || [];
     document.getElementById(boxId).textContent = arr.length ? arr.join(', ') : placeholder;
   }
 
@@ -332,11 +333,12 @@
       checks.appendChild(label);
     });
 
-    // Toggle and click propagation
+        // Toggle and click propagation
     box.onclick = e => { e.stopPropagation(); toggleDropdown(wrapperId); };
     checks.onclick = e => e.stopPropagation();
 
     // Atualiza label inicial
+    updateBox(boxId, filterKey, placeholder)
     updateBox(boxId, placeholder);
   }
 
@@ -490,4 +492,3 @@
 </script>
 </body>
 </html>
-

@@ -518,14 +518,16 @@ root.appendChild(info);
         } // end for sec
       }   // end for prog
     }
-    const endPage = document.createElement('div');
-endPage.className = 'page hero';
-endPage.innerHTML = `
-  <div class="hero">
-    <img class="bg" src="endpage-bg.png">
-  </div>`;
-root.appendChild(endPage);
-    } 
+   
+      // ADD FINAL COVER PAGE
+      const endPage = document.createElement('div');
+      endPage.className = 'page hero';
+      endPage.innerHTML = `
+        <div class="hero">
+          <img class="bg" src="endpage-bg.png">
+        </div>`;
+      root.appendChild(endPage);
+    }
 
     // PDF
     async function generatePdf() {

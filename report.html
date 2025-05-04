@@ -82,7 +82,7 @@
     .banner-bg { position:absolute; inset:0; width:100%; height:100%; object-fit:cover; }
     .banner-text {
       position:absolute; left:30px; bottom:20px;
-      font-size:1.25rem; font-weight:400; color:#007c91; z-index:1;
+      font-size:1.25rem; font-weight:400; color:#4C4C4C; z-index:1;
     }
     .banner-super {
   font-size: 1rem;
@@ -125,9 +125,12 @@
   
 }
     .meta-line {
-  color: #007c91;
+  color: #4C4C4C;
   font-size: 1rem;
   opacity: 0.85;
+}
+  .meta-value {
+  padding-left: 12px; /* adjust spacing as needed */
 }
 
     /* CHARTS */
@@ -378,8 +381,8 @@ info.innerHTML = `
           <h1>${pm.TÍTULO || prog}</h1>
           <div class="program-subtitle">${pm.SUBTÍTULO || ''}</div>
           <div class="meta-banner">
-    <div class="meta-line">Scope temporal: ${timeScope}</div>
-    <div class="meta-line">Trainers: ${(f.trainers || {})[prog] || 'N/A'}</div>
+    <div class="meta-line">Scope temporal:<span class="meta-value"> ${timeScope}</span></div>
+    <div class="meta-line">Trainers:<span class="meta-value"> ${(f.trainers || {})[prog] || 'N/A'}</span></div>
   </div>
 </div>
     </div>

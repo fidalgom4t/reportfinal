@@ -85,151 +85,151 @@
       "sort order": 14
     },
     {
-      "QUESTION ID": "01. In general, how would you rate the current level of Collaborative Efficiency? [In your team]",
+      "QUESTION ID": "Q1: How would you globally classify the collaborative efficiency:",
       "LABEL": "EFFICIENCY WITHIN TEAM",
       "": "",
       "sort order": 1
     },
     {
-      "QUESTION ID": "01. In general, how would you rate the current level of Collaborative Efficiency? [Between teams (of departments with which you regularly work with)]",
+      "QUESTION ID": "Q1: Inter-teams (teams you articulate most with)",
       "LABEL": "INTER-TEAM EFFICIENCY",
       "": "",
       "sort order": 2
     },
     {
-      "QUESTION ID": "01. In general, how would you rate the current level of Collaborative Efficiency? [In the organization as a whole]",
+      "QUESTION ID": "Q1: In your organisation as a whole",
       "LABEL": "EFFICIENCY WITHIN ORGANISATION",
       "": "",
       "sort order": 3
     },
     {
-      "QUESTION ID": "02. If you had total autonomy to improve Collaborative Efficiency in your team/department/organization, what would you change?",
+      "QUESTION ID": "Q4: ... I always know exactly what to do about each matter.",
       "LABEL": "RESPONSIBILITY",
       "": "",
       "sort order": 4
     },
     {
-      "QUESTION ID": "03. ... I always know what I'm being asked to do specifically on each topic.”",
+      "QUESTION ID": "Q5: ... in lengthier projects (> 3 months), it is very clear where we want to get and what it means to say \"Done!\".",
       "LABEL": "FINISH LINE",
       "": "",
       "sort order": 5
     },
     {
-      "QUESTION ID": "04. ... in longer projects (&gt; 3 months) it's very clear where we want to go and what “It's done!” means”.",
+      "QUESTION ID": "Q6: ... I always know the purpose of what I'm doing and that helps me to keep motivated.",
       "LABEL": "PURPOSE",
       "": "",
       "sort order": 6
     },
     {
-      "QUESTION ID": "05. ...I always know the purpose of what I'm doing (\"what is it for?\") and that helps me keep motivated”.",
+      "QUESTION ID": "Q7: ... there is good agility: decisions tend to be made quickly and issues are resolved swiftly.",
       "LABEL": "AGILITY",
       "": "",
       "sort order": 7
     },
     {
-      "QUESTION ID": "06. ... there is good agility: decisions tend to be swift and matters are resolved quickly.\"",
+      "QUESTION ID": "Q10: ... there is little doubt about who is responsible for what. Potential grey areas that come up when splitting responsibilities are quickly discussed and clarified.",
       "LABEL": "OWNERSHIP",
       "": "",
       "sort order": 8
     },
     {
-      "QUESTION ID": "07. \"Overall my reporting system within the team is effective (meets objectives).\"",
+      "QUESTION ID": "Q11: ... people are open to renegotiate deadlines. Each time something will likely get delayed, I am always told ahead of time.",
       "LABEL": "COMMITMENT ADJUSTMENT",
       "": "",
       "sort order": 9
     },
     {
-      "QUESTION ID": "08. \"Overall my reporting system within the team is efficient (objectives achieved vs. resources invested).’",
+      "QUESTION ID": "Q12: ... I rarely get \"blocked\". I know exactly who to speak to in order to get matters back on track.",
       "LABEL": "ROAD BLOCKS",
       "": "",
       "sort order": 10
     },
     {
-      "QUESTION ID": "09. In collaborative projects or tasks, which tools do you use to manage/report progress? (who needs to do what, by when)",
+      "QUESTION ID": "Q13: ... internal processes are simple and efficient.",
       "LABEL": "PROCESSES",
       "": "",
       "sort order": 11
     },
     {
-      "QUESTION ID": "10. ... there's little doubt about who's left to do what. Any grey areas that arise in the division of responsibilities are quickly discussed and clarified.’",
+      "QUESTION ID": "Q15: ... the use of emails is efficient.",
       "LABEL": "EMAILS",
       "": "",
       "sort order": 12
     },
     {
-      "QUESTION ID": "11. ... there is openness to renegotiate deadlines. Whenever something is predictably going to be delayed, they inform me in good time.\"",
+      "QUESTION ID": "Q16: ... meetings are effective.",
       "LABEL": "MEETINGS",
       "": "",
       "sort order": 13
     },
     {
-      "QUESTION ID": "12. ... I rarely get stuck. I know exactly who to speak to in order to resolve the issue quickly.\"",
+      "QUESTION ID": "Q17: ... is it easy and agile to report / know the status of each matter.",
       "LABEL": "REPORTING",
       "": "",
       "sort order": 14
     },
     {
-      "QUESTION ID": "13. ... there is a clear culture of commitment. No matter ‘falls through the cracks’ and if something goes wrong it's quickly signalled.\"",
+      "QUESTION ID": "Q6: \"Tenho sido capaz de motivar a minha equipa. Trabalham com sentido de missão, dão o seu melhor e acreditam na importância do que fazem.\"",
       "LABEL": "MOTIVAÇÃO",
       "": "",
       "sort order": 1
     },
     {
-      "QUESTION ID": "14. ... work distribution is efficient: there are very few situations in which a subject is being dealt redundantly by different people/areas.\"",
+      "QUESTION ID": "Q7: \"Tenho sido capaz de orientar a minha equipa. Comigo sabem sempre onde fica a meta.\"",
       "LABEL": "ORIENTAÇÃO",
       "": "",
       "sort order": 2
     },
     {
-      "QUESTION ID": "15. ... internal processes are simple and efficient.\"",
+      "QUESTION ID": "Q8: \"Tenho conseguido coordenar a equipa com eficiência. É raro haver confusão sobre quem faz o quê.\"",
       "LABEL": "DELEGAÇÃO",
       "": "",
       "sort order": 3
     },
     {
-      "QUESTION ID": "15. Regarding the use of EMAIL in your organisation: [The number of emails I receive every day is adequate.]",
+      "QUESTION ID": "Q10: \"Tenho sido capaz de fazer crescer a minha equipa. Sinto que cada vez são mais autónomos e proativos.\"",
       "LABEL": "AUTONOMIA",
       "": "",
       "sort order": 4
     },
     {
-      "QUESTION ID": "15. Regarding the use of EMAIL in your organisation: [The emails I receive are action-oriented. I know exactly what they want from me.]",
+      "QUESTION ID": "Q11: \"Tenho conseguido criar um bom espírito de equipa, com um ADN forte em alinhamento e valores.\"",
       "LABEL": "ALINHAMENTO",
       "": "",
       "sort order": 5
     },
     {
-      "QUESTION ID": "15. Regarding the use of EMAIL in your organisation: [Emails are sent efficiently, in the sense that they only involve the strictly necessary people.]",
+      "QUESTION ID": "Q12: \"Tenho conseguido servir a equipa e ser um elemento catalizador do seu bom desempenho.\"",
       "LABEL": "CATALIZADOR",
       "": "",
       "sort order": 6
     },
     {
-      "QUESTION ID": "15. Regarding the use of EMAIL in your organisation: [In general, EMAIL is used very productively.]",
+      "QUESTION ID": "Q4: \"In my work environment I am able to produce in a focused manner and with no major distractions.\"",
       "LABEL": "FOCUS",
       "": "",
       "sort order": 1
     },
     {
-      "QUESTION ID": "16. Regarding MEETINGS in your organisation: [Usually, I have an adequate number of meetings in my calendar.]",
+      "QUESTION ID": "Q5: \"In my case, it's rare having to manage lots of different issues simultaneously. The number of different subjects that I have to manage simultaneously is suitable, not excessive.\"",
       "LABEL": "DIVERSITY",
       "": "",
       "sort order": 2
     },
     {
-      "QUESTION ID": "16. Regarding MEETINGS in your organisation: [The meetings I attend are usually action-oriented. When finished, everyone knows who needs to do what, by when.]",
+      "QUESTION ID": "Q6: \"I organize my work methodically and efficiently, and I feel everything is under control.\"",
       "LABEL": "CONTROL",
       "": "",
       "sort order": 3
     },
     {
-      "QUESTION ID": "16. Regarding MEETINGS in your organisation: [Generally, meetings are carefully convened, with only the strictly necessary people present, and only for as long as necessary.]",
+      "QUESTION ID": "Q7: \"I rarely procrastinate. I always respect the priorities that I've defined on my to-do list.\"",
       "LABEL": "PRIORITIES",
       "": "",
       "sort order": 4
     },
     {
-      "QUESTION ID": "16. Regarding MEETINGS in your organisation: [In general, I think MEETINGS are very productive.]",
+      "QUESTION ID": "Q10: \"My duties are defined very clearly. I know exactly what my responsibilities are.\"",
       "LABEL": "RESPONSABILITIES",
       "": "",
       "sort order": 5

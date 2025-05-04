@@ -45,12 +45,10 @@
     /* CONTENT WINDOW */
     .page > .content {
       position:absolute;
-      top:80px; bottom:60px; /* header + footer */
+      top:80px; bottom:60px;
       left:0; right:0;
       overflow:hidden; box-sizing:border-box;
     }
-
-    /* FILL CONTENT (any direct child) */
     .content > * {
       width:100%; height:100%; position:relative;
     }
@@ -67,20 +65,15 @@
     }
     .hero-content {
       position:relative; z-index:1;
-      display:flex; flex-direction:column;
-      align-items:center; justify-content:center;
-      color:#fff; text-align:center;
-      padding:0 30px; box-sizing:border-box;
+      display:flex; flex-direction:column; align-items:center; justify-content:center;
+      color:#fff; text-align:center; padding:0 30px; box-sizing:border-box;
     }
     .hero-content h1 { font-size:3.5rem; margin:0; }
     .hero-content .subtitle { font-size:1.5rem; margin-top:12px; opacity:.85; }
 
     /* BANNERS */
     .banner { position:relative; overflow:hidden; }
-    .banner-bg {
-      position:absolute; inset:0;
-      width:100%; height:100%; object-fit:cover;
-    }
+    .banner-bg { position:absolute; inset:0; width:100%; height:100%; object-fit:cover; }
     .banner-text {
       position:absolute; left:30px; bottom:20px;
       font-size:1.25rem; font-weight:500; color:#000; z-index:1;
@@ -102,10 +95,7 @@
     .banner-box .meta strong { color:#000; }
 
     /* CHARTS */
-    .chart-fullpage {
-      display:flex; align-items:center; justify-content:center;
-      padding:20px; box-sizing:border-box;
-    }
+    .chart-fullpage { display:flex; align-items:center; justify-content:center; padding:20px; box-sizing:border-box; }
     .chart-full { width:100%; height:100%; }
     .chart-grid {
       display:grid; grid-template-columns:1fr 1fr;
@@ -117,35 +107,44 @@
     .text-page { padding:20px; box-sizing:border-box; }
     .text-question {
       background:#f9f9f9;
-      border:1px solid #007c91; border-left:6px solid #007c91;
-      padding:10px; margin:20px auto 20px;
+      border:1px solid #007c91;
+      padding:10px; 
       box-sizing:border-box;
       max-width:calc(100% - 40px);
-      max-height:320px;             /* clamp the question box */
+      max-height:360px;
       overflow:visible;
       page-break-inside:avoid; break-inside:avoid;
+      margin:20px auto 20px auto
     }
     .text-question-title {
-      font-size:1.2rem; font-weight:bold;
-      margin-bottom:12px; color:#007c91;
+      font-size:1.2rem; font-weight:bold; margin-bottom:12px; color:#007c91;
     }
     .text-question ul {
       padding-left:16px; font-size:0.75rem; line-height:1.6;
     }
     .text-question li { margin-bottom:8px; }
-
-    /* CLAMP THE ANSWERS LIST TO THAT BOX */
     .page.text-page .answer-list {
-      max-height:100%;    /* will inherit the 320px cap of its parent */
+      max-height:100%;
       overflow:hidden;
     }
 
     /* SECTION TITLE IN HEADER */
     .header .section-title {
-      text-transform:uppercase;
-      color:#007c91; font-weight:600;
-      letter-spacing:0.05em;
+      text-transform:uppercase; color:#007c91;
+      font-weight:600; letter-spacing:0.05em;
       font-size:1rem; font-style:italic;
+    }
+
+    .page.text-page .content {
+      display: flex;
+      align-items: flex-start;
+      justify-content: center;
+    }
+    .page.text-page .content > .text-question {
+      height: auto;
+      max-height: 360px;
+      overflow-y: auto;
+      display: inline-block;
     }
 
     /* HIDE HEADER/FOOTER ON HERO */
@@ -170,40 +169,40 @@
 
     // UTILITIES
     function createLabelMap(labels) {
-      return labels.reduce((m,l)=>{
-        const k = l.questionId||l['QUESTION ID'];
-        m[k] = l.label||l['LABEL'];
+      return labels.reduce((m, l) => {
+        const k = l.questionId || l['QUESTION ID'];
+        m[k] = l.label || l['LABEL'];
         return m;
-      },{});
+      }, {});
     }
     function createSortMap(labels) {
-      return labels.reduce((m,l)=>{
-        const k = l.questionId||l['QUESTION ID'];
-        m[k] = +(l.sortOrder||l['SORT ORDER']||l.sort_order);
+      return labels.reduce((m, l) => {
+        const k = l.questionId || l['QUESTION ID'];
+        m[k] = +(l.sortOrder || l['SORT ORDER'] || l.sort_order);
         return m;
-      },{});
+      }, {});
     }
     function groupBy(arr, key) {
-      return arr.reduce((o,i)=>{
+      return arr.reduce((o, i) => {
         (o[i[key]] ||= []).push(i);
         return o;
-      },{});
+      }, {});
     }
     function computeAverages(rows, LM, OM) {
       const g = {};
-      rows.forEach(r=>(g[r.question] ||= []).push(+r.value));
+      rows.forEach(r => (g[r.question] ||= []).push(+r.value));
       return Object.entries(g)
-        .map(([q, vals])=>({
-          question:q,
-          label:LM[q]||q,
-          avg:+(vals.reduce((a,b)=>a+b,0)/vals.length).toFixed(1)
+        .map(([q, vals]) => ({
+          question: q,
+          label: LM[q] || q,
+          avg: +(vals.reduce((a,b)=>a+b,0)/vals.length).toFixed(1)
         }))
-        .sort((a,b)=>(OM[a.question]||0)-(OM[b.question]||0));
+        .sort((a,b) => (OM[a.question]||0) - (OM[b.question]||0));
     }
     function countUnique(rows, sec) {
       return new Set(
-        rows.filter(d=>String(d.section||'').toLowerCase().includes(sec))
-            .map(d=>d['Submission ID'])
+        rows.filter(d => String(d.section||'').toLowerCase().includes(sec))
+            .map(d => d['Submission ID'])
       ).size;
     }
     function formatMonthYear(v) {
@@ -218,7 +217,12 @@
 
     // CHART
     function createBarChart(container, title, data, uniform) {
-      const chart = echarts.init(container);
+      const chart = echarts.init(container, null, {
+      renderer: 'svg'
+       // alternatively for canvas at 2× DPI:
+       // devicePixelRatio: window.devicePixelRatio
+     });
+
       chart.setOption({
         title:{text:title,left:'center',textStyle:{fontSize:20}},
         grid:{top:80,left:'10%',right:'10%',bottom:120},
@@ -262,8 +266,8 @@
 
     // MAIN BUILD
     async function build() {
-      const f    = JSON.parse(localStorage.getItem('reportFilters')||'{}');
-      const [data,meta] = await Promise.all([
+      const f = JSON.parse(localStorage.getItem('reportFilters')||'{}');
+      const [data, meta] = await Promise.all([
         fetch('data.json').then(r=>r.json()),
         fetch('meta.json').then(r=>r.json())
       ]);
@@ -376,7 +380,7 @@
             root.appendChild(gp);
             createBarChart(
               gp.querySelector('.chart-full'),
-              `Global (${name})`,
+              `Global`,
               computeAverages(numeric, LM, OM),
               sec==='evaluation'
             );
@@ -413,43 +417,57 @@
             }
           }
 
-          // text answers spill pages
-          const selQs = f.textQuestions||[];
-          selQs.forEach(qid=>{
-            const ans = rows.filter(d=>
-              String(d.section||'').toLowerCase().includes(sec) &&
-              d.question===qid && isNaN(+d.value)
+          // — TEXT ANSWERS WITH SPILL + FIT‑TO‑SHRINK —
+          const selQs = f.textQuestions || [];
+          selQs.forEach(qid => {
+            const ans = data.filter(d =>
+              (f.clients || []).includes(d.client) &&
+              d.program === prog &&
+              (f.clientInfos || []).includes(d.client_info) &&
+              (f[`turmas_${prog}`] || []).includes(d.turma) &&
+              String(d.section || '').toLowerCase().includes(sec) &&
+              d.question === qid &&
+              isNaN(+d.value)
             );
             if (!ans.length) return;
 
+            const pagesForThisQ = [];
             let page   = createTextPage(prog, sec, qid, true);
             let listEl = page.querySelector('.answer-list');
             root.appendChild(page);
+            pagesForThisQ.push(page);
 
-            ans.forEach(a=>{
+            ans.forEach(a => {
               const li = document.createElement('li');
               li.textContent = a.value;
               listEl.appendChild(li);
 
-              // overflow detection
-              if (listEl.scrollHeight > listEl.clientHeight) {
+              // overflow spill logic
+              const tq = page.querySelector('.text-question');
+              if (tq.scrollHeight > tq.clientHeight) {
                 listEl.removeChild(li);
                 page   = createTextPage(prog, sec, qid, false);
                 listEl = page.querySelector('.answer-list');
                 root.appendChild(page);
+                pagesForThisQ.push(page);
                 listEl.appendChild(li);
               }
             });
+
+            // shrink each grey box
+            pagesForThisQ.forEach(pg => {
+              const tq = pg.querySelector('.text-question');
+              tq.style.height = tq.scrollHeight + 'px';
+            });
           });
 
-        } // end sec
-      }   // end prog
+        } // end for sec
+      }   // end for prog
     }
 
     // PDF
     async function generatePdf() {
       await build();
-      // resize charts
       document.querySelectorAll('.chart-full, .chart-box').forEach(el=>{
         const c = echarts.getInstanceByDom(el);
         if (c) c.resize();
@@ -457,11 +475,14 @@
       await new Promise(r=>setTimeout(r,100));
 
       const pages  = Array.from(document.querySelectorAll('.page'));
-      const images = await Promise.all(pages.map(pg=>
-        html2canvas(pg, { backgroundColor:'#fff', useCORS:true, scale:3 })
-          .then(cnv=>cnv.toDataURL('image/png',1.0))
-      ));
-
+      const CANVAS_SCALE = 4;
+      const images = await Promise.all(pages.map(pg =>
+      html2canvas(pg, {
+        backgroundColor: '#fff',
+         useCORS: true,
+         scale: CANVAS_SCALE
+       }).then(cnv => cnv.toDataURL('image/png', 1.0))
+     ));
       pdfMake.createPdf({
         pageSize: { width:960, height:540 },
         pageMargins: [0,0,0,0],

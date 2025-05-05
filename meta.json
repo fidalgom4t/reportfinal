@@ -392,91 +392,91 @@
     },
     {
       "QUESTION ID": "09. In collaborative projects or tasks, which tools do you use to manage/report progress? (who needs to do what, by when)",
-      "LABEL": "GREY AREAS",
+      "LABEL": "",
       "": "",
       "sort order": 11
     },
     {
       "QUESTION ID": "10. ... there's little doubt about who's left to do what. Any grey areas that arise in the division of responsibilities are quickly discussed and clarified.’",
-      "LABEL": "RENEGOCIAÇÃO",
+      "LABEL": "GREY AREAS",
       "": "",
       "sort order": 12
     },
     {
       "QUESTION ID": "11. ... there is openness to renegotiate deadlines. Whenever something is predictably going to be delayed, they inform me in good time.\"",
-      "LABEL": "GUICHETS",
+      "LABEL": "RENEGOCIAÇÃO",
       "": "",
       "sort order": 13
     },
     {
       "QUESTION ID": "12. ... I rarely get stuck. I know exactly who to speak to in order to resolve the issue quickly.\"",
-      "LABEL": "COMPROMISSO",
+      "LABEL": "GUICHETS",
       "": "",
       "sort order": 14
     },
     {
       "QUESTION ID": "13. ... there is a clear culture of commitment. No matter ‘falls through the cracks’ and if something goes wrong it's quickly signalled.\"",
-      "LABEL": "DISTRIBUIÇÃO",
+      "LABEL": "COMPROMISSO",
       "": "",
       "sort order": 15
     },
     {
       "QUESTION ID": "14. ... work distribution is efficient: there are very few situations in which a subject is being dealt redundantly by different people/areas.\"",
-      "LABEL": "PROCESSOS",
+      "LABEL": "DISTRIBUIÇÃO",
       "": "",
       "sort order": 16
     },
     {
       "QUESTION ID": "15. ... internal processes are simple and efficient.\"",
-      "LABEL": "EMAILS - N.º",
+      "LABEL": "PROCESSOS",
       "": "",
       "sort order": 17
     },
     {
       "QUESTION ID": "15. Regarding the use of EMAIL in your organisation: [The number of emails I receive every day is adequate.]",
-      "LABEL": "EMAILS - AÇÃO",
+      "LABEL": "EMAILS - N.º",
       "": "",
       "sort order": 18
     },
     {
       "QUESTION ID": "15. Regarding the use of EMAIL in your organisation: [The emails I receive are action-oriented. I know exactly what they want from me.]",
-      "LABEL": "EMAILS - EFICIÊNCIA",
+      "LABEL": "EMAILS - AÇÃO",
       "": "",
       "sort order": 19
     },
     {
       "QUESTION ID": "15. Regarding the use of EMAIL in your organisation: [Emails are sent efficiently, in the sense that they only involve the strictly necessary people.]",
-      "LABEL": "EMAILS - PRODUTIVOS",
+      "LABEL": "EMAILS - EFICIÊNCIA",
       "": "",
       "sort order": 20
     },
     {
       "QUESTION ID": "15. Regarding the use of EMAIL in your organisation: [In general, EMAIL is used very productively.]",
-      "LABEL": "REUNIÕES - N.º",
+      "LABEL": "EMAILS - PRODUTIVOS",
       "": "",
       "sort order": 21
     },
     {
       "QUESTION ID": "16. Regarding MEETINGS in your organisation: [Usually, I have an adequate number of meetings in my calendar.]",
-      "LABEL": "REUNIÕES - AÇÃO",
+      "LABEL": "REUNIÕES - N.º",
       "": "",
       "sort order": 22
     },
     {
       "QUESTION ID": "16. Regarding MEETINGS in your organisation: [The meetings I attend are usually action-oriented. When finished, everyone knows who needs to do what, by when.]",
-      "LABEL": "REUNIÕES - CONVOCATÓRIA",
+      "LABEL": "REUNIÕES - AÇÃO",
       "": "",
       "sort order": 23
     },
     {
       "QUESTION ID": "16. Regarding MEETINGS in your organisation: [Generally, meetings are carefully convened, with only the strictly necessary people present, and only for as long as necessary.]",
-      "LABEL": "REUNIÕES - PRODUTIVAS",
+      "LABEL": "REUNIÕES - CONVOCATÓRIA",
       "": "",
       "sort order": 24
     },
     {
       "QUESTION ID": "16. Regarding MEETINGS in your organisation: [In general, I think MEETINGS are very productive.]",
-      "LABEL": "",
+      "LABEL": "REUNIÕES - PRODUTIVAS",
       "": "",
       "sort order": 25
     },

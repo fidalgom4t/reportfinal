@@ -128,6 +128,7 @@
   color: #4C4C4C;
   font-size: 1rem;
   opacity: 0.85;
+  font-style:italic;
 }
   .meta-value {
   padding-left: 12px; /* adjust spacing as needed */
@@ -381,7 +382,7 @@ info.innerHTML = `
           <h1>${pm.TÍTULO || prog}</h1>
           <div class="program-subtitle">${pm.SUBTÍTULO || ''}</div>
           <div class="meta-banner">
-    <div class="meta-line">Scope temporal:<span class="meta-value"> ${timeScope}</span></div>
+    <div class="meta-line">scope temporal:<span class="meta-value"> ${timeScope}</span></div>
     <div class="meta-line">Trainers:<span class="meta-value"> ${(f.trainers || {})[prog] || 'N/A'}</span></div>
   </div>
 </div>

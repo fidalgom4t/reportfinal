@@ -27029,11 +27029,11 @@
     "date_month": "",
     "date_year": "",
     "Question": "01. O que poderia mudar no seu contexto de trabalho para melhorar o seu índice de performance?",
-    "Answer": "",
+    "Answer": "Nos mues assuntos que dependem de outros colegas, o progresso tende a ser lento quando eles não respondem ou demoram demais. Isso porque, quando finalmente o fazem, preciso retomar tudo do início, podendo esquecer detalhes importantes que na minha interação inicial estavam claros, o que acaba resultando em perda de tempo.",
     "client": "SYSMEX",
     "program": "P365",
     "question": "01. O que poderia mudar no seu contexto de trabalho para melhorar o seu índice de performance?",
-    "value": "",
+    "value": "Nos mues assuntos que dependem de outros colegas, o progresso tende a ser lento quando eles não respondem ou demoram demais. Isso porque, quando finalmente o fazem, preciso retomar tudo do início, podendo esquecer detalhes importantes que na minha interação inicial estavam claros, o que acaba resultando em perda de tempo.",
     "section": "assessment",
     "lang": "pt"
   },
@@ -27051,11 +27051,11 @@
     "date_month": "",
     "date_year": "",
     "Question": "02. Se já tivesse um maior índice de produtividade e performance onde e como notaria?",
-    "Answer": "",
+    "Answer": "Maior agilidade na execução resulta em uma resolução mais eficiente dos assuntos.",
     "client": "SYSMEX",
     "program": "P365",
     "question": "02. Se já tivesse um maior índice de produtividade e performance onde e como notaria?",
-    "value": "",
+    "value": "Maior agilidade na execução resulta em uma resolução mais eficiente dos assuntos.",
     "section": "assessment",
     "lang": "pt"
   },
@@ -27457,490 +27457,6 @@
   },
   {
     "Response ID": 36,
-    "Submission ID": "Ek5OY02",
-    "Respondent ID": "",
-    "Submitted at": "",
-    "client_raw": "SYSMEX P365 T1 fev. 25",
-    "client_name": "SYSMEX",
-    "program_id": "P365",
-    "turma": "T1",
-    "client_info": "fev. 25",
-    "date_day": "",
-    "date_month": "",
-    "date_year": "",
-    "Question": "A. ENQUADRAMENTO",
-    "Answer": "",
-    "client": "SYSMEX",
-    "program": "P365",
-    "question": "A. ENQUADRAMENTO",
-    "value": "",
-    "section": "assessment",
-    "lang": "pt"
-  },
-  {
-    "Response ID": 36,
-    "Submission ID": "Ek5OY02",
-    "Respondent ID": "",
-    "Submitted at": "",
-    "client_raw": "SYSMEX P365 T1 fev. 25",
-    "client_name": "SYSMEX",
-    "program_id": "P365",
-    "turma": "T1",
-    "client_info": "fev. 25",
-    "date_day": "",
-    "date_month": "",
-    "date_year": "",
-    "Question": "Função",
-    "Answer": "",
-    "client": "SYSMEX",
-    "program": "P365",
-    "question": "Função",
-    "value": "",
-    "section": "assessment",
-    "lang": "pt"
-  },
-  {
-    "Response ID": 36,
-    "Submission ID": "Ek5OY02",
-    "Respondent ID": "",
-    "Submitted at": "",
-    "client_raw": "SYSMEX P365 T1 fev. 25",
-    "client_name": "SYSMEX",
-    "program_id": "P365",
-    "turma": "T1",
-    "client_info": "fev. 25",
-    "date_day": "",
-    "date_month": "",
-    "date_year": "",
-    "Question": "01. O que poderia mudar no seu contexto de trabalho para melhorar o seu índice de performance?",
-    "Answer": "",
-    "client": "SYSMEX",
-    "program": "P365",
-    "question": "01. O que poderia mudar no seu contexto de trabalho para melhorar o seu índice de performance?",
-    "value": "",
-    "section": "assessment",
-    "lang": "pt"
-  },
-  {
-    "Response ID": 36,
-    "Submission ID": "Ek5OY02",
-    "Respondent ID": "",
-    "Submitted at": "",
-    "client_raw": "SYSMEX P365 T1 fev. 25",
-    "client_name": "SYSMEX",
-    "program_id": "P365",
-    "turma": "T1",
-    "client_info": "fev. 25",
-    "date_day": "",
-    "date_month": "",
-    "date_year": "",
-    "Question": "02. Se já tivesse um maior índice de produtividade e performance onde e como notaria?",
-    "Answer": "",
-    "client": "SYSMEX",
-    "program": "P365",
-    "question": "02. Se já tivesse um maior índice de produtividade e performance onde e como notaria?",
-    "value": "",
-    "section": "assessment",
-    "lang": "pt"
-  },
-  {
-    "Response ID": 36,
-    "Submission ID": "Ek5OY02",
-    "Respondent ID": "",
-    "Submitted at": "",
-    "client_raw": "SYSMEX P365 T1 fev. 25",
-    "client_name": "SYSMEX",
-    "program_id": "P365",
-    "turma": "T1",
-    "client_info": "fev. 25",
-    "date_day": "",
-    "date_month": "",
-    "date_year": "",
-    "Question": "03. \"No meu contexto de trabalho, consigo produzir de forma focalizada e sem grandes interrupções.\"",
-    "Answer": "",
-    "client": "SYSMEX",
-    "program": "P365",
-    "question": "03. \"No meu contexto de trabalho, consigo produzir de forma focalizada e sem grandes interrupções.\"",
-    "value": "",
-    "section": "assessment",
-    "lang": "pt"
-  },
-  {
-    "Response ID": 36,
-    "Submission ID": "Ek5OY02",
-    "Respondent ID": "",
-    "Submitted at": "",
-    "client_raw": "SYSMEX P365 T1 fev. 25",
-    "client_name": "SYSMEX",
-    "program_id": "P365",
-    "turma": "T1",
-    "client_info": "fev. 25",
-    "date_day": "",
-    "date_month": "",
-    "date_year": "",
-    "Question": "04. \"O número de assuntos diferentes que tenho de gerir em paralelo é adequado, não excessivo.\"",
-    "Answer": "",
-    "client": "SYSMEX",
-    "program": "P365",
-    "question": "04. \"O número de assuntos diferentes que tenho de gerir em paralelo é adequado, não excessivo.\"",
-    "value": "",
-    "section": "assessment",
-    "lang": "pt"
-  },
-  {
-    "Response ID": 36,
-    "Submission ID": "Ek5OY02",
-    "Respondent ID": "",
-    "Submitted at": "",
-    "client_raw": "SYSMEX P365 T1 fev. 25",
-    "client_name": "SYSMEX",
-    "program_id": "P365",
-    "turma": "T1",
-    "client_info": "fev. 25",
-    "date_day": "",
-    "date_month": "",
-    "date_year": "",
-    "Question": "05. \"Organizo o meu trabalho de forma metódica e eficiente, e sinto ter tudo sob controlo.\"",
-    "Answer": "",
-    "client": "SYSMEX",
-    "program": "P365",
-    "question": "05. \"Organizo o meu trabalho de forma metódica e eficiente, e sinto ter tudo sob controlo.\"",
-    "value": "",
-    "section": "assessment",
-    "lang": "pt"
-  },
-  {
-    "Response ID": 36,
-    "Submission ID": "Ek5OY02",
-    "Respondent ID": "",
-    "Submitted at": "",
-    "client_raw": "SYSMEX P365 T1 fev. 25",
-    "client_name": "SYSMEX",
-    "program_id": "P365",
-    "turma": "T1",
-    "client_info": "fev. 25",
-    "date_day": "",
-    "date_month": "",
-    "date_year": "",
-    "Question": "06. \"Raramente procrastino. Respeito sempre as prioridades que defini na minha lista de tarefas.",
-    "Answer": "",
-    "client": "SYSMEX",
-    "program": "P365",
-    "question": "06. \"Raramente procrastino. Respeito sempre as prioridades que defini na minha lista de tarefas.",
-    "value": "",
-    "section": "assessment",
-    "lang": "pt"
-  },
-  {
-    "Response ID": 36,
-    "Submission ID": "Ek5OY02",
-    "Respondent ID": "",
-    "Submitted at": "",
-    "client_raw": "SYSMEX P365 T1 fev. 25",
-    "client_name": "SYSMEX",
-    "program_id": "P365",
-    "turma": "T1",
-    "client_info": "fev. 25",
-    "date_day": "",
-    "date_month": "",
-    "date_year": "",
-    "Question": "tirar notas",
-    "Answer": "",
-    "client": "SYSMEX",
-    "program": "P365",
-    "question": "tirar notas",
-    "value": "",
-    "section": "assessment",
-    "lang": "pt"
-  },
-  {
-    "Response ID": 36,
-    "Submission ID": "Ek5OY02",
-    "Respondent ID": "",
-    "Submitted at": "",
-    "client_raw": "SYSMEX P365 T1 fev. 25",
-    "client_name": "SYSMEX",
-    "program_id": "P365",
-    "turma": "T1",
-    "client_info": "fev. 25",
-    "date_day": "",
-    "date_month": "",
-    "date_year": "",
-    "Question": "gerir tarefas",
-    "Answer": "",
-    "client": "SYSMEX",
-    "program": "P365",
-    "question": "gerir tarefas",
-    "value": "",
-    "section": "assessment",
-    "lang": "pt"
-  },
-  {
-    "Response ID": 36,
-    "Submission ID": "Ek5OY02",
-    "Respondent ID": "",
-    "Submitted at": "",
-    "client_raw": "SYSMEX P365 T1 fev. 25",
-    "client_name": "SYSMEX",
-    "program_id": "P365",
-    "turma": "T1",
-    "client_info": "fev. 25",
-    "date_day": "",
-    "date_month": "",
-    "date_year": "",
-    "Question": "email e calendário",
-    "Answer": "",
-    "client": "SYSMEX",
-    "program": "P365",
-    "question": "email e calendário",
-    "value": "",
-    "section": "assessment",
-    "lang": "pt"
-  },
-  {
-    "Response ID": 36,
-    "Submission ID": "Ek5OY02",
-    "Respondent ID": "",
-    "Submitted at": "",
-    "client_raw": "SYSMEX P365 T1 fev. 25",
-    "client_name": "SYSMEX",
-    "program_id": "P365",
-    "turma": "T1",
-    "client_info": "fev. 25",
-    "date_day": "",
-    "date_month": "",
-    "date_year": "",
-    "Question": "outros",
-    "Answer": "",
-    "client": "SYSMEX",
-    "program": "P365",
-    "question": "outros",
-    "value": "",
-    "section": "assessment",
-    "lang": "pt"
-  },
-  {
-    "Response ID": 36,
-    "Submission ID": "Ek5OY02",
-    "Respondent ID": "",
-    "Submitted at": "",
-    "client_raw": "SYSMEX P365 T1 fev. 25",
-    "client_name": "SYSMEX",
-    "program_id": "P365",
-    "turma": "T1",
-    "client_info": "fev. 25",
-    "date_day": "",
-    "date_month": "",
-    "date_year": "",
-    "Question": "08. ... a utilização de emails é eficiente.\"",
-    "Answer": "",
-    "client": "SYSMEX",
-    "program": "P365",
-    "question": "08. ... a utilização de emails é eficiente.\"",
-    "value": "",
-    "section": "assessment",
-    "lang": "pt"
-  },
-  {
-    "Response ID": 36,
-    "Submission ID": "Ek5OY02",
-    "Respondent ID": "",
-    "Submitted at": "",
-    "client_raw": "SYSMEX P365 T1 fev. 25",
-    "client_name": "SYSMEX",
-    "program_id": "P365",
-    "turma": "T1",
-    "client_info": "fev. 25",
-    "date_day": "",
-    "date_month": "",
-    "date_year": "",
-    "Question": "09. ... as reuniões são eficazes.\"",
-    "Answer": "",
-    "client": "SYSMEX",
-    "program": "P365",
-    "question": "09. ... as reuniões são eficazes.\"",
-    "value": "",
-    "section": "assessment",
-    "lang": "pt"
-  },
-  {
-    "Response ID": 36,
-    "Submission ID": "Ek5OY02",
-    "Respondent ID": "",
-    "Submitted at": "",
-    "client_raw": "SYSMEX P365 T1 fev. 25",
-    "client_name": "SYSMEX",
-    "program_id": "P365",
-    "turma": "T1",
-    "client_info": "fev. 25",
-    "date_day": "",
-    "date_month": "",
-    "date_year": "",
-    "Question": "10. ... há boa agilidade: as decisões tendem a ser céleres e os assuntos resolvem-se com rapidez.\"",
-    "Answer": "",
-    "client": "SYSMEX",
-    "program": "P365",
-    "question": "10. ... há boa agilidade: as decisões tendem a ser céleres e os assuntos resolvem-se com rapidez.\"",
-    "value": "",
-    "section": "assessment",
-    "lang": "pt"
-  },
-  {
-    "Response ID": 36,
-    "Submission ID": "Ek5OY02",
-    "Respondent ID": "",
-    "Submitted at": "",
-    "client_raw": "SYSMEX P365 T1 fev. 25",
-    "client_name": "SYSMEX",
-    "program_id": "P365",
-    "turma": "T1",
-    "client_info": "fev. 25",
-    "date_day": "",
-    "date_month": "",
-    "date_year": "",
-    "Question": "11. ... os processos internos são simples e eficientes.\"",
-    "Answer": "",
-    "client": "SYSMEX",
-    "program": "P365",
-    "question": "11. ... os processos internos são simples e eficientes.\"",
-    "value": "",
-    "section": "assessment",
-    "lang": "pt"
-  },
-  {
-    "Response ID": 36,
-    "Submission ID": "Ek5OY02",
-    "Respondent ID": "",
-    "Submitted at": "",
-    "client_raw": "SYSMEX P365 T1 fev. 25",
-    "client_name": "SYSMEX",
-    "program_id": "P365",
-    "turma": "T1",
-    "client_info": "fev. 25",
-    "date_day": "",
-    "date_month": "",
-    "date_year": "",
-    "Question": "12. ... há poucas dúvidas sobre quem ficou de fazer o quê. Eventuais áreas cinzentas que surjam na divisão de responsabilidades são rapidamente discutidas e clarificadas.\"",
-    "Answer": "",
-    "client": "SYSMEX",
-    "program": "P365",
-    "question": "12. ... há poucas dúvidas sobre quem ficou de fazer o quê. Eventuais áreas cinzentas que surjam na divisão de responsabilidades são rapidamente discutidas e clarificadas.\"",
-    "value": "",
-    "section": "assessment",
-    "lang": "pt"
-  },
-  {
-    "Response ID": 36,
-    "Submission ID": "Ek5OY02",
-    "Respondent ID": "",
-    "Submitted at": "",
-    "client_raw": "SYSMEX P365 T1 fev. 25",
-    "client_name": "SYSMEX",
-    "program_id": "P365",
-    "turma": "T1",
-    "client_info": "fev. 25",
-    "date_day": "",
-    "date_month": "",
-    "date_year": "",
-    "Question": "13. ... há claramente um clima de confiança entre os colaboradores.\"",
-    "Answer": "",
-    "client": "SYSMEX",
-    "program": "P365",
-    "question": "13. ... há claramente um clima de confiança entre os colaboradores.\"",
-    "value": "",
-    "section": "assessment",
-    "lang": "pt"
-  },
-  {
-    "Response ID": 36,
-    "Submission ID": "Ek5OY02",
-    "Respondent ID": "",
-    "Submitted at": "",
-    "client_raw": "SYSMEX P365 T1 fev. 25",
-    "client_name": "SYSMEX",
-    "program_id": "P365",
-    "turma": "T1",
-    "client_info": "fev. 25",
-    "date_day": "",
-    "date_month": "",
-    "date_year": "",
-    "Question": "14. A definição das minhas funções é muito clara. Sei precisamente quais as minhas responsabilidades.\"",
-    "Answer": "",
-    "client": "SYSMEX",
-    "program": "P365",
-    "question": "14. A definição das minhas funções é muito clara. Sei precisamente quais as minhas responsabilidades.\"",
-    "value": "",
-    "section": "assessment",
-    "lang": "pt"
-  },
-  {
-    "Response ID": 36,
-    "Submission ID": "Ek5OY02",
-    "Respondent ID": "",
-    "Submitted at": "",
-    "client_raw": "SYSMEX P365 T1 fev. 25",
-    "client_name": "SYSMEX",
-    "program_id": "P365",
-    "turma": "T1",
-    "client_info": "fev. 25",
-    "date_day": "",
-    "date_month": "",
-    "date_year": "",
-    "Question": "15. A estratégia atual da empresa, e a forma como deve ser implementada na minha equipa/unidade/departamento, estão para mim muito claras.\"",
-    "Answer": "",
-    "client": "SYSMEX",
-    "program": "P365",
-    "question": "15. A estratégia atual da empresa, e a forma como deve ser implementada na minha equipa/unidade/departamento, estão para mim muito claras.\"",
-    "value": "",
-    "section": "assessment",
-    "lang": "pt"
-  },
-  {
-    "Response ID": 36,
-    "Submission ID": "Ek5OY02",
-    "Respondent ID": "",
-    "Submitted at": "",
-    "client_raw": "SYSMEX P365 T1 fev. 25",
-    "client_name": "SYSMEX",
-    "program_id": "P365",
-    "turma": "T1",
-    "client_info": "fev. 25",
-    "date_day": "",
-    "date_month": "",
-    "date_year": "",
-    "Question": "16. Conheço perfeitamente quais os meus objetivos atuais, e não tenho qualquer dúvida sobre as prioridades que devo respeitar.\"",
-    "Answer": "",
-    "client": "SYSMEX",
-    "program": "P365",
-    "question": "16. Conheço perfeitamente quais os meus objetivos atuais, e não tenho qualquer dúvida sobre as prioridades que devo respeitar.\"",
-    "value": "",
-    "section": "assessment",
-    "lang": "pt"
-  },
-  {
-    "Response ID": 36,
-    "Submission ID": "Ek5OY02",
-    "Respondent ID": "",
-    "Submitted at": "",
-    "client_raw": "SYSMEX P365 T1 fev. 25",
-    "client_name": "SYSMEX",
-    "program_id": "P365",
-    "turma": "T1",
-    "client_info": "fev. 25",
-    "date_day": "",
-    "date_month": "",
-    "date_year": "",
-    "Question": "17. \"Quanto aos critérios de sucesso que definem o meu bom desempenho, a minha visão e a visão de quem me avalia e/ou lidera são inteiramente coincidentes.\"",
-    "Answer": "",
-    "client": "SYSMEX",
-    "program": "P365",
-    "question": "17. \"Quanto aos critérios de sucesso que definem o meu bom desempenho, a minha visão e a visão de quem me avalia e/ou lidera são inteiramente coincidentes.\"",
-    "value": "",
-    "section": "assessment",
-    "lang": "pt"
-  },
-  {
-    "Response ID": 37,
     "Submission ID": "2EB6519",
     "Respondent ID": "",
     "Submitted at": "",
@@ -27962,7 +27478,7 @@
     "lang": "pt"
   },
   {
-    "Response ID": 37,
+    "Response ID": 36,
     "Submission ID": "2EB6519",
     "Respondent ID": "",
     "Submitted at": "",
@@ -27984,7 +27500,7 @@
     "lang": "pt"
   },
   {
-    "Response ID": 37,
+    "Response ID": 36,
     "Submission ID": "2EB6519",
     "Respondent ID": "",
     "Submitted at": "",
@@ -27997,16 +27513,16 @@
     "date_month": "",
     "date_year": "",
     "Question": "01. O que poderia mudar no seu contexto de trabalho para melhorar o seu índice de performance?",
-    "Answer": "",
+    "Answer": "Aprender a melhorar",
     "client": "SYSMEX",
     "program": "P365",
     "question": "01. O que poderia mudar no seu contexto de trabalho para melhorar o seu índice de performance?",
-    "value": "",
+    "value": "Aprender a melhorar",
     "section": "assessment",
     "lang": "pt"
   },
   {
-    "Response ID": 37,
+    "Response ID": 36,
     "Submission ID": "2EB6519",
     "Respondent ID": "",
     "Submitted at": "",
@@ -28019,16 +27535,16 @@
     "date_month": "",
     "date_year": "",
     "Question": "02. Se já tivesse um maior índice de produtividade e performance onde e como notaria?",
-    "Answer": "",
+    "Answer": "Nao ter muitas coisas pendentes",
     "client": "SYSMEX",
     "program": "P365",
     "question": "02. Se já tivesse um maior índice de produtividade e performance onde e como notaria?",
-    "value": "",
+    "value": "Nao ter muitas coisas pendentes",
     "section": "assessment",
     "lang": "pt"
   },
   {
-    "Response ID": 37,
+    "Response ID": 36,
     "Submission ID": "2EB6519",
     "Respondent ID": "",
     "Submitted at": "",
@@ -28050,7 +27566,7 @@
     "lang": "pt"
   },
   {
-    "Response ID": 37,
+    "Response ID": 36,
     "Submission ID": "2EB6519",
     "Respondent ID": "",
     "Submitted at": "",
@@ -28072,7 +27588,7 @@
     "lang": "pt"
   },
   {
-    "Response ID": 37,
+    "Response ID": 36,
     "Submission ID": "2EB6519",
     "Respondent ID": "",
     "Submitted at": "",
@@ -28094,7 +27610,7 @@
     "lang": "pt"
   },
   {
-    "Response ID": 37,
+    "Response ID": 36,
     "Submission ID": "2EB6519",
     "Respondent ID": "",
     "Submitted at": "",
@@ -28116,7 +27632,7 @@
     "lang": "pt"
   },
   {
-    "Response ID": 37,
+    "Response ID": 36,
     "Submission ID": "2EB6519",
     "Respondent ID": "",
     "Submitted at": "",
@@ -28138,7 +27654,7 @@
     "lang": "pt"
   },
   {
-    "Response ID": 37,
+    "Response ID": 36,
     "Submission ID": "2EB6519",
     "Respondent ID": "",
     "Submitted at": "",
@@ -28160,7 +27676,7 @@
     "lang": "pt"
   },
   {
-    "Response ID": 37,
+    "Response ID": 36,
     "Submission ID": "2EB6519",
     "Respondent ID": "",
     "Submitted at": "",
@@ -28182,7 +27698,7 @@
     "lang": "pt"
   },
   {
-    "Response ID": 37,
+    "Response ID": 36,
     "Submission ID": "2EB6519",
     "Respondent ID": "",
     "Submitted at": "",
@@ -28204,7 +27720,7 @@
     "lang": "pt"
   },
   {
-    "Response ID": 37,
+    "Response ID": 36,
     "Submission ID": "2EB6519",
     "Respondent ID": "",
     "Submitted at": "",
@@ -28226,7 +27742,7 @@
     "lang": "pt"
   },
   {
-    "Response ID": 37,
+    "Response ID": 36,
     "Submission ID": "2EB6519",
     "Respondent ID": "",
     "Submitted at": "",
@@ -28248,7 +27764,7 @@
     "lang": "pt"
   },
   {
-    "Response ID": 37,
+    "Response ID": 36,
     "Submission ID": "2EB6519",
     "Respondent ID": "",
     "Submitted at": "",
@@ -28270,7 +27786,7 @@
     "lang": "pt"
   },
   {
-    "Response ID": 37,
+    "Response ID": 36,
     "Submission ID": "2EB6519",
     "Respondent ID": "",
     "Submitted at": "",
@@ -28292,7 +27808,7 @@
     "lang": "pt"
   },
   {
-    "Response ID": 37,
+    "Response ID": 36,
     "Submission ID": "2EB6519",
     "Respondent ID": "",
     "Submitted at": "",
@@ -28314,7 +27830,7 @@
     "lang": "pt"
   },
   {
-    "Response ID": 37,
+    "Response ID": 36,
     "Submission ID": "2EB6519",
     "Respondent ID": "",
     "Submitted at": "",
@@ -28336,7 +27852,7 @@
     "lang": "pt"
   },
   {
-    "Response ID": 37,
+    "Response ID": 36,
     "Submission ID": "2EB6519",
     "Respondent ID": "",
     "Submitted at": "",
@@ -28358,7 +27874,7 @@
     "lang": "pt"
   },
   {
-    "Response ID": 37,
+    "Response ID": 36,
     "Submission ID": "2EB6519",
     "Respondent ID": "",
     "Submitted at": "",
@@ -28380,7 +27896,7 @@
     "lang": "pt"
   },
   {
-    "Response ID": 37,
+    "Response ID": 36,
     "Submission ID": "2EB6519",
     "Respondent ID": "",
     "Submitted at": "",
@@ -28402,7 +27918,7 @@
     "lang": "pt"
   },
   {
-    "Response ID": 37,
+    "Response ID": 36,
     "Submission ID": "2EB6519",
     "Respondent ID": "",
     "Submitted at": "",
@@ -28424,7 +27940,7 @@
     "lang": "pt"
   },
   {
-    "Response ID": 38,
+    "Response ID": 37,
     "Submission ID": "GxKPyyo",
     "Respondent ID": "",
     "Submitted at": "",
@@ -28446,7 +27962,7 @@
     "lang": "pt"
   },
   {
-    "Response ID": 38,
+    "Response ID": 37,
     "Submission ID": "GxKPyyo",
     "Respondent ID": "",
     "Submitted at": "",
@@ -28468,7 +27984,7 @@
     "lang": "pt"
   },
   {
-    "Response ID": 38,
+    "Response ID": 37,
     "Submission ID": "GxKPyyo",
     "Respondent ID": "",
     "Submitted at": "",
@@ -28481,16 +27997,16 @@
     "date_month": "",
     "date_year": "",
     "Question": "01. O que poderia mudar no seu contexto de trabalho para melhorar o seu índice de performance?",
-    "Answer": "",
+    "Answer": "A gestão do tempo de cada tarefa, organização eficiente da informação de conteúdos.",
     "client": "SYSMEX",
     "program": "P365",
     "question": "01. O que poderia mudar no seu contexto de trabalho para melhorar o seu índice de performance?",
-    "value": "",
+    "value": "A gestão do tempo de cada tarefa, organização eficiente da informação de conteúdos.",
     "section": "assessment",
     "lang": "pt"
   },
   {
-    "Response ID": 38,
+    "Response ID": 37,
     "Submission ID": "GxKPyyo",
     "Respondent ID": "",
     "Submitted at": "",
@@ -28503,16 +28019,16 @@
     "date_month": "",
     "date_year": "",
     "Question": "02. Se já tivesse um maior índice de produtividade e performance onde e como notaria?",
-    "Answer": "",
+    "Answer": "Na saúde e no descanso.",
     "client": "SYSMEX",
     "program": "P365",
     "question": "02. Se já tivesse um maior índice de produtividade e performance onde e como notaria?",
-    "value": "",
+    "value": "Na saúde e no descanso.",
     "section": "assessment",
     "lang": "pt"
   },
   {
-    "Response ID": 38,
+    "Response ID": 37,
     "Submission ID": "GxKPyyo",
     "Respondent ID": "",
     "Submitted at": "",
@@ -28534,7 +28050,7 @@
     "lang": "pt"
   },
   {
-    "Response ID": 38,
+    "Response ID": 37,
     "Submission ID": "GxKPyyo",
     "Respondent ID": "",
     "Submitted at": "",
@@ -28556,7 +28072,7 @@
     "lang": "pt"
   },
   {
-    "Response ID": 38,
+    "Response ID": 37,
     "Submission ID": "GxKPyyo",
     "Respondent ID": "",
     "Submitted at": "",
@@ -28578,7 +28094,7 @@
     "lang": "pt"
   },
   {
-    "Response ID": 38,
+    "Response ID": 37,
     "Submission ID": "GxKPyyo",
     "Respondent ID": "",
     "Submitted at": "",
@@ -28600,7 +28116,7 @@
     "lang": "pt"
   },
   {
-    "Response ID": 38,
+    "Response ID": 37,
     "Submission ID": "GxKPyyo",
     "Respondent ID": "",
     "Submitted at": "",
@@ -28622,7 +28138,7 @@
     "lang": "pt"
   },
   {
-    "Response ID": 38,
+    "Response ID": 37,
     "Submission ID": "GxKPyyo",
     "Respondent ID": "",
     "Submitted at": "",
@@ -28644,7 +28160,7 @@
     "lang": "pt"
   },
   {
-    "Response ID": 38,
+    "Response ID": 37,
     "Submission ID": "GxKPyyo",
     "Respondent ID": "",
     "Submitted at": "",
@@ -28666,7 +28182,7 @@
     "lang": "pt"
   },
   {
-    "Response ID": 38,
+    "Response ID": 37,
     "Submission ID": "GxKPyyo",
     "Respondent ID": "",
     "Submitted at": "",
@@ -28688,7 +28204,7 @@
     "lang": "pt"
   },
   {
-    "Response ID": 38,
+    "Response ID": 37,
     "Submission ID": "GxKPyyo",
     "Respondent ID": "",
     "Submitted at": "",
@@ -28710,7 +28226,7 @@
     "lang": "pt"
   },
   {
-    "Response ID": 38,
+    "Response ID": 37,
     "Submission ID": "GxKPyyo",
     "Respondent ID": "",
     "Submitted at": "",
@@ -28732,7 +28248,7 @@
     "lang": "pt"
   },
   {
-    "Response ID": 38,
+    "Response ID": 37,
     "Submission ID": "GxKPyyo",
     "Respondent ID": "",
     "Submitted at": "",
@@ -28754,7 +28270,7 @@
     "lang": "pt"
   },
   {
-    "Response ID": 38,
+    "Response ID": 37,
     "Submission ID": "GxKPyyo",
     "Respondent ID": "",
     "Submitted at": "",
@@ -28776,7 +28292,7 @@
     "lang": "pt"
   },
   {
-    "Response ID": 38,
+    "Response ID": 37,
     "Submission ID": "GxKPyyo",
     "Respondent ID": "",
     "Submitted at": "",
@@ -28798,7 +28314,7 @@
     "lang": "pt"
   },
   {
-    "Response ID": 38,
+    "Response ID": 37,
     "Submission ID": "GxKPyyo",
     "Respondent ID": "",
     "Submitted at": "",
@@ -28820,7 +28336,7 @@
     "lang": "pt"
   },
   {
-    "Response ID": 38,
+    "Response ID": 37,
     "Submission ID": "GxKPyyo",
     "Respondent ID": "",
     "Submitted at": "",
@@ -28842,7 +28358,7 @@
     "lang": "pt"
   },
   {
-    "Response ID": 38,
+    "Response ID": 37,
     "Submission ID": "GxKPyyo",
     "Respondent ID": "",
     "Submitted at": "",
@@ -28864,7 +28380,7 @@
     "lang": "pt"
   },
   {
-    "Response ID": 38,
+    "Response ID": 37,
     "Submission ID": "GxKPyyo",
     "Respondent ID": "",
     "Submitted at": "",
@@ -28886,7 +28402,7 @@
     "lang": "pt"
   },
   {
-    "Response ID": 38,
+    "Response ID": 37,
     "Submission ID": "GxKPyyo",
     "Respondent ID": "",
     "Submitted at": "",
@@ -28908,7 +28424,7 @@
     "lang": "pt"
   },
   {
-    "Response ID": 39,
+    "Response ID": 38,
     "Submission ID": "44BbdVo",
     "Respondent ID": "",
     "Submitted at": "",
@@ -28930,7 +28446,7 @@
     "lang": "pt"
   },
   {
-    "Response ID": 39,
+    "Response ID": 38,
     "Submission ID": "44BbdVo",
     "Respondent ID": "",
     "Submitted at": "",
@@ -28952,7 +28468,7 @@
     "lang": "pt"
   },
   {
-    "Response ID": 39,
+    "Response ID": 38,
     "Submission ID": "44BbdVo",
     "Respondent ID": "",
     "Submitted at": "",
@@ -28965,16 +28481,16 @@
     "date_month": "",
     "date_year": "",
     "Question": "01. O que poderia mudar no seu contexto de trabalho para melhorar o seu índice de performance?",
-    "Answer": "",
+    "Answer": "Não no meu caso em concreto, mas a elevada quantidade de reuniões dificulta a disponibilidade de outros elementos para diálogos essenciais a desbloquear tarefas da equipa.",
     "client": "SYSMEX",
     "program": "P365",
     "question": "01. O que poderia mudar no seu contexto de trabalho para melhorar o seu índice de performance?",
-    "value": "",
+    "value": "Não no meu caso em concreto, mas a elevada quantidade de reuniões dificulta a disponibilidade de outros elementos para diálogos essenciais a desbloquear tarefas da equipa.",
     "section": "assessment",
     "lang": "pt"
   },
   {
-    "Response ID": 39,
+    "Response ID": 38,
     "Submission ID": "44BbdVo",
     "Respondent ID": "",
     "Submitted at": "",
@@ -28987,16 +28503,16 @@
     "date_month": "",
     "date_year": "",
     "Question": "02. Se já tivesse um maior índice de produtividade e performance onde e como notaria?",
-    "Answer": "",
+    "Answer": "Rapidez de resolução de processos que por vezes ficam pendentes durante demasiado tempo.",
     "client": "SYSMEX",
     "program": "P365",
     "question": "02. Se já tivesse um maior índice de produtividade e performance onde e como notaria?",
-    "value": "",
+    "value": "Rapidez de resolução de processos que por vezes ficam pendentes durante demasiado tempo.",
     "section": "assessment",
     "lang": "pt"
   },
   {
-    "Response ID": 39,
+    "Response ID": 38,
     "Submission ID": "44BbdVo",
     "Respondent ID": "",
     "Submitted at": "",
@@ -29018,7 +28534,7 @@
     "lang": "pt"
   },
   {
-    "Response ID": 39,
+    "Response ID": 38,
     "Submission ID": "44BbdVo",
     "Respondent ID": "",
     "Submitted at": "",
@@ -29040,7 +28556,7 @@
     "lang": "pt"
   },
   {
-    "Response ID": 39,
+    "Response ID": 38,
     "Submission ID": "44BbdVo",
     "Respondent ID": "",
     "Submitted at": "",
@@ -29062,7 +28578,7 @@
     "lang": "pt"
   },
   {
-    "Response ID": 39,
+    "Response ID": 38,
     "Submission ID": "44BbdVo",
     "Respondent ID": "",
     "Submitted at": "",
@@ -29084,7 +28600,7 @@
     "lang": "pt"
   },
   {
-    "Response ID": 39,
+    "Response ID": 38,
     "Submission ID": "44BbdVo",
     "Respondent ID": "",
     "Submitted at": "",
@@ -29106,7 +28622,7 @@
     "lang": "pt"
   },
   {
-    "Response ID": 39,
+    "Response ID": 38,
     "Submission ID": "44BbdVo",
     "Respondent ID": "",
     "Submitted at": "",
@@ -29128,7 +28644,7 @@
     "lang": "pt"
   },
   {
-    "Response ID": 39,
+    "Response ID": 38,
     "Submission ID": "44BbdVo",
     "Respondent ID": "",
     "Submitted at": "",
@@ -29150,7 +28666,7 @@
     "lang": "pt"
   },
   {
-    "Response ID": 39,
+    "Response ID": 38,
     "Submission ID": "44BbdVo",
     "Respondent ID": "",
     "Submitted at": "",
@@ -29172,7 +28688,7 @@
     "lang": "pt"
   },
   {
-    "Response ID": 39,
+    "Response ID": 38,
     "Submission ID": "44BbdVo",
     "Respondent ID": "",
     "Submitted at": "",
@@ -29194,7 +28710,7 @@
     "lang": "pt"
   },
   {
-    "Response ID": 39,
+    "Response ID": 38,
     "Submission ID": "44BbdVo",
     "Respondent ID": "",
     "Submitted at": "",
@@ -29216,7 +28732,7 @@
     "lang": "pt"
   },
   {
-    "Response ID": 39,
+    "Response ID": 38,
     "Submission ID": "44BbdVo",
     "Respondent ID": "",
     "Submitted at": "",
@@ -29238,7 +28754,7 @@
     "lang": "pt"
   },
   {
-    "Response ID": 39,
+    "Response ID": 38,
     "Submission ID": "44BbdVo",
     "Respondent ID": "",
     "Submitted at": "",
@@ -29260,7 +28776,7 @@
     "lang": "pt"
   },
   {
-    "Response ID": 39,
+    "Response ID": 38,
     "Submission ID": "44BbdVo",
     "Respondent ID": "",
     "Submitted at": "",
@@ -29282,7 +28798,7 @@
     "lang": "pt"
   },
   {
-    "Response ID": 39,
+    "Response ID": 38,
     "Submission ID": "44BbdVo",
     "Respondent ID": "",
     "Submitted at": "",
@@ -29304,7 +28820,7 @@
     "lang": "pt"
   },
   {
-    "Response ID": 39,
+    "Response ID": 38,
     "Submission ID": "44BbdVo",
     "Respondent ID": "",
     "Submitted at": "",
@@ -29326,7 +28842,7 @@
     "lang": "pt"
   },
   {
-    "Response ID": 39,
+    "Response ID": 38,
     "Submission ID": "44BbdVo",
     "Respondent ID": "",
     "Submitted at": "",
@@ -29348,7 +28864,7 @@
     "lang": "pt"
   },
   {
-    "Response ID": 39,
+    "Response ID": 38,
     "Submission ID": "44BbdVo",
     "Respondent ID": "",
     "Submitted at": "",
@@ -29370,7 +28886,7 @@
     "lang": "pt"
   },
   {
-    "Response ID": 39,
+    "Response ID": 38,
     "Submission ID": "44BbdVo",
     "Respondent ID": "",
     "Submitted at": "",
@@ -29392,7 +28908,7 @@
     "lang": "pt"
   },
   {
-    "Response ID": 40,
+    "Response ID": 39,
     "Submission ID": "PdDqyK1",
     "Respondent ID": "",
     "Submitted at": "",
@@ -29414,7 +28930,7 @@
     "lang": "pt"
   },
   {
-    "Response ID": 40,
+    "Response ID": 39,
     "Submission ID": "PdDqyK1",
     "Respondent ID": "",
     "Submitted at": "",
@@ -29436,7 +28952,7 @@
     "lang": "pt"
   },
   {
-    "Response ID": 40,
+    "Response ID": 39,
     "Submission ID": "PdDqyK1",
     "Respondent ID": "",
     "Submitted at": "",
@@ -29449,16 +28965,16 @@
     "date_month": "",
     "date_year": "",
     "Question": "01. O que poderia mudar no seu contexto de trabalho para melhorar o seu índice de performance?",
-    "Answer": "",
+    "Answer": "Melhor comunicação entre departamentos.",
     "client": "SYSMEX",
     "program": "P365",
     "question": "01. O que poderia mudar no seu contexto de trabalho para melhorar o seu índice de performance?",
-    "value": "",
+    "value": "Melhor comunicação entre departamentos.",
     "section": "assessment",
     "lang": "pt"
   },
   {
-    "Response ID": 40,
+    "Response ID": 39,
     "Submission ID": "PdDqyK1",
     "Respondent ID": "",
     "Submitted at": "",
@@ -29471,16 +28987,16 @@
     "date_month": "",
     "date_year": "",
     "Question": "02. Se já tivesse um maior índice de produtividade e performance onde e como notaria?",
-    "Answer": "",
+    "Answer": "Menos stress. Mais descanso e melhor saúde.",
     "client": "SYSMEX",
     "program": "P365",
     "question": "02. Se já tivesse um maior índice de produtividade e performance onde e como notaria?",
-    "value": "",
+    "value": "Menos stress. Mais descanso e melhor saúde.",
     "section": "assessment",
     "lang": "pt"
   },
   {
-    "Response ID": 40,
+    "Response ID": 39,
     "Submission ID": "PdDqyK1",
     "Respondent ID": "",
     "Submitted at": "",
@@ -29502,7 +29018,7 @@
     "lang": "pt"
   },
   {
-    "Response ID": 40,
+    "Response ID": 39,
     "Submission ID": "PdDqyK1",
     "Respondent ID": "",
     "Submitted at": "",
@@ -29524,7 +29040,7 @@
     "lang": "pt"
   },
   {
-    "Response ID": 40,
+    "Response ID": 39,
     "Submission ID": "PdDqyK1",
     "Respondent ID": "",
     "Submitted at": "",
@@ -29546,7 +29062,7 @@
     "lang": "pt"
   },
   {
-    "Response ID": 40,
+    "Response ID": 39,
     "Submission ID": "PdDqyK1",
     "Respondent ID": "",
     "Submitted at": "",
@@ -29568,7 +29084,7 @@
     "lang": "pt"
   },
   {
-    "Response ID": 40,
+    "Response ID": 39,
     "Submission ID": "PdDqyK1",
     "Respondent ID": "",
     "Submitted at": "",
@@ -29590,7 +29106,7 @@
     "lang": "pt"
   },
   {
-    "Response ID": 40,
+    "Response ID": 39,
     "Submission ID": "PdDqyK1",
     "Respondent ID": "",
     "Submitted at": "",
@@ -29612,7 +29128,7 @@
     "lang": "pt"
   },
   {
-    "Response ID": 40,
+    "Response ID": 39,
     "Submission ID": "PdDqyK1",
     "Respondent ID": "",
     "Submitted at": "",
@@ -29634,7 +29150,7 @@
     "lang": "pt"
   },
   {
-    "Response ID": 40,
+    "Response ID": 39,
     "Submission ID": "PdDqyK1",
     "Respondent ID": "",
     "Submitted at": "",
@@ -29656,7 +29172,7 @@
     "lang": "pt"
   },
   {
-    "Response ID": 40,
+    "Response ID": 39,
     "Submission ID": "PdDqyK1",
     "Respondent ID": "",
     "Submitted at": "",
@@ -29678,7 +29194,7 @@
     "lang": "pt"
   },
   {
-    "Response ID": 40,
+    "Response ID": 39,
     "Submission ID": "PdDqyK1",
     "Respondent ID": "",
     "Submitted at": "",
@@ -29700,7 +29216,7 @@
     "lang": "pt"
   },
   {
-    "Response ID": 40,
+    "Response ID": 39,
     "Submission ID": "PdDqyK1",
     "Respondent ID": "",
     "Submitted at": "",
@@ -29722,7 +29238,7 @@
     "lang": "pt"
   },
   {
-    "Response ID": 40,
+    "Response ID": 39,
     "Submission ID": "PdDqyK1",
     "Respondent ID": "",
     "Submitted at": "",
@@ -29744,7 +29260,7 @@
     "lang": "pt"
   },
   {
-    "Response ID": 40,
+    "Response ID": 39,
     "Submission ID": "PdDqyK1",
     "Respondent ID": "",
     "Submitted at": "",
@@ -29766,7 +29282,7 @@
     "lang": "pt"
   },
   {
-    "Response ID": 40,
+    "Response ID": 39,
     "Submission ID": "PdDqyK1",
     "Respondent ID": "",
     "Submitted at": "",
@@ -29788,7 +29304,7 @@
     "lang": "pt"
   },
   {
-    "Response ID": 40,
+    "Response ID": 39,
     "Submission ID": "PdDqyK1",
     "Respondent ID": "",
     "Submitted at": "",
@@ -29810,7 +29326,7 @@
     "lang": "pt"
   },
   {
-    "Response ID": 40,
+    "Response ID": 39,
     "Submission ID": "PdDqyK1",
     "Respondent ID": "",
     "Submitted at": "",
@@ -29832,7 +29348,7 @@
     "lang": "pt"
   },
   {
-    "Response ID": 40,
+    "Response ID": 39,
     "Submission ID": "PdDqyK1",
     "Respondent ID": "",
     "Submitted at": "",
@@ -29854,7 +29370,7 @@
     "lang": "pt"
   },
   {
-    "Response ID": 40,
+    "Response ID": 39,
     "Submission ID": "PdDqyK1",
     "Respondent ID": "",
     "Submitted at": "",
@@ -29876,7 +29392,7 @@
     "lang": "pt"
   },
   {
-    "Response ID": 41,
+    "Response ID": 40,
     "Submission ID": "68eBy8J",
     "Respondent ID": "",
     "Submitted at": "",
@@ -29898,7 +29414,7 @@
     "lang": "pt"
   },
   {
-    "Response ID": 41,
+    "Response ID": 40,
     "Submission ID": "68eBy8J",
     "Respondent ID": "",
     "Submitted at": "",
@@ -29920,7 +29436,7 @@
     "lang": "pt"
   },
   {
-    "Response ID": 41,
+    "Response ID": 40,
     "Submission ID": "68eBy8J",
     "Respondent ID": "",
     "Submitted at": "",
@@ -29933,16 +29449,16 @@
     "date_month": "",
     "date_year": "",
     "Question": "01. O que poderia mudar no seu contexto de trabalho para melhorar o seu índice de performance?",
-    "Answer": "",
+    "Answer": "Definição de prioridades na gestão do tempo",
     "client": "SYSMEX",
     "program": "P365",
     "question": "01. O que poderia mudar no seu contexto de trabalho para melhorar o seu índice de performance?",
-    "value": "",
+    "value": "Definição de prioridades na gestão do tempo",
     "section": "assessment",
     "lang": "pt"
   },
   {
-    "Response ID": 41,
+    "Response ID": 40,
     "Submission ID": "68eBy8J",
     "Respondent ID": "",
     "Submitted at": "",
@@ -29955,16 +29471,16 @@
     "date_month": "",
     "date_year": "",
     "Question": "02. Se já tivesse um maior índice de produtividade e performance onde e como notaria?",
-    "Answer": "",
+    "Answer": "No tempo livre",
     "client": "SYSMEX",
     "program": "P365",
     "question": "02. Se já tivesse um maior índice de produtividade e performance onde e como notaria?",
-    "value": "",
+    "value": "No tempo livre",
     "section": "assessment",
     "lang": "pt"
   },
   {
-    "Response ID": 41,
+    "Response ID": 40,
     "Submission ID": "68eBy8J",
     "Respondent ID": "",
     "Submitted at": "",
@@ -29986,7 +29502,7 @@
     "lang": "pt"
   },
   {
-    "Response ID": 41,
+    "Response ID": 40,
     "Submission ID": "68eBy8J",
     "Respondent ID": "",
     "Submitted at": "",
@@ -30008,7 +29524,7 @@
     "lang": "pt"
   },
   {
-    "Response ID": 41,
+    "Response ID": 40,
     "Submission ID": "68eBy8J",
     "Respondent ID": "",
     "Submitted at": "",
@@ -30030,7 +29546,7 @@
     "lang": "pt"
   },
   {
-    "Response ID": 41,
+    "Response ID": 40,
     "Submission ID": "68eBy8J",
     "Respondent ID": "",
     "Submitted at": "",
@@ -30052,7 +29568,7 @@
     "lang": "pt"
   },
   {
-    "Response ID": 41,
+    "Response ID": 40,
     "Submission ID": "68eBy8J",
     "Respondent ID": "",
     "Submitted at": "",
@@ -30074,7 +29590,7 @@
     "lang": "pt"
   },
   {
-    "Response ID": 41,
+    "Response ID": 40,
     "Submission ID": "68eBy8J",
     "Respondent ID": "",
     "Submitted at": "",
@@ -30096,7 +29612,7 @@
     "lang": "pt"
   },
   {
-    "Response ID": 41,
+    "Response ID": 40,
     "Submission ID": "68eBy8J",
     "Respondent ID": "",
     "Submitted at": "",
@@ -30118,7 +29634,7 @@
     "lang": "pt"
   },
   {
-    "Response ID": 41,
+    "Response ID": 40,
     "Submission ID": "68eBy8J",
     "Respondent ID": "",
     "Submitted at": "",
@@ -30140,7 +29656,7 @@
     "lang": "pt"
   },
   {
-    "Response ID": 41,
+    "Response ID": 40,
     "Submission ID": "68eBy8J",
     "Respondent ID": "",
     "Submitted at": "",
@@ -30162,7 +29678,7 @@
     "lang": "pt"
   },
   {
-    "Response ID": 41,
+    "Response ID": 40,
     "Submission ID": "68eBy8J",
     "Respondent ID": "",
     "Submitted at": "",
@@ -30184,7 +29700,7 @@
     "lang": "pt"
   },
   {
-    "Response ID": 41,
+    "Response ID": 40,
     "Submission ID": "68eBy8J",
     "Respondent ID": "",
     "Submitted at": "",
@@ -30206,7 +29722,7 @@
     "lang": "pt"
   },
   {
-    "Response ID": 41,
+    "Response ID": 40,
     "Submission ID": "68eBy8J",
     "Respondent ID": "",
     "Submitted at": "",
@@ -30228,7 +29744,7 @@
     "lang": "pt"
   },
   {
-    "Response ID": 41,
+    "Response ID": 40,
     "Submission ID": "68eBy8J",
     "Respondent ID": "",
     "Submitted at": "",
@@ -30250,7 +29766,7 @@
     "lang": "pt"
   },
   {
-    "Response ID": 41,
+    "Response ID": 40,
     "Submission ID": "68eBy8J",
     "Respondent ID": "",
     "Submitted at": "",
@@ -30272,7 +29788,7 @@
     "lang": "pt"
   },
   {
-    "Response ID": 41,
+    "Response ID": 40,
     "Submission ID": "68eBy8J",
     "Respondent ID": "",
     "Submitted at": "",
@@ -30294,7 +29810,7 @@
     "lang": "pt"
   },
   {
-    "Response ID": 41,
+    "Response ID": 40,
     "Submission ID": "68eBy8J",
     "Respondent ID": "",
     "Submitted at": "",
@@ -30316,7 +29832,7 @@
     "lang": "pt"
   },
   {
-    "Response ID": 41,
+    "Response ID": 40,
     "Submission ID": "68eBy8J",
     "Respondent ID": "",
     "Submitted at": "",
@@ -30338,7 +29854,7 @@
     "lang": "pt"
   },
   {
-    "Response ID": 41,
+    "Response ID": 40,
     "Submission ID": "68eBy8J",
     "Respondent ID": "",
     "Submitted at": "",
@@ -30360,7 +29876,7 @@
     "lang": "pt"
   },
   {
-    "Response ID": 42,
+    "Response ID": 41,
     "Submission ID": "yPNaR60",
     "Respondent ID": "",
     "Submitted at": "",
@@ -30382,7 +29898,7 @@
     "lang": "pt"
   },
   {
-    "Response ID": 42,
+    "Response ID": 41,
     "Submission ID": "yPNaR60",
     "Respondent ID": "",
     "Submitted at": "",
@@ -30404,7 +29920,7 @@
     "lang": "pt"
   },
   {
-    "Response ID": 42,
+    "Response ID": 41,
     "Submission ID": "yPNaR60",
     "Respondent ID": "",
     "Submitted at": "",
@@ -30417,16 +29933,16 @@
     "date_month": "",
     "date_year": "",
     "Question": "01. O que poderia mudar no seu contexto de trabalho para melhorar o seu índice de performance?",
-    "Answer": "",
+    "Answer": "Agilizar e clarificar o uso e utilidade das múltiplas aplicações profissionais de que dispomos atualmente.",
     "client": "SYSMEX",
     "program": "P365",
     "question": "01. O que poderia mudar no seu contexto de trabalho para melhorar o seu índice de performance?",
-    "value": "",
+    "value": "Agilizar e clarificar o uso e utilidade das múltiplas aplicações profissionais de que dispomos atualmente.",
     "section": "assessment",
     "lang": "pt"
   },
   {
-    "Response ID": 42,
+    "Response ID": 41,
     "Submission ID": "yPNaR60",
     "Respondent ID": "",
     "Submitted at": "",
@@ -30439,16 +29955,16 @@
     "date_month": "",
     "date_year": "",
     "Question": "02. Se já tivesse um maior índice de produtividade e performance onde e como notaria?",
-    "Answer": "",
+    "Answer": "Num menor tempo despendido para efetuar determinadas tarefas.",
     "client": "SYSMEX",
     "program": "P365",
     "question": "02. Se já tivesse um maior índice de produtividade e performance onde e como notaria?",
-    "value": "",
+    "value": "Num menor tempo despendido para efetuar determinadas tarefas.",
     "section": "assessment",
     "lang": "pt"
   },
   {
-    "Response ID": 42,
+    "Response ID": 41,
     "Submission ID": "yPNaR60",
     "Respondent ID": "",
     "Submitted at": "",
@@ -30470,7 +29986,7 @@
     "lang": "pt"
   },
   {
-    "Response ID": 42,
+    "Response ID": 41,
     "Submission ID": "yPNaR60",
     "Respondent ID": "",
     "Submitted at": "",
@@ -30492,7 +30008,7 @@
     "lang": "pt"
   },
   {
-    "Response ID": 42,
+    "Response ID": 41,
     "Submission ID": "yPNaR60",
     "Respondent ID": "",
     "Submitted at": "",
@@ -30514,7 +30030,7 @@
     "lang": "pt"
   },
   {
-    "Response ID": 42,
+    "Response ID": 41,
     "Submission ID": "yPNaR60",
     "Respondent ID": "",
     "Submitted at": "",
@@ -30536,7 +30052,7 @@
     "lang": "pt"
   },
   {
-    "Response ID": 42,
+    "Response ID": 41,
     "Submission ID": "yPNaR60",
     "Respondent ID": "",
     "Submitted at": "",
@@ -30558,7 +30074,7 @@
     "lang": "pt"
   },
   {
-    "Response ID": 42,
+    "Response ID": 41,
     "Submission ID": "yPNaR60",
     "Respondent ID": "",
     "Submitted at": "",
@@ -30580,7 +30096,7 @@
     "lang": "pt"
   },
   {
-    "Response ID": 42,
+    "Response ID": 41,
     "Submission ID": "yPNaR60",
     "Respondent ID": "",
     "Submitted at": "",
@@ -30602,7 +30118,7 @@
     "lang": "pt"
   },
   {
-    "Response ID": 42,
+    "Response ID": 41,
     "Submission ID": "yPNaR60",
     "Respondent ID": "",
     "Submitted at": "",
@@ -30624,7 +30140,7 @@
     "lang": "pt"
   },
   {
-    "Response ID": 42,
+    "Response ID": 41,
     "Submission ID": "yPNaR60",
     "Respondent ID": "",
     "Submitted at": "",
@@ -30646,7 +30162,7 @@
     "lang": "pt"
   },
   {
-    "Response ID": 42,
+    "Response ID": 41,
     "Submission ID": "yPNaR60",
     "Respondent ID": "",
     "Submitted at": "",
@@ -30668,7 +30184,7 @@
     "lang": "pt"
   },
   {
-    "Response ID": 42,
+    "Response ID": 41,
     "Submission ID": "yPNaR60",
     "Respondent ID": "",
     "Submitted at": "",
@@ -30690,7 +30206,7 @@
     "lang": "pt"
   },
   {
-    "Response ID": 42,
+    "Response ID": 41,
     "Submission ID": "yPNaR60",
     "Respondent ID": "",
     "Submitted at": "",
@@ -30712,7 +30228,7 @@
     "lang": "pt"
   },
   {
-    "Response ID": 42,
+    "Response ID": 41,
     "Submission ID": "yPNaR60",
     "Respondent ID": "",
     "Submitted at": "",
@@ -30734,7 +30250,7 @@
     "lang": "pt"
   },
   {
-    "Response ID": 42,
+    "Response ID": 41,
     "Submission ID": "yPNaR60",
     "Respondent ID": "",
     "Submitted at": "",
@@ -30756,7 +30272,7 @@
     "lang": "pt"
   },
   {
-    "Response ID": 42,
+    "Response ID": 41,
     "Submission ID": "yPNaR60",
     "Respondent ID": "",
     "Submitted at": "",
@@ -30778,7 +30294,7 @@
     "lang": "pt"
   },
   {
-    "Response ID": 42,
+    "Response ID": 41,
     "Submission ID": "yPNaR60",
     "Respondent ID": "",
     "Submitted at": "",
@@ -30800,7 +30316,7 @@
     "lang": "pt"
   },
   {
-    "Response ID": 42,
+    "Response ID": 41,
     "Submission ID": "yPNaR60",
     "Respondent ID": "",
     "Submitted at": "",
@@ -30822,7 +30338,7 @@
     "lang": "pt"
   },
   {
-    "Response ID": 42,
+    "Response ID": 41,
     "Submission ID": "yPNaR60",
     "Respondent ID": "",
     "Submitted at": "",
@@ -30844,7 +30360,7 @@
     "lang": "pt"
   },
   {
-    "Response ID": 43,
+    "Response ID": 42,
     "Submission ID": "q4alMo5",
     "Respondent ID": "",
     "Submitted at": "",
@@ -30866,7 +30382,7 @@
     "lang": "pt"
   },
   {
-    "Response ID": 43,
+    "Response ID": 42,
     "Submission ID": "q4alMo5",
     "Respondent ID": "",
     "Submitted at": "",
@@ -30888,7 +30404,7 @@
     "lang": "pt"
   },
   {
-    "Response ID": 43,
+    "Response ID": 42,
     "Submission ID": "q4alMo5",
     "Respondent ID": "",
     "Submitted at": "",
@@ -30901,16 +30417,16 @@
     "date_month": "",
     "date_year": "",
     "Question": "01. O que poderia mudar no seu contexto de trabalho para melhorar o seu índice de performance?",
-    "Answer": "",
+    "Answer": "Ainda não tenho 1 ano de empresa, mas senti que me faltou um plano mais estruturado de \"primeiros passos\".",
     "client": "SYSMEX",
     "program": "P365",
     "question": "01. O que poderia mudar no seu contexto de trabalho para melhorar o seu índice de performance?",
-    "value": "",
+    "value": "Ainda não tenho 1 ano de empresa, mas senti que me faltou um plano mais estruturado de \"primeiros passos\".",
     "section": "assessment",
     "lang": "pt"
   },
   {
-    "Response ID": 43,
+    "Response ID": 42,
     "Submission ID": "q4alMo5",
     "Respondent ID": "",
     "Submitted at": "",
@@ -30923,16 +30439,16 @@
     "date_month": "",
     "date_year": "",
     "Question": "02. Se já tivesse um maior índice de produtividade e performance onde e como notaria?",
-    "Answer": "",
+    "Answer": "Num maior à-vontade para resolver qualquer questão do cliente.",
     "client": "SYSMEX",
     "program": "P365",
     "question": "02. Se já tivesse um maior índice de produtividade e performance onde e como notaria?",
-    "value": "",
+    "value": "Num maior à-vontade para resolver qualquer questão do cliente.",
     "section": "assessment",
     "lang": "pt"
   },
   {
-    "Response ID": 43,
+    "Response ID": 42,
     "Submission ID": "q4alMo5",
     "Respondent ID": "",
     "Submitted at": "",
@@ -30954,7 +30470,7 @@
     "lang": "pt"
   },
   {
-    "Response ID": 43,
+    "Response ID": 42,
     "Submission ID": "q4alMo5",
     "Respondent ID": "",
     "Submitted at": "",
@@ -30976,7 +30492,7 @@
     "lang": "pt"
   },
   {
-    "Response ID": 43,
+    "Response ID": 42,
     "Submission ID": "q4alMo5",
     "Respondent ID": "",
     "Submitted at": "",
@@ -30998,7 +30514,7 @@
     "lang": "pt"
   },
   {
-    "Response ID": 43,
+    "Response ID": 42,
     "Submission ID": "q4alMo5",
     "Respondent ID": "",
     "Submitted at": "",
@@ -31020,7 +30536,7 @@
     "lang": "pt"
   },
   {
-    "Response ID": 43,
+    "Response ID": 42,
     "Submission ID": "q4alMo5",
     "Respondent ID": "",
     "Submitted at": "",
@@ -31042,7 +30558,7 @@
     "lang": "pt"
   },
   {
-    "Response ID": 43,
+    "Response ID": 42,
     "Submission ID": "q4alMo5",
     "Respondent ID": "",
     "Submitted at": "",
@@ -31064,7 +30580,7 @@
     "lang": "pt"
   },
   {
-    "Response ID": 43,
+    "Response ID": 42,
     "Submission ID": "q4alMo5",
     "Respondent ID": "",
     "Submitted at": "",
@@ -31086,7 +30602,7 @@
     "lang": "pt"
   },
   {
-    "Response ID": 43,
+    "Response ID": 42,
     "Submission ID": "q4alMo5",
     "Respondent ID": "",
     "Submitted at": "",
@@ -31108,7 +30624,7 @@
     "lang": "pt"
   },
   {
-    "Response ID": 43,
+    "Response ID": 42,
     "Submission ID": "q4alMo5",
     "Respondent ID": "",
     "Submitted at": "",
@@ -31130,7 +30646,7 @@
     "lang": "pt"
   },
   {
-    "Response ID": 43,
+    "Response ID": 42,
     "Submission ID": "q4alMo5",
     "Respondent ID": "",
     "Submitted at": "",
@@ -31152,7 +30668,7 @@
     "lang": "pt"
   },
   {
-    "Response ID": 43,
+    "Response ID": 42,
     "Submission ID": "q4alMo5",
     "Respondent ID": "",
     "Submitted at": "",
@@ -31174,7 +30690,7 @@
     "lang": "pt"
   },
   {
-    "Response ID": 43,
+    "Response ID": 42,
     "Submission ID": "q4alMo5",
     "Respondent ID": "",
     "Submitted at": "",
@@ -31196,7 +30712,7 @@
     "lang": "pt"
   },
   {
-    "Response ID": 43,
+    "Response ID": 42,
     "Submission ID": "q4alMo5",
     "Respondent ID": "",
     "Submitted at": "",
@@ -31218,7 +30734,7 @@
     "lang": "pt"
   },
   {
-    "Response ID": 43,
+    "Response ID": 42,
     "Submission ID": "q4alMo5",
     "Respondent ID": "",
     "Submitted at": "",
@@ -31240,7 +30756,7 @@
     "lang": "pt"
   },
   {
-    "Response ID": 43,
+    "Response ID": 42,
     "Submission ID": "q4alMo5",
     "Respondent ID": "",
     "Submitted at": "",
@@ -31262,7 +30778,7 @@
     "lang": "pt"
   },
   {
-    "Response ID": 43,
+    "Response ID": 42,
     "Submission ID": "q4alMo5",
     "Respondent ID": "",
     "Submitted at": "",
@@ -31284,7 +30800,7 @@
     "lang": "pt"
   },
   {
-    "Response ID": 43,
+    "Response ID": 42,
     "Submission ID": "q4alMo5",
     "Respondent ID": "",
     "Submitted at": "",
@@ -31306,7 +30822,7 @@
     "lang": "pt"
   },
   {
-    "Response ID": 43,
+    "Response ID": 42,
     "Submission ID": "q4alMo5",
     "Respondent ID": "",
     "Submitted at": "",
@@ -31328,7 +30844,7 @@
     "lang": "pt"
   },
   {
-    "Response ID": 44,
+    "Response ID": 43,
     "Submission ID": "aQeMXgW",
     "Respondent ID": "",
     "Submitted at": "",
@@ -31350,7 +30866,7 @@
     "lang": "pt"
   },
   {
-    "Response ID": 44,
+    "Response ID": 43,
     "Submission ID": "aQeMXgW",
     "Respondent ID": "",
     "Submitted at": "",
@@ -31372,7 +30888,7 @@
     "lang": "pt"
   },
   {
-    "Response ID": 44,
+    "Response ID": 43,
     "Submission ID": "aQeMXgW",
     "Respondent ID": "",
     "Submitted at": "",
@@ -31385,16 +30901,16 @@
     "date_month": "",
     "date_year": "",
     "Question": "01. O que poderia mudar no seu contexto de trabalho para melhorar o seu índice de performance?",
-    "Answer": "",
+    "Answer": "gerir melhor meu tempo",
     "client": "SYSMEX",
     "program": "P365",
     "question": "01. O que poderia mudar no seu contexto de trabalho para melhorar o seu índice de performance?",
-    "value": "",
+    "value": "gerir melhor meu tempo",
     "section": "assessment",
     "lang": "pt"
   },
   {
-    "Response ID": 44,
+    "Response ID": 43,
     "Submission ID": "aQeMXgW",
     "Respondent ID": "",
     "Submitted at": "",
@@ -31407,16 +30923,16 @@
     "date_month": "",
     "date_year": "",
     "Question": "02. Se já tivesse um maior índice de produtividade e performance onde e como notaria?",
-    "Answer": "",
+    "Answer": "aumento de vendas",
     "client": "SYSMEX",
     "program": "P365",
     "question": "02. Se já tivesse um maior índice de produtividade e performance onde e como notaria?",
-    "value": "",
+    "value": "aumento de vendas",
     "section": "assessment",
     "lang": "pt"
   },
   {
-    "Response ID": 44,
+    "Response ID": 43,
     "Submission ID": "aQeMXgW",
     "Respondent ID": "",
     "Submitted at": "",
@@ -31438,7 +30954,7 @@
     "lang": "pt"
   },
   {
-    "Response ID": 44,
+    "Response ID": 43,
     "Submission ID": "aQeMXgW",
     "Respondent ID": "",
     "Submitted at": "",
@@ -31460,7 +30976,7 @@
     "lang": "pt"
   },
   {
-    "Response ID": 44,
+    "Response ID": 43,
     "Submission ID": "aQeMXgW",
     "Respondent ID": "",
     "Submitted at": "",
@@ -31482,7 +30998,7 @@
     "lang": "pt"
   },
   {
-    "Response ID": 44,
+    "Response ID": 43,
     "Submission ID": "aQeMXgW",
     "Respondent ID": "",
     "Submitted at": "",
@@ -31504,7 +31020,7 @@
     "lang": "pt"
   },
   {
-    "Response ID": 44,
+    "Response ID": 43,
     "Submission ID": "aQeMXgW",
     "Respondent ID": "",
     "Submitted at": "",
@@ -31526,7 +31042,7 @@
     "lang": "pt"
   },
   {
-    "Response ID": 44,
+    "Response ID": 43,
     "Submission ID": "aQeMXgW",
     "Respondent ID": "",
     "Submitted at": "",
@@ -31548,7 +31064,7 @@
     "lang": "pt"
   },
   {
-    "Response ID": 44,
+    "Response ID": 43,
     "Submission ID": "aQeMXgW",
     "Respondent ID": "",
     "Submitted at": "",
@@ -31570,7 +31086,7 @@
     "lang": "pt"
   },
   {
-    "Response ID": 44,
+    "Response ID": 43,
     "Submission ID": "aQeMXgW",
     "Respondent ID": "",
     "Submitted at": "",
@@ -31592,7 +31108,7 @@
     "lang": "pt"
   },
   {
-    "Response ID": 44,
+    "Response ID": 43,
     "Submission ID": "aQeMXgW",
     "Respondent ID": "",
     "Submitted at": "",
@@ -31614,7 +31130,7 @@
     "lang": "pt"
   },
   {
-    "Response ID": 44,
+    "Response ID": 43,
     "Submission ID": "aQeMXgW",
     "Respondent ID": "",
     "Submitted at": "",
@@ -31636,7 +31152,7 @@
     "lang": "pt"
   },
   {
-    "Response ID": 44,
+    "Response ID": 43,
     "Submission ID": "aQeMXgW",
     "Respondent ID": "",
     "Submitted at": "",
@@ -31658,7 +31174,7 @@
     "lang": "pt"
   },
   {
-    "Response ID": 44,
+    "Response ID": 43,
     "Submission ID": "aQeMXgW",
     "Respondent ID": "",
     "Submitted at": "",
@@ -31680,7 +31196,7 @@
     "lang": "pt"
   },
   {
-    "Response ID": 44,
+    "Response ID": 43,
     "Submission ID": "aQeMXgW",
     "Respondent ID": "",
     "Submitted at": "",
@@ -31702,7 +31218,7 @@
     "lang": "pt"
   },
   {
-    "Response ID": 44,
+    "Response ID": 43,
     "Submission ID": "aQeMXgW",
     "Respondent ID": "",
     "Submitted at": "",
@@ -31724,7 +31240,7 @@
     "lang": "pt"
   },
   {
-    "Response ID": 44,
+    "Response ID": 43,
     "Submission ID": "aQeMXgW",
     "Respondent ID": "",
     "Submitted at": "",
@@ -31746,7 +31262,7 @@
     "lang": "pt"
   },
   {
-    "Response ID": 44,
+    "Response ID": 43,
     "Submission ID": "aQeMXgW",
     "Respondent ID": "",
     "Submitted at": "",
@@ -31768,7 +31284,7 @@
     "lang": "pt"
   },
   {
-    "Response ID": 44,
+    "Response ID": 43,
     "Submission ID": "aQeMXgW",
     "Respondent ID": "",
     "Submitted at": "",
@@ -31790,7 +31306,7 @@
     "lang": "pt"
   },
   {
-    "Response ID": 44,
+    "Response ID": 43,
     "Submission ID": "aQeMXgW",
     "Respondent ID": "",
     "Submitted at": "",
@@ -31812,7 +31328,7 @@
     "lang": "pt"
   },
   {
-    "Response ID": 45,
+    "Response ID": 44,
     "Submission ID": "eqDXGv0",
     "Respondent ID": "",
     "Submitted at": "",
@@ -31834,7 +31350,7 @@
     "lang": "pt"
   },
   {
-    "Response ID": 45,
+    "Response ID": 44,
     "Submission ID": "eqDXGv0",
     "Respondent ID": "",
     "Submitted at": "",
@@ -31856,7 +31372,7 @@
     "lang": "pt"
   },
   {
-    "Response ID": 45,
+    "Response ID": 44,
     "Submission ID": "eqDXGv0",
     "Respondent ID": "",
     "Submitted at": "",
@@ -31869,16 +31385,16 @@
     "date_month": "",
     "date_year": "",
     "Question": "01. O que poderia mudar no seu contexto de trabalho para melhorar o seu índice de performance?",
-    "Answer": "",
+    "Answer": "Melhoria de processos no sentido de os tornar mais ágeis e menos burocráticos",
     "client": "SYSMEX",
     "program": "P365",
     "question": "01. O que poderia mudar no seu contexto de trabalho para melhorar o seu índice de performance?",
-    "value": "",
+    "value": "Melhoria de processos no sentido de os tornar mais ágeis e menos burocráticos",
     "section": "assessment",
     "lang": "pt"
   },
   {
-    "Response ID": 45,
+    "Response ID": 44,
     "Submission ID": "eqDXGv0",
     "Respondent ID": "",
     "Submitted at": "",
@@ -31891,16 +31407,16 @@
     "date_month": "",
     "date_year": "",
     "Question": "02. Se já tivesse um maior índice de produtividade e performance onde e como notaria?",
-    "Answer": "",
+    "Answer": "Maior disponibilidade mental e de tempo para dedicar a projetos e decisões mais estratégicas",
     "client": "SYSMEX",
     "program": "P365",
     "question": "02. Se já tivesse um maior índice de produtividade e performance onde e como notaria?",
-    "value": "",
+    "value": "Maior disponibilidade mental e de tempo para dedicar a projetos e decisões mais estratégicas",
     "section": "assessment",
     "lang": "pt"
   },
   {
-    "Response ID": 45,
+    "Response ID": 44,
     "Submission ID": "eqDXGv0",
     "Respondent ID": "",
     "Submitted at": "",
@@ -31922,7 +31438,7 @@
     "lang": "pt"
   },
   {
-    "Response ID": 45,
+    "Response ID": 44,
     "Submission ID": "eqDXGv0",
     "Respondent ID": "",
     "Submitted at": "",
@@ -31944,7 +31460,7 @@
     "lang": "pt"
   },
   {
-    "Response ID": 45,
+    "Response ID": 44,
     "Submission ID": "eqDXGv0",
     "Respondent ID": "",
     "Submitted at": "",
@@ -31966,7 +31482,7 @@
     "lang": "pt"
   },
   {
-    "Response ID": 45,
+    "Response ID": 44,
     "Submission ID": "eqDXGv0",
     "Respondent ID": "",
     "Submitted at": "",
@@ -31988,7 +31504,7 @@
     "lang": "pt"
   },
   {
-    "Response ID": 45,
+    "Response ID": 44,
     "Submission ID": "eqDXGv0",
     "Respondent ID": "",
     "Submitted at": "",
@@ -32010,7 +31526,7 @@
     "lang": "pt"
   },
   {
-    "Response ID": 45,
+    "Response ID": 44,
     "Submission ID": "eqDXGv0",
     "Respondent ID": "",
     "Submitted at": "",
@@ -32032,7 +31548,7 @@
     "lang": "pt"
   },
   {
-    "Response ID": 45,
+    "Response ID": 44,
     "Submission ID": "eqDXGv0",
     "Respondent ID": "",
     "Submitted at": "",
@@ -32054,7 +31570,7 @@
     "lang": "pt"
   },
   {
-    "Response ID": 45,
+    "Response ID": 44,
     "Submission ID": "eqDXGv0",
     "Respondent ID": "",
     "Submitted at": "",
@@ -32076,7 +31592,7 @@
     "lang": "pt"
   },
   {
-    "Response ID": 45,
+    "Response ID": 44,
     "Submission ID": "eqDXGv0",
     "Respondent ID": "",
     "Submitted at": "",
@@ -32098,7 +31614,7 @@
     "lang": "pt"
   },
   {
-    "Response ID": 45,
+    "Response ID": 44,
     "Submission ID": "eqDXGv0",
     "Respondent ID": "",
     "Submitted at": "",
@@ -32120,7 +31636,7 @@
     "lang": "pt"
   },
   {
-    "Response ID": 45,
+    "Response ID": 44,
     "Submission ID": "eqDXGv0",
     "Respondent ID": "",
     "Submitted at": "",
@@ -32142,7 +31658,7 @@
     "lang": "pt"
   },
   {
-    "Response ID": 45,
+    "Response ID": 44,
     "Submission ID": "eqDXGv0",
     "Respondent ID": "",
     "Submitted at": "",
@@ -32164,7 +31680,7 @@
     "lang": "pt"
   },
   {
-    "Response ID": 45,
+    "Response ID": 44,
     "Submission ID": "eqDXGv0",
     "Respondent ID": "",
     "Submitted at": "",
@@ -32186,7 +31702,7 @@
     "lang": "pt"
   },
   {
-    "Response ID": 45,
+    "Response ID": 44,
     "Submission ID": "eqDXGv0",
     "Respondent ID": "",
     "Submitted at": "",
@@ -32208,7 +31724,7 @@
     "lang": "pt"
   },
   {
-    "Response ID": 45,
+    "Response ID": 44,
     "Submission ID": "eqDXGv0",
     "Respondent ID": "",
     "Submitted at": "",
@@ -32230,7 +31746,7 @@
     "lang": "pt"
   },
   {
-    "Response ID": 45,
+    "Response ID": 44,
     "Submission ID": "eqDXGv0",
     "Respondent ID": "",
     "Submitted at": "",
@@ -32252,7 +31768,7 @@
     "lang": "pt"
   },
   {
-    "Response ID": 45,
+    "Response ID": 44,
     "Submission ID": "eqDXGv0",
     "Respondent ID": "",
     "Submitted at": "",
@@ -32274,7 +31790,7 @@
     "lang": "pt"
   },
   {
-    "Response ID": 45,
+    "Response ID": 44,
     "Submission ID": "eqDXGv0",
     "Respondent ID": "",
     "Submitted at": "",
@@ -32296,7 +31812,7 @@
     "lang": "pt"
   },
   {
-    "Response ID": 46,
+    "Response ID": 45,
     "Submission ID": "Y5RAb70",
     "Respondent ID": "",
     "Submitted at": "",
@@ -32318,7 +31834,7 @@
     "lang": "pt"
   },
   {
-    "Response ID": 46,
+    "Response ID": 45,
     "Submission ID": "Y5RAb70",
     "Respondent ID": "",
     "Submitted at": "",
@@ -32340,7 +31856,7 @@
     "lang": "pt"
   },
   {
-    "Response ID": 46,
+    "Response ID": 45,
     "Submission ID": "Y5RAb70",
     "Respondent ID": "",
     "Submitted at": "",
@@ -32353,16 +31869,16 @@
     "date_month": "",
     "date_year": "",
     "Question": "01. O que poderia mudar no seu contexto de trabalho para melhorar o seu índice de performance?",
-    "Answer": "",
+    "Answer": "De momento não sinto falta de nada.",
     "client": "SYSMEX",
     "program": "P365",
     "question": "01. O que poderia mudar no seu contexto de trabalho para melhorar o seu índice de performance?",
-    "value": "",
+    "value": "De momento não sinto falta de nada.",
     "section": "assessment",
     "lang": "pt"
   },
   {
-    "Response ID": 46,
+    "Response ID": 45,
     "Submission ID": "Y5RAb70",
     "Respondent ID": "",
     "Submitted at": "",
@@ -32375,16 +31891,16 @@
     "date_month": "",
     "date_year": "",
     "Question": "02. Se já tivesse um maior índice de produtividade e performance onde e como notaria?",
-    "Answer": "",
+    "Answer": "Talvez uma maior eficiência nas visitas e demonstrações. Com uma produtividade aumentada, conseguia realizar mais visitas a clientes e demonstrações de equipamentos, otimizando o tempo entre cada interação e reduzindo o tempo de resposta a pedidos ou dúvidas técnicas.",
     "client": "SYSMEX",
     "program": "P365",
     "question": "02. Se já tivesse um maior índice de produtividade e performance onde e como notaria?",
-    "value": "",
+    "value": "Talvez uma maior eficiência nas visitas e demonstrações. Com uma produtividade aumentada, conseguia realizar mais visitas a clientes e demonstrações de equipamentos, otimizando o tempo entre cada interação e reduzindo o tempo de resposta a pedidos ou dúvidas técnicas.",
     "section": "assessment",
     "lang": "pt"
   },
   {
-    "Response ID": 46,
+    "Response ID": 45,
     "Submission ID": "Y5RAb70",
     "Respondent ID": "",
     "Submitted at": "",
@@ -32406,7 +31922,7 @@
     "lang": "pt"
   },
   {
-    "Response ID": 46,
+    "Response ID": 45,
     "Submission ID": "Y5RAb70",
     "Respondent ID": "",
     "Submitted at": "",
@@ -32428,7 +31944,7 @@
     "lang": "pt"
   },
   {
-    "Response ID": 46,
+    "Response ID": 45,
     "Submission ID": "Y5RAb70",
     "Respondent ID": "",
     "Submitted at": "",
@@ -32450,7 +31966,7 @@
     "lang": "pt"
   },
   {
-    "Response ID": 46,
+    "Response ID": 45,
     "Submission ID": "Y5RAb70",
     "Respondent ID": "",
     "Submitted at": "",
@@ -32472,7 +31988,7 @@
     "lang": "pt"
   },
   {
-    "Response ID": 46,
+    "Response ID": 45,
     "Submission ID": "Y5RAb70",
     "Respondent ID": "",
     "Submitted at": "",
@@ -32494,7 +32010,7 @@
     "lang": "pt"
   },
   {
-    "Response ID": 46,
+    "Response ID": 45,
     "Submission ID": "Y5RAb70",
     "Respondent ID": "",
     "Submitted at": "",
@@ -32516,7 +32032,7 @@
     "lang": "pt"
   },
   {
-    "Response ID": 46,
+    "Response ID": 45,
     "Submission ID": "Y5RAb70",
     "Respondent ID": "",
     "Submitted at": "",
@@ -32538,7 +32054,7 @@
     "lang": "pt"
   },
   {
-    "Response ID": 46,
+    "Response ID": 45,
     "Submission ID": "Y5RAb70",
     "Respondent ID": "",
     "Submitted at": "",
@@ -32560,7 +32076,7 @@
     "lang": "pt"
   },
   {
-    "Response ID": 46,
+    "Response ID": 45,
     "Submission ID": "Y5RAb70",
     "Respondent ID": "",
     "Submitted at": "",
@@ -32582,7 +32098,7 @@
     "lang": "pt"
   },
   {
-    "Response ID": 46,
+    "Response ID": 45,
     "Submission ID": "Y5RAb70",
     "Respondent ID": "",
     "Submitted at": "",
@@ -32604,7 +32120,7 @@
     "lang": "pt"
   },
   {
-    "Response ID": 46,
+    "Response ID": 45,
     "Submission ID": "Y5RAb70",
     "Respondent ID": "",
     "Submitted at": "",
@@ -32626,7 +32142,7 @@
     "lang": "pt"
   },
   {
-    "Response ID": 46,
+    "Response ID": 45,
     "Submission ID": "Y5RAb70",
     "Respondent ID": "",
     "Submitted at": "",
@@ -32648,7 +32164,7 @@
     "lang": "pt"
   },
   {
-    "Response ID": 46,
+    "Response ID": 45,
     "Submission ID": "Y5RAb70",
     "Respondent ID": "",
     "Submitted at": "",
@@ -32670,7 +32186,7 @@
     "lang": "pt"
   },
   {
-    "Response ID": 46,
+    "Response ID": 45,
     "Submission ID": "Y5RAb70",
     "Respondent ID": "",
     "Submitted at": "",
@@ -32692,7 +32208,7 @@
     "lang": "pt"
   },
   {
-    "Response ID": 46,
+    "Response ID": 45,
     "Submission ID": "Y5RAb70",
     "Respondent ID": "",
     "Submitted at": "",
@@ -32714,7 +32230,7 @@
     "lang": "pt"
   },
   {
-    "Response ID": 46,
+    "Response ID": 45,
     "Submission ID": "Y5RAb70",
     "Respondent ID": "",
     "Submitted at": "",
@@ -32736,7 +32252,7 @@
     "lang": "pt"
   },
   {
-    "Response ID": 46,
+    "Response ID": 45,
     "Submission ID": "Y5RAb70",
     "Respondent ID": "",
     "Submitted at": "",
@@ -32758,7 +32274,7 @@
     "lang": "pt"
   },
   {
-    "Response ID": 46,
+    "Response ID": 45,
     "Submission ID": "Y5RAb70",
     "Respondent ID": "",
     "Submitted at": "",
@@ -32780,7 +32296,7 @@
     "lang": "pt"
   },
   {
-    "Response ID": 47,
+    "Response ID": 46,
     "Submission ID": "rjB4j95",
     "Respondent ID": "",
     "Submitted at": "",
@@ -32802,7 +32318,7 @@
     "lang": "pt"
   },
   {
-    "Response ID": 47,
+    "Response ID": 46,
     "Submission ID": "rjB4j95",
     "Respondent ID": "",
     "Submitted at": "",
@@ -32824,7 +32340,7 @@
     "lang": "pt"
   },
   {
-    "Response ID": 47,
+    "Response ID": 46,
     "Submission ID": "rjB4j95",
     "Respondent ID": "",
     "Submitted at": "",
@@ -32837,16 +32353,16 @@
     "date_month": "",
     "date_year": "",
     "Question": "01. O que poderia mudar no seu contexto de trabalho para melhorar o seu índice de performance?",
-    "Answer": "",
+    "Answer": "Estando numa área de negócio nova, a empresa poderia ter uma estrutura mais sólida principalmente no que toca à estratégia a seguir. \n \n Falta-nos muito este apoio desde a Sysmex Central, o que me dificulta ser mais incisiva. \n \n Ter este apoio seria importante para melhorar o meu indice de performance, mas sei que ainda estamos num processo de amadurecimento. No entretanto vamos perdendo oportunidades...",
     "client": "SYSMEX",
     "program": "P365",
     "question": "01. O que poderia mudar no seu contexto de trabalho para melhorar o seu índice de performance?",
-    "value": "",
+    "value": "Estando numa área de negócio nova, a empresa poderia ter uma estrutura mais sólida principalmente no que toca à estratégia a seguir. \n \n Falta-nos muito este apoio desde a Sysmex Central, o que me dificulta ser mais incisiva. \n \n Ter este apoio seria importante para melhorar o meu indice de performance, mas sei que ainda estamos num processo de amadurecimento. No entretanto vamos perdendo oportunidades...",
     "section": "assessment",
     "lang": "pt"
   },
   {
-    "Response ID": 47,
+    "Response ID": 46,
     "Submission ID": "rjB4j95",
     "Respondent ID": "",
     "Submitted at": "",
@@ -32859,16 +32375,16 @@
     "date_month": "",
     "date_year": "",
     "Question": "02. Se já tivesse um maior índice de produtividade e performance onde e como notaria?",
-    "Answer": "",
+    "Answer": "Aumento de carteira de clientes.",
     "client": "SYSMEX",
     "program": "P365",
     "question": "02. Se já tivesse um maior índice de produtividade e performance onde e como notaria?",
-    "value": "",
+    "value": "Aumento de carteira de clientes.",
     "section": "assessment",
     "lang": "pt"
   },
   {
-    "Response ID": 47,
+    "Response ID": 46,
     "Submission ID": "rjB4j95",
     "Respondent ID": "",
     "Submitted at": "",
@@ -32890,7 +32406,7 @@
     "lang": "pt"
   },
   {
-    "Response ID": 47,
+    "Response ID": 46,
     "Submission ID": "rjB4j95",
     "Respondent ID": "",
     "Submitted at": "",
@@ -32912,7 +32428,7 @@
     "lang": "pt"
   },
   {
-    "Response ID": 47,
+    "Response ID": 46,
     "Submission ID": "rjB4j95",
     "Respondent ID": "",
     "Submitted at": "",
@@ -32934,7 +32450,7 @@
     "lang": "pt"
   },
   {
-    "Response ID": 47,
+    "Response ID": 46,
     "Submission ID": "rjB4j95",
     "Respondent ID": "",
     "Submitted at": "",
@@ -32956,7 +32472,7 @@
     "lang": "pt"
   },
   {
-    "Response ID": 47,
+    "Response ID": 46,
     "Submission ID": "rjB4j95",
     "Respondent ID": "",
     "Submitted at": "",
@@ -32978,7 +32494,7 @@
     "lang": "pt"
   },
   {
-    "Response ID": 47,
+    "Response ID": 46,
     "Submission ID": "rjB4j95",
     "Respondent ID": "",
     "Submitted at": "",
@@ -33000,7 +32516,7 @@
     "lang": "pt"
   },
   {
-    "Response ID": 47,
+    "Response ID": 46,
     "Submission ID": "rjB4j95",
     "Respondent ID": "",
     "Submitted at": "",
@@ -33022,7 +32538,7 @@
     "lang": "pt"
   },
   {
-    "Response ID": 47,
+    "Response ID": 46,
     "Submission ID": "rjB4j95",
     "Respondent ID": "",
     "Submitted at": "",
@@ -33044,7 +32560,7 @@
     "lang": "pt"
   },
   {
-    "Response ID": 47,
+    "Response ID": 46,
     "Submission ID": "rjB4j95",
     "Respondent ID": "",
     "Submitted at": "",
@@ -33066,7 +32582,7 @@
     "lang": "pt"
   },
   {
-    "Response ID": 47,
+    "Response ID": 46,
     "Submission ID": "rjB4j95",
     "Respondent ID": "",
     "Submitted at": "",
@@ -33088,7 +32604,7 @@
     "lang": "pt"
   },
   {
-    "Response ID": 47,
+    "Response ID": 46,
     "Submission ID": "rjB4j95",
     "Respondent ID": "",
     "Submitted at": "",
@@ -33110,7 +32626,7 @@
     "lang": "pt"
   },
   {
-    "Response ID": 47,
+    "Response ID": 46,
     "Submission ID": "rjB4j95",
     "Respondent ID": "",
     "Submitted at": "",
@@ -33132,7 +32648,7 @@
     "lang": "pt"
   },
   {
-    "Response ID": 47,
+    "Response ID": 46,
     "Submission ID": "rjB4j95",
     "Respondent ID": "",
     "Submitted at": "",
@@ -33154,7 +32670,7 @@
     "lang": "pt"
   },
   {
-    "Response ID": 47,
+    "Response ID": 46,
     "Submission ID": "rjB4j95",
     "Respondent ID": "",
     "Submitted at": "",
@@ -33176,7 +32692,7 @@
     "lang": "pt"
   },
   {
-    "Response ID": 47,
+    "Response ID": 46,
     "Submission ID": "rjB4j95",
     "Respondent ID": "",
     "Submitted at": "",
@@ -33198,7 +32714,7 @@
     "lang": "pt"
   },
   {
-    "Response ID": 47,
+    "Response ID": 46,
     "Submission ID": "rjB4j95",
     "Respondent ID": "",
     "Submitted at": "",
@@ -33220,7 +32736,7 @@
     "lang": "pt"
   },
   {
-    "Response ID": 47,
+    "Response ID": 46,
     "Submission ID": "rjB4j95",
     "Respondent ID": "",
     "Submitted at": "",
@@ -33242,7 +32758,7 @@
     "lang": "pt"
   },
   {
-    "Response ID": 47,
+    "Response ID": 46,
     "Submission ID": "rjB4j95",
     "Respondent ID": "",
     "Submitted at": "",
@@ -33264,7 +32780,7 @@
     "lang": "pt"
   },
   {
-    "Response ID": 48,
+    "Response ID": 47,
     "Submission ID": "MeD4e0E",
     "Respondent ID": "",
     "Submitted at": "",
@@ -33286,7 +32802,7 @@
     "lang": "pt"
   },
   {
-    "Response ID": 48,
+    "Response ID": 47,
     "Submission ID": "MeD4e0E",
     "Respondent ID": "",
     "Submitted at": "",
@@ -33308,7 +32824,7 @@
     "lang": "pt"
   },
   {
-    "Response ID": 48,
+    "Response ID": 47,
     "Submission ID": "MeD4e0E",
     "Respondent ID": "",
     "Submitted at": "",
@@ -33321,16 +32837,16 @@
     "date_month": "",
     "date_year": "",
     "Question": "01. O que poderia mudar no seu contexto de trabalho para melhorar o seu índice de performance?",
-    "Answer": "",
+    "Answer": "Programacao de tarefas mais antecipadamente para melhor gestao de assuntos urgentes que vao surgindo. Um dia dedicado para atualizacao de documentacao, CRM, etc",
     "client": "SYSMEX",
     "program": "P365",
     "question": "01. O que poderia mudar no seu contexto de trabalho para melhorar o seu índice de performance?",
-    "value": "",
+    "value": "Programacao de tarefas mais antecipadamente para melhor gestao de assuntos urgentes que vao surgindo. Um dia dedicado para atualizacao de documentacao, CRM, etc",
     "section": "assessment",
     "lang": "pt"
   },
   {
-    "Response ID": 48,
+    "Response ID": 47,
     "Submission ID": "MeD4e0E",
     "Respondent ID": "",
     "Submitted at": "",
@@ -33343,16 +32859,16 @@
     "date_month": "",
     "date_year": "",
     "Question": "02. Se já tivesse um maior índice de produtividade e performance onde e como notaria?",
-    "Answer": "",
+    "Answer": "Sem coisas pendentes em relacao a documentacao, CRM, etc. \n \n Lista de tarefas pendentes mais reduzida",
     "client": "SYSMEX",
     "program": "P365",
     "question": "02. Se já tivesse um maior índice de produtividade e performance onde e como notaria?",
-    "value": "",
+    "value": "Sem coisas pendentes em relacao a documentacao, CRM, etc. \n \n Lista de tarefas pendentes mais reduzida",
     "section": "assessment",
     "lang": "pt"
   },
   {
-    "Response ID": 48,
+    "Response ID": 47,
     "Submission ID": "MeD4e0E",
     "Respondent ID": "",
     "Submitted at": "",
@@ -33374,7 +32890,7 @@
     "lang": "pt"
   },
   {
-    "Response ID": 48,
+    "Response ID": 47,
     "Submission ID": "MeD4e0E",
     "Respondent ID": "",
     "Submitted at": "",
@@ -33396,7 +32912,7 @@
     "lang": "pt"
   },
   {
-    "Response ID": 48,
+    "Response ID": 47,
     "Submission ID": "MeD4e0E",
     "Respondent ID": "",
     "Submitted at": "",
@@ -33418,7 +32934,7 @@
     "lang": "pt"
   },
   {
-    "Response ID": 48,
+    "Response ID": 47,
     "Submission ID": "MeD4e0E",
     "Respondent ID": "",
     "Submitted at": "",
@@ -33440,7 +32956,7 @@
     "lang": "pt"
   },
   {
-    "Response ID": 48,
+    "Response ID": 47,
     "Submission ID": "MeD4e0E",
     "Respondent ID": "",
     "Submitted at": "",
@@ -33462,7 +32978,7 @@
     "lang": "pt"
   },
   {
-    "Response ID": 48,
+    "Response ID": 47,
     "Submission ID": "MeD4e0E",
     "Respondent ID": "",
     "Submitted at": "",
@@ -33484,7 +33000,7 @@
     "lang": "pt"
   },
   {
-    "Response ID": 48,
+    "Response ID": 47,
     "Submission ID": "MeD4e0E",
     "Respondent ID": "",
     "Submitted at": "",
@@ -33506,7 +33022,7 @@
     "lang": "pt"
   },
   {
-    "Response ID": 48,
+    "Response ID": 47,
     "Submission ID": "MeD4e0E",
     "Respondent ID": "",
     "Submitted at": "",
@@ -33528,7 +33044,7 @@
     "lang": "pt"
   },
   {
-    "Response ID": 48,
+    "Response ID": 47,
     "Submission ID": "MeD4e0E",
     "Respondent ID": "",
     "Submitted at": "",
@@ -33550,7 +33066,7 @@
     "lang": "pt"
   },
   {
-    "Response ID": 48,
+    "Response ID": 47,
     "Submission ID": "MeD4e0E",
     "Respondent ID": "",
     "Submitted at": "",
@@ -33572,7 +33088,7 @@
     "lang": "pt"
   },
   {
-    "Response ID": 48,
+    "Response ID": 47,
     "Submission ID": "MeD4e0E",
     "Respondent ID": "",
     "Submitted at": "",
@@ -33594,7 +33110,7 @@
     "lang": "pt"
   },
   {
-    "Response ID": 48,
+    "Response ID": 47,
     "Submission ID": "MeD4e0E",
     "Respondent ID": "",
     "Submitted at": "",
@@ -33616,7 +33132,7 @@
     "lang": "pt"
   },
   {
-    "Response ID": 48,
+    "Response ID": 47,
     "Submission ID": "MeD4e0E",
     "Respondent ID": "",
     "Submitted at": "",
@@ -33638,7 +33154,7 @@
     "lang": "pt"
   },
   {
-    "Response ID": 48,
+    "Response ID": 47,
     "Submission ID": "MeD4e0E",
     "Respondent ID": "",
     "Submitted at": "",
@@ -33660,7 +33176,7 @@
     "lang": "pt"
   },
   {
-    "Response ID": 48,
+    "Response ID": 47,
     "Submission ID": "MeD4e0E",
     "Respondent ID": "",
     "Submitted at": "",
@@ -33682,7 +33198,7 @@
     "lang": "pt"
   },
   {
-    "Response ID": 48,
+    "Response ID": 47,
     "Submission ID": "MeD4e0E",
     "Respondent ID": "",
     "Submitted at": "",
@@ -33704,7 +33220,7 @@
     "lang": "pt"
   },
   {
-    "Response ID": 48,
+    "Response ID": 47,
     "Submission ID": "MeD4e0E",
     "Respondent ID": "",
     "Submitted at": "",
@@ -33726,7 +33242,7 @@
     "lang": "pt"
   },
   {
-    "Response ID": 48,
+    "Response ID": 47,
     "Submission ID": "MeD4e0E",
     "Respondent ID": "",
     "Submitted at": "",

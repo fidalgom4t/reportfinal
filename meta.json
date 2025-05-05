@@ -188,19 +188,19 @@
     },
     {
       "QUESTION ID": "01. De uma forma geral, como classificaria o nível atual de Eficiência Colaborativa: [Na sua equipa direta]",
-      "LABEL": "",
+      "LABEL": "EFICIÊNCIA equipa",
       "": "",
       "sort order": 1
     },
     {
       "QUESTION ID": "01. De uma forma geral, como classificaria o nível atual de Eficiência Colaborativa: [Inter-equipas (departamentos com que articula regularmente)]",
-      "LABEL": "",
+      "LABEL": "EFICIÊNCIA equipa",
       "": "",
       "sort order": 2
     },
     {
       "QUESTION ID": "01. De uma forma geral, como classificaria o nível atual de Eficiência Colaborativa: [Na organização como um todo]",
-      "LABEL": "",
+      "LABEL": "EFICIÊNCIA equipa",
       "": "",
       "sort order": 3
     },

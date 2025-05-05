@@ -332,13 +332,13 @@
     },
     {
       "QUESTION ID": "01. In general, how would you rate the current level of Collaborative Efficiency? [In your team]",
-      "LABEL": "",
+      "LABEL": "EFFICIENCY (intra)",
       "": "",
       "sort order": 1
     },
     {
       "QUESTION ID": "01. In general, how would you rate the current level of Collaborative Efficiency? [Between teams (of departments with which you regularly work with)]",
-      "LABEL": "",
+      "LABEL": "EFFICIENCY (intra)",
       "": "",
       "sort order": 2
     },

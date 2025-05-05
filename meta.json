@@ -302,13 +302,13 @@
     },
     {
       "QUESTION ID": "17. Relativamente às REUNIÕES na sua organização: [No meu dia-a-dia, a minha agenda tem um número adequado de reuniões.]",
-      "LABEL": "EMAILS - N.º",
+      "LABEL": "REUNIÕES - N.º",
       "": "",
       "sort order": 22
     },
     {
       "QUESTION ID": "17. Relativamente às REUNIÕES na sua organização: [Habitualmente as reuniões em que participo são orientadas para a ação. No final, todos sabem quem ficou de fazer o quê.]",
-      "LABEL": "EMAILS - AÇÃO",
+      "LABEL": "REUNIÕES - AÇÃO",
       "": "",
       "sort order": 23
     },

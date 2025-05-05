@@ -458,13 +458,13 @@
     },
     {
       "QUESTION ID": "16. Regarding MEETINGS in your organisation: [Usually, I have an adequate number of meetings in my calendar.]",
-      "LABEL": "REUNIÕES - N.º",
+      "LABEL": "MEETINGS - N.º",
       "": "",
       "sort order": 22
     },
     {
       "QUESTION ID": "16. Regarding MEETINGS in your organisation: [The meetings I attend are usually action-oriented. When finished, everyone knows who needs to do what, by when.]",
-      "LABEL": "REUNIÕES - AÇÃO",
+      "LABEL": "MEETINGS - AÇÃO",
       "": "",
       "sort order": 23
     },

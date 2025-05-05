@@ -326,7 +326,7 @@
     },
     {
       "QUESTION ID": "COLAB365 EN",
-      "LABEL": "EFFICIENCY (intra)",
+      "LABEL": "",
       "": "",
       "sort order": ""
     },
@@ -344,7 +344,7 @@
     },
     {
       "QUESTION ID": "01. In general, how would you rate the current level of Collaborative Efficiency? [In the organization as a whole]",
-      "LABEL": "",
+      "LABEL": "EFFICIENCY (intra)",
       "": "",
       "sort order": 3
     },

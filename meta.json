@@ -302,25 +302,25 @@
     },
     {
       "QUESTION ID": "17. Relativamente às REUNIÕES na sua organização: [No meu dia-a-dia, a minha agenda tem um número adequado de reuniões.]",
-      "LABEL": "",
+      "LABEL": "EMAILS - N.º",
       "": "",
       "sort order": 22
     },
     {
       "QUESTION ID": "17. Relativamente às REUNIÕES na sua organização: [Habitualmente as reuniões em que participo são orientadas para a ação. No final, todos sabem quem ficou de fazer o quê.]",
-      "LABEL": "",
+      "LABEL": "EMAILS - AÇÃO",
       "": "",
       "sort order": 23
     },
     {
       "QUESTION ID": "17. Relativamente às REUNIÕES na sua organização: [De uma forma geral, as convocatórias para as reuniões são criteriosas, estando presentes apenas as pessoas estritamente necessárias, e apenas pelo tempo indispensável.]",
-      "LABEL": "",
+      "LABEL": "EMAILS - EFICIÊNCIA",
       "": "",
       "sort order": 24
     },
     {
       "QUESTION ID": "17. Relativamente às REUNIÕES na sua organização: [De um modo geral, considero que a ferramenta REUNIÕES é usada de forma muito produtiva.]",
-      "LABEL": "",
+      "LABEL": "EMAILS - PRODUTIVOS",
       "": "",
       "sort order": 25
     },

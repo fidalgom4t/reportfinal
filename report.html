@@ -18,13 +18,13 @@
     /* RESET & PAGE SETUP */
     html, body { margin:0; padding:0; background:#333; }
     body { font-family:'Roboto',sans-serif; }
-    @page { size:1920px 1080px; margin:0; }
+    @page { size:960px 540px; margin:0; }
     @media print { .page { page-break-after: always; } }
 
     /* PAGE CONTAINER */
     .page {
       position:relative;
-      width:1920px; height:1080px;
+      width:960px; height:540px;
       margin:20px auto; background:#fff;
       overflow:hidden; box-sizing:border-box;
     }
@@ -556,10 +556,10 @@ root.appendChild(info);
        }).then(cnv => cnv.toDataURL('image/png', 1.0))
      ));
       pdfMake.createPdf({
-        pageSize: { width:1920, height:1080 },
+        pageSize: { width:960, height:540 },
         pageMargins: [0,0,0,0],
         content: images.map((img,i)=>({
-          image: img, width: 1920,
+          image: img, width: 960,
           pageBreak: i<images.length-1 ? 'after' : undefined
         }))
       }).download('report.pdf');

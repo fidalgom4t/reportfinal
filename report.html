@@ -18,13 +18,13 @@
     /* RESET & PAGE SETUP */
     html, body { margin:0; padding:0; background:#333; }
     body { font-family:'Roboto',sans-serif; }
-    @page { size:960px 540px; margin:0; }
+    @page { size:1920px 1080px; margin:0; }
     @media print { .page { page-break-after: always; } }
 
     /* PAGE CONTAINER */
     .page {
       position:relative;
-      width:960px; height:540px;
+      width:1920px; height:1080px;
       margin:20px auto; background:#fff;
       overflow:hidden; box-sizing:border-box;
     }
@@ -315,6 +315,21 @@
       return tp;
     }
 
+  async function getTextQuestions(section, program) {
+      try {
+        const res = await fetch('text_questions.json');
+        const json = await res.json();
+        if (section === 'evaluation') {
+          return json.evaluation || [];
+        } else if (section === 'assessment') {
+          return (json.assessment || {})[program] || [];
+        }
+        return [];
+      } catch (e) {
+        console.error('Erro ao carregar perguntas de texto:', e);
+        return [];
+      }
+    }
   async function build() {
   const f = JSON.parse(localStorage.getItem('reportFilters') || '{}');
   const [data, meta] = await Promise.all([
@@ -480,7 +495,7 @@ root.appendChild(info);
           }
 
           // — TEXT ANSWERS WITH SPILL + FIT‑TO‑SHRINK —
-          const selQs = f.textQuestions || [];
+          const selQs = await getTextQuestions(sec, prog);
           selQs.forEach(qid => {
             const ans = data.filter(d =>
               (f.clients || []).includes(d.client) &&
@@ -556,10 +571,10 @@ root.appendChild(info);
        }).then(cnv => cnv.toDataURL('image/png', 1.0))
      ));
       pdfMake.createPdf({
-        pageSize: { width:960, height:540 },
+        pageSize: { width:1920, height:1080 },
         pageMargins: [0,0,0,0],
         content: images.map((img,i)=>({
-          image: img, width: 960,
+          image: img, width: 1920,
           pageBreak: i<images.length-1 ? 'after' : undefined
         }))
       }).download('report.pdf');

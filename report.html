@@ -571,10 +571,10 @@ root.appendChild(info);
        }).then(cnv => cnv.toDataURL('image/png', 1.0))
      ));
       pdfMake.createPdf({
-        pageSize: { width:960, height:540 },
+        pageSize: { width:1920, height:1080 },
         pageMargins: [0,0,0,0],
         content: images.map((img,i)=>({
-          image: img, width: 540,
+          image: img, width: 1920,
           pageBreak: i<images.length-1 ? 'after' : undefined
         }))
       }).download('report.pdf');

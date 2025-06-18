@@ -155,10 +155,6 @@
     <button id="viewReport" disabled>Ver Relatório</button>
   </div>
 
-  <div class="toggle-container">
-    <button id="toggleQuestions" disabled>Mostrar Perguntas Abertas</button>
-  </div>
-  <div id="textQuestionsBlock" style="display:none;"></div>
 
   <script>
     let data = [];
@@ -313,10 +309,10 @@
       const infos  = f.clientInfos|| [];
       const db     = document.getElementById('dynamicBlocks');
       const vb     = document.getElementById('viewReport');
-      const tb     = document.getElementById('toggleQuestions');
+// botão toggleQuestions já não existe, portanto removido
 
       // toggle always enabled
-      tb.disabled = false;
+      // tb.disabled = false;
       // report only when all filters filled
       vb.disabled = (!client || !progs.length || !infos.length);
 
@@ -324,7 +320,7 @@
       if (!client || !progs.length || !infos.length) return;
 
       progs.forEach(p => db.appendChild(renderBlock(client, p, infos)));
-      renderTextQuestions();
+      //renderTextQuestions();
     }
 
     function renderBlock(client, program, infos) {
@@ -346,12 +342,13 @@
 
       return block;
     }
-
+    
+    /*
     function renderTextQuestions() {
-      const container = document.getElementById('textQuestionsBlock');
-      container.innerHTML = '';
-      const grouped = {};
-      const evalSet = new Set();
+       // const container = document.getElementById('textQuestionsBlock');
+       // container.innerHTML = '';
+       // const grouped = {};
+       // const evalSet = new Set();
 
       data.forEach(d => {
         if (!isNaN(+d.value)) return;
@@ -362,6 +359,8 @@
           grouped[d.program].add(d.question);
         }
       });
+      
+      
 
       function isNum(s) { return /^\d/.test(s); }
       const specials = ['Reivention','clube rh','HR Club'];
@@ -441,7 +440,8 @@
 
       container.appendChild(blk);
     }
-
+    */
+   
     function applyAndGo(download) {
       const all = loadFilters();
       localStorage.setItem('reportFilters', JSON.stringify(all));
@@ -477,10 +477,7 @@
 
     document.addEventListener('DOMContentLoaded', () => {
       init();
-      document.getElementById('toggleQuestions').addEventListener('click', () => {
-        const b = document.getElementById('textQuestionsBlock');
-        b.style.display = b.style.display === 'none' ? 'block' : 'none';
-      });
+    
       document.getElementById('viewReport').addEventListener('click', () => applyAndGo(false));
     });
   </script>

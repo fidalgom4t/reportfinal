@@ -26,7 +26,7 @@
       position:relative;
       width:960px; height:540px;
       margin:20px auto; background:#fff;
-      overflow:hidden; box-sizing:border-box;
+      overflow:visible; box-sizing:border-box;
     }
 
     /* HEADER & FOOTER */
@@ -267,31 +267,81 @@
     }
 
     // CHART
-    function createBarChart(container, title, data, uniform) {
-      const chart = echarts.init(container, null, {
-      renderer: 'svg'
-       // alternatively for canvas at 2× DPI:
-       // devicePixelRatio: window.devicePixelRatio
-     });
+  
+     function createBarChart(container, title, data, uniform) {
+  const chart = echarts.init(container, null, {
+    renderer: 'canvas' // ou 'svg', ambos funcionam com rich text
+  });
 
-      chart.setOption({
-        title:{text:title,left:'center',textStyle:{fontSize:20}},
-        grid:{top:80,left:'10%',right:'10%',bottom:120},
-        tooltip:{},
-        xAxis:{type:'category',data:data.map(d=>d.label),
-               axisLabel:{rotate:30,interval:0,margin:10}},
-        yAxis:{type:'value',min:1,max:5,
-               splitLine:{show:false},axisLine:{show:false},
-               axisTick:{show:false},axisLabel:{show:false}},
-        series:[{type:'bar',data:data.map(d=>d.avg),
-          label:{show:true,position:'top',formatter:'{c}'},
-          itemStyle: uniform
-            ? {color:'#6A99D0'}
-            : {color:p=>p.value<3?'#EA3323':p.value<4?'#6A99D0':'#9FCE63'}
-        }]
-      });
-      chart.resize();
-    }
+  chart.setOption({
+    title: {
+      text: title,
+      left: 'center',
+      textStyle: { fontSize: 20 }
+    },
+    grid: { top: 80, left: '10%', right: '10%', bottom: 120 },
+    tooltip: {},
+    xAxis: {
+      type: 'category',
+      data: data.map(d => d.label),
+      axisLabel: {
+        interval: 0,
+        fontSize: 10,
+        fontWeight: 'bold',
+        color: '#000',
+        lineHeight: 14,
+        formatter: function (value) {
+          return value
+            .toUpperCase()
+            .replace(/\s*-\s*/g, ' ')     // remove hífen com espaços
+            .split(' ')                  // divide em palavras
+            .map(w => `{line|${w}}`)     // aplica estilo a cada palavra
+            .join('\n');                 // força quebra de linha
+        },
+        rich: {
+          line: {
+            fontSize: 10,
+            fontWeight: 'bold',
+            color: '#000',
+            lineHeight: 14
+          }
+        }
+      },
+      axisLine: { show: false },
+      axisTick: { show: false }
+    },
+    yAxis: {
+      type: 'value',
+      min: 1,
+      max: 5,
+      splitLine: { show: false },
+      axisLine: { show: false },
+      axisTick: { show: false },
+      axisLabel: { show: false }
+    },
+    series: [{
+      type: 'bar',
+      data: data.map(d => d.avg),
+      label: {
+        show: true,
+        position: 'top',
+        formatter: '{c}'
+      },
+      itemStyle: uniform
+        ? { color: '#6A99D0' }
+        : {
+            color: p =>
+              p.value < 3 ? '#EA3323' :
+              p.value < 4 ? '#6A99D0' :
+                            '#9FCE63'
+          }
+    }]
+  });
+
+  chart.resize();
+}
+
+
 
     // TEXT PAGE BUILDER
     function createTextPage(prog, sec, qid, showTitle) {

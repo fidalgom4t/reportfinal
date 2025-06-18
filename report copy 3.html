@@ -20,10 +20,7 @@
 
 
   <style>
-
-    /* RESET & PAGE SETUP */
-    html, body { margin:0; padding:0; background:#333; }
-    body { font-family:'Roboto',sans-serif; }
+    html, body { margin:0; padding:0; background:#333; font-family:'Roboto',sans-serif; }
     @page { size:960px 540px; margin:0; }
     @media print { .page { page-break-after: always; } }
 
@@ -520,30 +517,29 @@ function enableDeletePageButtons() {
     btn.textContent = 'apagar';
     btn.className = 'resumo-btn-global eliminar-pagina-btn';
     btn.style.background = '#d9534f';
+    btn.style.position = 'fixed'; // 🧷 fixo à viewport
+    btn.style.zIndex = '3000';
 
-    // ⏱ Atualiza posição com base na localização da página
     function updatePosition() {
       const rect = pg.getBoundingClientRect();
-      const scrollTop = window.scrollY || document.documentElement.scrollTop;
-      const scrollLeft = window.scrollX || document.documentElement.scrollLeft;
+      btn.style.top = `${rect.top + 50}px`;
+      btn.style.left = `${rect.right + 10}px`;
 
-      btn.style.position = 'absolute';
-      btn.style.top = `${rect.top + scrollTop + 50}px`; // 50px abaixo do topo da página
-      btn.style.left = `${rect.right + scrollLeft + 10}px`; // 10px à direita da página
+      // Oculta botão se página estiver marcada como apagada
+      if (pg.dataset.deleted === 'true') {
+        btn.style.display = 'none';
+      } else {
+        btn.style.display = 'block';
+      }
     }
 
     btn.addEventListener('click', () => {
-  if (confirm('Deseja mesmo eliminar esta página do relatório?')) {
-    const qid = pg.dataset.qid;
-    pg.dataset.deleted = 'true';
-    pg.style.display = 'none';
-    btn.remove();
-
-    // 🔁 Remover outros botões associados ao mesmo QID
-    document.querySelectorAll(`.resumo-btn-global[data-qid="${qid}"]`).forEach(b => b.remove());
-    document.querySelectorAll(`.eliminar-pagina-btn[data-qid="${qid}"]`).forEach(b => b.remove());
-  }
-});
+      if (confirm('Deseja mesmo eliminar esta página do relatório?')) {
+        pg.dataset.deleted = 'true'; // ✅ mantém atributo para build
+        btn.remove();
+        pg.remove(); // ❗ remove do DOM para evitar captura/exportação
+      }
+    });
 
     document.body.appendChild(btn);
     requestAnimationFrame(updatePosition);
@@ -551,6 +547,7 @@ function enableDeletePageButtons() {
     window.addEventListener('resize', updatePosition);
   });
 }
+
 
 
     const currentYear = new Date().getFullYear();
@@ -877,7 +874,7 @@ document.querySelectorAll('.resumo-btn-global:not(.eliminar-pagina-btn)').forEac
         summaryPage = createSummaryPage(titleEl.textContent.trim(), section);
         summaryPage.dataset.qid = qid;
         report.insertBefore(summaryPage, pg);
-        btn.textContent = 'Eliminar Resumo 
+        btn.textContent = 'Eliminar Resumo';
         btn.style.background = '#d9534f';
       } else {
         summaryPage.remove();
@@ -900,7 +897,7 @@ document.querySelectorAll('.resumo-btn-global:not(.eliminar-pagina-btn)').forEac
 function createTextPage(prog, sec, qid, showTitle) {
   const tp = document.createElement('div');
   tp.className = 'page text-page';
-  tp.dataset.qid = qid;
+  tp.dataset.qid = qid; // ✅ CORRETO
 
   tp.innerHTML = `
     <div class="header">
@@ -908,14 +905,13 @@ function createTextPage(prog, sec, qid, showTitle) {
       <div class="section-title">${sec==='assessment'?'Assessment':'Avaliação'}</div>
     </div>
     <div class="content">
-      <div class="text-question">
-        ${showTitle ? `<div class="text-question-title">${qid}</div>` : ''}
-        <ul class="answer-list" contenteditable="true" spellcheck="true" data-qid="${qid}"></ul>
-      </div>
-    </div>
-  `;
-  return tp;
-}
+          <div class="text-question">
+            ${showTitle?`<div class="text-question-title">${qid}</div>`:``}
+            <ul class="answer-list"></ul>
+          </div>
+        `;
+      return tp;
+    }
 
   async function getTextQuestions(section, program) {
       try {
@@ -999,8 +995,8 @@ hero.innerHTML = `
     <img class="bg" src="hourglass-bg.png" />
     <img class="report-logo-top" src="logo-branco.png" />
     <div class="hero-content">
-      <h1 contenteditable="true" data-edit-id="hero-title">TRAINING REPORT</h1>
-      <div class="subtitle" contenteditable="true" data-edit-id="hero-subtitle">${timeScope}</div>
+      <h1>TRAINING REPORT</h1>
+      <div class="subtitle">${timeScope}</div>
     </div>
     <div class="site-footer-link">www.mind4time.com</div>
   </div>`;
@@ -1053,27 +1049,21 @@ root.appendChild(info);
             
 
           // banner
-           if (['assessment', 'evaluation'].includes(sec)) {
-  const bg    = sec === 'assessment' ? 'assessment-bg.png' : 'evaluation-bg.png';
-  const title = sec === 'assessment' ? 'TRAINING ASSESSMENT' : 'TRAINING EVALUATION';
-  const cover = document.createElement('div');
-  cover.className = 'page hero';
-  cover.innerHTML = `
-    <div class="hero">
-      <img class="bg" src="${bg}">
-      <img class="report-logo-top" src="logo-branco.png">
-      <div class="hero-content">
-        <h1 contenteditable="true"
-            spellcheck="true"
-            data-edit-id="section-title-${sec}"
-            style="font-size: 2.5rem; letter-spacing: 0.05em; white-space:nowrap">
-          ${title}
-        </h1>
-      </div>
-    </div>`;
-  root.appendChild(cover);
-}
-
+            if (['assessment', 'evaluation'].includes(sec)) {
+              const bg    = sec === 'assessment' ? 'assessment-bg.png' : 'evaluation-bg.png';
+              const title = sec === 'assessment' ? 'TRAINING ASSESSMENT' : 'TRAINING EVALUATION';
+              const cover = document.createElement('div');
+              cover.className = 'page hero';
+              cover.innerHTML = `
+                <div class="hero">
+                  <img class="bg" src="${bg}">
+                  <img class="report-logo-top" src="logo-branco.png">
+                  <div class="hero-content">
+                    <h1 style="font-size: 2.5rem; letter-spacing: 0.05em; white-space:nowrap">${title}</h1>
+                  </div>
+                </div>`;
+              root.appendChild(cover);
+            }
 
           
     
@@ -1161,17 +1151,6 @@ selQs.forEach(qid => {
 
 
   if (!ans.length) return;
-          selQs.forEach(qid => {
-            const ans = data.filter(d =>
-              (f.clients || []).includes(d.client) &&
-              d.program === prog &&
-              (f.clientInfos || []).includes(d.client_info) &&
-              (f[`turmas_${prog}`] || []).includes(d.turma) &&
-              String(d.section || '').toLowerCase().includes(sec) &&
-              d.question === qid &&
-              isNaN(+d.value)
-            );
-            if (!ans.length) return;
 
             const pagesForThisQ = [];
             let page   = createTextPage(prog, sec, qid, true);
@@ -1257,13 +1236,7 @@ enableSummaryButtons();     // ← chamada depois, mas não deve limpar os outro
 
     // PDF
  
-  async function generatePdf() {
-    const summaryCache = {};
-document.querySelectorAll('.summary-page').forEach(pg => {
-  const qid = pg.dataset.qid;
-  const html = pg.querySelector('.editable')?.innerHTML || '';
-  if (qid) summaryCache[qid] = html;
-});
+ async function generatePdf() {
   // 👉 1. Guardar todas as edições e páginas eliminadas
   const editableCache = getEditableContentMap();
   console.log('🧠 PDF: Editable cache before build:', editableCache);
@@ -1278,38 +1251,15 @@ document.querySelectorAll('.summary-page').forEach(pg => {
   await build();
   console.log('✅ Build completed');
 
-  for (const qid of deletedQids) {
-  document.querySelectorAll(`.page[data-qid="${qid}"]`).forEach(pg => pg.remove());
-  document.querySelectorAll(`[data-qid="${qid}"]`).forEach(btn => btn.remove());
-}
-
   // 👉 3. Reaplicar edições
   applyEditableContentMap(editableCache);
   console.log('🔁 PDF: Editable content reapplied');
-for (const [qid, html] of Object.entries(summaryCache)) {
-  const target = [...document.querySelectorAll('.page.text-page')]
-    .find(p => (p.dataset.qid || '').trim() === qid.trim());
-
-  if (target) {
-    const sectionTitle = target.querySelector('.section-title')?.textContent || 'Resumo';
-    const summary = createSummaryPage(qid, sectionTitle);
-    summary.dataset.qid = qid;
-    summary.querySelector('.editable').innerHTML = html;
-    document.getElementById('report').insertBefore(summary, target);
-  }
-}
 
   // 👉 4. Remover páginas eliminadas
   for (const qid of deletedQids) {
     const pg = document.querySelector(`.page[data-qid="${qid}"]`);
     if (pg) pg.remove();
   }
-
-  document.querySelectorAll('.eliminar-pagina-btn').forEach(btn => {
-  const relatedQid = btn.dataset.qid;
-  if (deletedQids.has(relatedQid)) btn.remove();
-});
-
 
   // 👉 5. Redimensionar gráficos
   document.querySelectorAll('.chart-full, .chart-box').forEach(el => {
@@ -1369,17 +1319,24 @@ for (const [qid, html] of Object.entries(summaryCache)) {
   });
 
   // 👉 2. Recolhe os edits em todos os contenteditable
-  const editCache = getEditableContentMap();
+const editableCache = getEditableContentMap();
+console.log('🧠 EDITABLE CACHE ANTES DO BUILD:', editableCache);
+
+
 
   // 👉 3. Reconstrói o relatório
   await build();
-  
-for (const qid of deletedQids) {
-  document.querySelectorAll(`.page[data-qid="${qid}"]`).forEach(pg => pg.remove());
-  document.querySelectorAll(`[data-qid="${qid}"]`).forEach(btn => btn.remove());
-}
+
   // 👉 4. Restaura os edits manuais
-  applyEditableContentMap(editCache);
+  applyEditableContentMap(editableCache);
+  console.log('🔁 RESTORED CONTENT:', editableCache);
+
+
+  for (const [qid, html] of Object.entries(editableCache)) {
+  const pg = document.querySelector(`.page[data-qid="${qid}"]`);
+  const editable = pg?.querySelector('.editable');
+  if (editable) editable.innerHTML = html;
+}
 
   // 👉 5. Reinsere os resumos
   for (const [qid, html] of Object.entries(summaryCache)) {
@@ -1441,24 +1398,18 @@ for (const qid of deletedQids) {
 function getEditableContentMap() {
   const map = {};
   document.querySelectorAll('[contenteditable="true"]').forEach(el => {
-    const key = el.dataset.qid || el.dataset.editId;
-    if (key) {
-      map[key] = el.innerHTML.trim();
-    }
+    const key = el.dataset.qid || el.dataset.editId || el.className + '_' + el.innerText.slice(0, 30);
+    map[key] = el.innerHTML.trim();
   });
   return map;
 }
 
-
 function applyEditableContentMap(map) {
   document.querySelectorAll('[contenteditable="true"]').forEach(el => {
-    const key = el.dataset.qid || el.dataset.editId;
-    if (key && map[key]) {
-      el.innerHTML = map[key];
-    }
+    const key = el.dataset.qid || el.dataset.editId || el.className + '_' + el.innerText.slice(0, 30);
+    if (map[key]) el.innerHTML = map[key];
   });
 }
-
 
 
 document.addEventListener('DOMContentLoaded', () => {

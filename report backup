@@ -4,571 +4,156 @@
   <meta charset="UTF-8"/>
   <title>Training Report</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-
-  <!-- Roboto & ECharts -->
+  <!-- Roboto font -->
   <link href="https://fonts.googleapis.com/css?family=Roboto:400,500,700&display=swap" rel="stylesheet">
   <script src="https://cdn.jsdelivr.net/npm/echarts@5/dist/echarts.min.js"></script>
-
-  <!-- html2canvas & pdfMake -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.7/pdfmake.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.7/vfs_fonts.js"></script>
-
   <style>
-    /* RESET & PAGE SETUP */
-    html, body { margin:0; padding:0; background:#333; }
-    body { font-family:'Roboto',sans-serif; }
-    @page { size:960px 540px; margin:0; }
-    @media print { .page { page-break-after: always; } }
-
-    /* PAGE CONTAINER */
-    .page {
-      position:relative;
-      width:960px; height:540px;
-      margin:20px auto; background:#fff;
-      overflow:hidden; box-sizing:border-box;
+    /* === Global font === */
+    body, .page-wrapper, .hero-content, .section-banner, .chart-full, .chart-grid-page, .text-question, .page-header, .page-footer {
+      font-family: 'Roboto', sans-serif;
     }
 
-    /* HEADER & FOOTER */
-    .header, .footer {
-      position:absolute; left:0; right:0;
-      display:flex; justify-content:space-between; align-items:center;
-      padding:0 30px; background:#fff; z-index:10;
-    }
-    .header { top:0; height:80px; border-bottom:1px solid #92C4C8; font-weight:bold; }
-    .header img { height:60px; }
-    .footer {
-      bottom:0; height:60px; border-top:1px solid #40a3a3;
-      color:#007c91; font-size:14px; font-weight:bold;
-    }
-
-    /* CONTENT WINDOW */
-    .page > .content {
-      position:absolute;
-      top:80px; bottom:60px;
-      left:0; right:0;
-      overflow:hidden; box-sizing:border-box;
-    }
-    .content > * {
-      width:100%; height:100%; position:relative;
+    /* === Force US‑Letter landscape === */
+    @page { size: 11in 8.5in; margin: 0; }
+    @media print {
+      .page-wrapper { page-break-after: always; }
+      /* Prevent splits inside */
+      .hero-content,
+      .section-banner,
+      .chart-full,
+      .chart-grid-page,
+      .text-question {
+        page-break-inside: avoid;
+        break-inside: avoid;
+      }
     }
 
-    /* HERO */
-    .page.hero { overflow:hidden; }
-    .page.hero > .hero {
-      position:absolute; inset:0;
-      display:flex; align-items:center; justify-content:center;
+    /* === Page wrapper with header/footer padding === */
+    .page-wrapper {
+      position: relative;
+      width: 100vw; height: 100vh;
+      overflow: hidden;
+      box-sizing: border-box;
+      padding-top: 60px;    /* header height */
+      padding-bottom: 40px; /* footer height */
     }
-    .page.hero .bg {
-      position:absolute; inset:0;
-      width:100%; height:100%; object-fit:cover;
+    .page-header, .page-footer {
+      position: absolute; left: 0; right: 0;
+      display: flex; align-items: center; justify-content: space-between;
+      background: #fff;
+      padding: 0 30px;
+      box-sizing: border-box;
+      z-index: 2;
+    }
+    .page-header {
+      top: 0; height: 60px;
+      border-bottom: 1px solid #40a3a3;
+    }
+    .page-header img {
+      height: 40px;
+    }
+    .page-footer {
+      bottom: 0; height: 40px;
+      font-size: 12px; color: #007c91;
+      border-top: 1px solid #40a3a3;
+    }
+
+    /* === Hero page === */
+    .hero-page {
+      display: flex; align-items: center; justify-content: center;
+      background: url('hourglass-bg.jpg') center/cover no-repeat;
+      text-align: center; color: #fff;
+    }
+    .hero-page::before {
+      content: '';
+      position: absolute; inset: 0;
+      background: rgba(0,124,145,0.6);
+      z-index: 1;
     }
     .hero-content {
-      position:relative; z-index:1;
-      display:flex; flex-direction:column; align-items:left-aligned; justify-content:center;
-      color:#fff; text-align:left; padding:0 30px; box-sizing:border-box;
+      position: relative; z-index: 2;
+      max-width: 80%;
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
+      height: 100%; /* fills between header/footer */
     }
-    .hero-content h1 { font-size:3.5rem; margin:0; }
-    .hero-content .subtitle { font-size:1rem; margin-top:0px; opacity:.85; font-style:italic; padding-left:3px }
-    .hero-logo {
-  position: absolute;
-  bottom: 30px;
-  right: 30px;
-  height: 100px; /* ajusta conforme necessário */
-}
-
-    /* BANNERS */
-    .banner { position:relative; overflow:hidden; }
-    .banner-bg { position:absolute; inset:0; width:100%; height:100%; object-fit:cover; }
-    .banner-text {
-      position:absolute; left:30px; bottom:20px;
-      font-size:1.25rem; font-weight:bold; color:#4C4C4C; z-index:1;font-style:italic;
+    .hero-content small {
+      font-style: italic; color: #e0f2f3; margin-bottom: 8px; font-size: 1.2rem;
     }
-    .banner-super {
-  font-size: 1rem;
-  color: #27828C;
-  font-weight: 400;      /* não bold */
-  opacity: 0.85;
-  margin-bottom: 6px;
-  letter-spacing: 0.03em;
-  font-style: italic;
-}
-
-    /* PROGRAM DETAILS BOX */
-   .banner-box {
-  position: absolute;
-  top: 50%;
-  left: 250px;
-  transform: translateY( -50%);
-  color: #000;
-  text-align: left;
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  padding: 0 0 0 20px;
-}
-  .banner-box h1 {
-  margin: 0;
-  font-size: 2.5rem;
-  color: #27828C;
-  font-weight: 700;
-  text-transform: uppercase;
-    white-space: nowrap;
-}
-    .banner-box .meta { display:flex; gap:20px; font-size:1.5rem; opacity:.85; }
-    .banner-box .meta span,
-    .banner-box .meta strong { color: #4C4C4C; }
-   .meta-banner {
-  margin-top: 70px;         /* aumenta o espaçamento acima */
-  font-size: 1rem;
-  line-height: 1.6;          /* mais espaçamento vertical entre linhas */
-  
-}
-    .meta-line {
-  color: #4C4C4C;
-  font-size: 1rem;
-  opacity: 0.85;
-  font-style:italic;
-}
-  .meta-value {
-  padding-left: 12px; /* adjust spacing as needed */
-}
-
-    /* CHARTS */
-    .chart-fullpage { display:flex; align-items:center; justify-content:center; padding:20px; box-sizing:border-box; }
-    .chart-full { width:100%; height:100%; }
-    .chart-grid {
-      display:grid; grid-template-columns:1fr 1fr;
-      gap:20px; padding:20px; box-sizing:border-box;
+    .hero-content h1 {
+      font-size: 4rem; margin: 0; font-weight: 600;
     }
-    .chart-box { width:100%; height:100%; }
+    .hero-content .subtitle {
+      font-size: 1.8rem; margin-top: 12px;
+    }
+    .hero-content .meta {
+      margin-top: 24px; display: flex; gap: 40px; justify-content: center; font-size: 1.2rem;
+    }
+    .hero-content .meta span {
+      display: block; font-style: italic; color: #e0f2f3;
+    }
+    .hero-content .meta strong {
+      color: #fff; font-weight: 600;
+    }
 
-    /* TEXT PAGES */
-    .text-page { padding:20px; box-sizing:border-box; }
+    /* === Section banner page === */
+    .banner-page {
+      display: flex; align-items: center; justify-content: center; background: #fff;
+    }
+    .section-banner {
+      background: #f0f8f9;
+      padding: 40px 60px;
+      border-left: 6px solid #007c91;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+      width: 70%;
+    }
+    .section-banner h1 {
+      margin: 0 0 16px; font-size: 48px; color: #007c91; font-weight: 500;
+    }
+    .section-banner .section-meta {
+      display: flex; gap: 40px; font-size: 18px; color: #555;
+    }
+
+    /* === Full‑screen chart page === */
+    .chart-page {
+      display: flex; align-items: center; justify-content: center; background: #fff;
+    }
+    .chart-full {
+      width: 90vw; height: 80vh; /* fills between header/footer */
+    }
+
+    /* === Remaining content === */
+    .chart-grid-page {
+      display: grid; grid-template: 1fr 1fr / 1fr 1fr;
+      gap: 20px; padding: 20px; box-sizing: border-box;
+    }
+    .chart-container { width: 100%; height: 300px; }
     .text-question {
-      background:#f9f9f9;
-      border:1px solid #007c91;
-      padding:10px; 
-      box-sizing:border-box;
-      max-width:calc(100% - 40px);
-      max-height:360px;
-      overflow:visible;
-      page-break-inside:avoid; break-inside:avoid;
-      margin:20px auto 20px auto
+      border: 1px solid #007c91; border-left: 6px solid #007c91;
+      padding: 16px; margin: 20px auto 40px;
+      background: #f9f9f9; width: 90vw; box-sizing: border-box;
+      line-height: 1.8;
     }
     .text-question-title {
-      font-size:1.2rem; font-weight:bold; margin-bottom:12px; color:#007c91;
+      font-weight: 500; margin-bottom: 8px; font-size: 18px; color: #007c91;
     }
-    .text-question ul {
-      padding-left:16px; font-size:0.75rem; line-height:1.6;
-    }
-    .text-question li { margin-bottom:8px; }
-    .page.text-page .answer-list {
-      max-height:100%;
-      overflow:hidden;
-    }
-
-    /* SECTION TITLE IN HEADER */
-    .header .section-title {
-      text-transform:uppercase; color:#007c91;
-      font-weight:600; letter-spacing:0.05em;
-      font-size:1rem; font-style:italic;
-    }
-
-    .page.text-page .content {
-      display: flex;
-      align-items: flex-start;
-      justify-content: center;
-    }
-    .page.text-page .content > .text-question {
-      height: auto;
-      max-height: 360px;
-      overflow-y: auto;
-      display: inline-block;
-    }
-
-    /* HIDE HEADER/FOOTER ON HERO */
-    .page.hero > .header,
-    .page.hero > .footer { display:none; }
-    .page.hero > .content { top:0; bottom:0; }
-
-    /* PDF BUTTON */
-    #gerar-pdf {
-      position:fixed; top:10px; right:10px; z-index:1000;
-      padding:8px 16px; background:#007c91; color:#fff;
-      border:none; border-radius:4px; cursor:pointer;
-    }
-    
-  .program-subtitle {
-   margin-top: 3px;
-  font-size: 1.25rem;
-  font-style: italic;
-  color: #007c91;
-  opacity: 0.7;
-  white-space: nowrap;
-}
+    ul { padding-left: 20px; font-size: 16px; }
   </style>
 </head>
 <body>
-  <button id="gerar-pdf">Gerar Relatório (PDF)</button>
-  <div id="report"></div>
-
-
-
+  <div id="reportContent"></div>
   <script>
-    const currentYear = new Date().getFullYear();
+    // Helpers (unchanged)…
+    function createLabelMap(labels) { /* … */ }
+    function createSortMap(labels) { /* … */ }
+    function groupBy(arr,key){ /* … */ }
+    function computeAverages(rows,LM,OM){ /* … */ }
+    function createBarChartIn(div,title,data){ /* … */ }
+    function renderTextQuestions(rows,ct){ /* … */ }
+    function countUnique(rows,sec){ /* … */ }
 
-    // UTILITIES
-    function createLabelMap(labels) {
-      return labels.reduce((m, l) => {
-        const k = l.questionId || l['QUESTION ID'];
-        m[k] = l.label || l['LABEL'];
-        return m;
-      }, {});
-    }
-    function createSortMap(labels) {
-      return labels.reduce((m, l) => {
-        const k = l.questionId || l['QUESTION ID'];
-        m[k] = +(l.sortOrder || l['SORT ORDER'] || l.sort_order);
-        return m;
-      }, {});
-    }
-    function groupBy(arr, key) {
-      return arr.reduce((o, i) => {
-        (o[i[key]] ||= []).push(i);
-        return o;
-      }, {});
-    }
-    function computeAverages(rows, LM, OM) {
-      const g = {};
-      rows.forEach(r => (g[r.question] ||= []).push(+r.value));
-      return Object.entries(g)
-        .map(([q, vals]) => ({
-          question: q,
-          label: LM[q] || q,
-          avg: +(vals.reduce((a,b)=>a+b,0)/vals.length).toFixed(1)
-        }))
-        .sort((a,b) => (OM[a.question]||0) - (OM[b.question]||0));
-    }
-    function countUnique(rows, sec) {
-      return new Set(
-        rows.filter(d => String(d.section||'').toLowerCase().includes(sec))
-            .map(d => d['Submission ID'])
-      ).size;
-    }
-    function formatMonthYear(v) {
-      const names = {
-        '01':'janeiro','02':'fevereiro','03':'março','04':'abril',
-        '05':'maio','06':'junho','07':'julho','08':'agosto',
-        '09':'setembro','10':'outubro','11':'novembro','12':'dezembro'
-      };
-      const [y,m] = v.split('-');
-      return { month:names[m], year:y };
-    }
-
-    // CHART
-    function createBarChart(container, title, data, uniform) {
-      const chart = echarts.init(container, null, {
-      renderer: 'svg'
-       // alternatively for canvas at 2× DPI:
-       // devicePixelRatio: window.devicePixelRatio
-     });
-
-      chart.setOption({
-        title:{text:title,left:'center',textStyle:{fontSize:20}},
-        grid:{top:80,left:'10%',right:'10%',bottom:120},
-        tooltip:{},
-        xAxis:{type:'category',data:data.map(d=>d.label),
-               axisLabel:{rotate:30,interval:0,margin:10}},
-        yAxis:{type:'value',min:1,max:5,
-               splitLine:{show:false},axisLine:{show:false},
-               axisTick:{show:false},axisLabel:{show:false}},
-        series:[{type:'bar',data:data.map(d=>d.avg),
-          label:{show:true,position:'top',formatter:'{c}'},
-          itemStyle: uniform
-            ? {color:'#6A99D0'}
-            : {color:p=>p.value<3?'#EA3323':p.value<4?'#6A99D0':'#9FCE63'}
-        }]
-      });
-      chart.resize();
-    }
-
-    // TEXT PAGE BUILDER
-    function createTextPage(prog, sec, qid, showTitle) {
-      const tp = document.createElement('div');
-      tp.className = 'page text-page';
-      tp.innerHTML = `
-        <div class="header">
-          <img src="mind4time-logo.png">
-          <div class="section-title">${sec==='assessment'?'Assessment':'Avaliação'}</div>
-        </div>
-        <div class="content">
-          <div class="text-question">
-            ${showTitle?`<div class="text-question-title">${qid}</div>`:``}
-            <ul class="answer-list"></ul>
-          </div>
-        </div>
-        <div class="footer">
-          <div>www.MIND4TIME.com</div>
-          <div>© MIND4TIME ${currentYear}</div>
-        </div>`;
-      return tp;
-    }
-
-  async function build() {
-  const f = JSON.parse(localStorage.getItem('reportFilters') || '{}');
-  const [data, meta] = await Promise.all([
-    fetch('data.json').then(r => r.json()),
-    fetch('meta.json').then(r => r.json())
-  ]);
-  const LM = createLabelMap(meta.labels),
-        OM = createSortMap(meta.labels);
-  const root = document.getElementById('report');
-  root.innerHTML = '';
-
-  // Agora DENTRO do ciclo
-  for (const prog of f.programs || []) {
-    // 👇 cálculo do timeScope aqui dentro
-    let timeScope = '';
-    const start = (f.starts || {})[prog];
-    const end   = (f.ends || {})[prog];
-
-    if (start && end) {
-      const s = formatMonthYear(start),
-            e = formatMonthYear(end);
-      timeScope = `${s.month} – ${e.month} ${e.year}`;
-    }
-
-    const selTur = f[`turmas_${prog}`] || [];
-    const rows = data.filter(d =>
-      (f.clients || []).includes(d.client) &&
-      d.program === prog &&
-      selTur.includes(d.turma)
-    );
-    const pm = meta.titles.find(t => t.program_id === prog) || {};
-        // Hero
-        const hero = document.createElement('div');
-        hero.className = 'page hero';
-        hero.innerHTML = `
-          <div class="hero">
-            <img class="bg" src="hourglass-bg.jpg">
-            <div class="hero-content">
-              <h1>TRAINING REPORT</h1>
-              <div class="subtitle">${timeScope}</div>
-            </div>
-              <img class="hero-logo" src="Logo.png">
-          </div>`;
-        root.appendChild(hero);
-
-        // Program details
-        const bannerImg =
-  prog.toLowerCase() === 'p365'
-    ? 'p365-banner.png'
-    : prog.toLowerCase() === 'colab365'
-    ? 'colab365-banner.png'
-    : 'p365-banner.png';
-        
-        const info = document.createElement('div');
-info.className = 'page';
-info.innerHTML = `
-  <div class="header">
-    <img src="mind4time-logo.png"><div></div>
-  </div>
-  <div class="content">
-    <div class="banner">
-      <img class="banner-bg" src="${bannerImg}">
-      <div class="banner-box">
-          <div class="banner-super">corporate training</div>
-          <h1>${pm.TÍTULO || prog}</h1>
-          <div class="program-subtitle">${pm.SUBTÍTULO || ''}</div>
-          <div class="meta-banner">
-    <div class="meta-line">scope temporal:<span class="meta-value"> ${timeScope}</span></div>
-    <div class="meta-line">Trainers:<span class="meta-value"> ${(f.trainers || {})[prog] || 'N/A'}</span></div>
-  </div>
-</div>
-    </div>
-  </div>
-  <div class="footer">
-    <div>www.MIND4TIME.com</div>
-    <div>© MIND4TIME ${currentYear}</div>
-  </div>`;
-root.appendChild(info);
-
-        // Sections
-        for (const sec of ['assessment','evaluation']) {
-          const name    = sec==='assessment'?'Assessment':'Avaliação';
-          const total   = countUnique(rows, sec);
-          const numeric = rows.filter(d=>
-            String(d.section||'').toLowerCase().includes(sec) &&
-            /^\d+(\.\d+)?$/.test(String(d.value).trim())
-          );
-          const byT     = Object.entries(groupBy(numeric,'turma'));
-
-          // banner
-          const ban = document.createElement('div'); ban.className='page';
-          ban.innerHTML = `
-            <div class="header">
-              <img src="mind4time-logo.png">
-            </div>
-            <div class="content">
-              <div class="banner">
-                <img class="banner-bg" src="${sec}-bg.jpg">
-                <div class="banner-text">Nº Respostas: ${total}</div>
-              </div>
-            </div>
-            <div class="footer">
-              <div>www.MIND4TIME.com</div>
-              <div>© MIND4TIME ${currentYear}</div>
-            </div>`;
-          root.appendChild(ban);
-
-          // global chart
-          if (numeric.length) {
-            const gp = document.createElement('div'); gp.className='page';
-            gp.innerHTML = `
-              <div class="header">
-                <img src="mind4time-logo.png">
-                <div class="section-title">${name}</div>
-              </div>
-              <div class="content">
-                <div class="chart-fullpage">
-                  <div class="chart-full" id="chart-global-${prog}-${sec}"></div>
-                </div>
-              </div>
-              <div class="footer">
-                <div>www.MIND4TIME.com</div>
-                <div>© MIND4TIME ${currentYear}</div>
-              </div>`;
-            root.appendChild(gp);
-            createBarChart(
-              gp.querySelector('.chart-full'),
-              `Global`,
-              computeAverages(numeric, LM, OM),
-              sec==='evaluation'
-            );
-          }
-
-          // 2‑chart grid
-          if (byT.length>1) {
-            for (let i=0; i<byT.length; i+=2) {
-              const gp2 = document.createElement('div'); gp2.className='page';
-              const boxes = byT.slice(i,i+2)
-                .map(([,v],j)=>`<div class="chart-box" id="chart-${prog}-grid-${i+j}"></div>`)
-                .join('');
-              gp2.innerHTML = `
-                <div class="header">
-                  <img src="mind4time-logo.png">
-                  <div class="section-title">${name}</div>
-                </div>
-                <div class="content">
-                  <div class="chart-grid">${boxes}</div>
-                </div>
-                <div class="footer">
-                  <div>www.MIND4TIME.com</div>
-                  <div>© MIND4TIME ${currentYear}</div>
-                </div>`;
-              root.appendChild(gp2);
-              byT.slice(i,i+2).forEach(([,v],j)=>{
-                createBarChart(
-                  document.getElementById(`chart-${prog}-grid-${i+j}`),
-                  byT[i+j][0],
-                  computeAverages(v, LM, OM),
-                  sec==='evaluation'
-                );
-              });
-            }
-          }
-
-          // — TEXT ANSWERS WITH SPILL + FIT‑TO‑SHRINK —
-          const selQs = f.textQuestions || [];
-          selQs.forEach(qid => {
-            const ans = data.filter(d =>
-              (f.clients || []).includes(d.client) &&
-              d.program === prog &&
-              (f.clientInfos || []).includes(d.client_info) &&
-              (f[`turmas_${prog}`] || []).includes(d.turma) &&
-              String(d.section || '').toLowerCase().includes(sec) &&
-              d.question === qid &&
-              isNaN(+d.value)
-            );
-            if (!ans.length) return;
-
-            const pagesForThisQ = [];
-            let page   = createTextPage(prog, sec, qid, true);
-            let listEl = page.querySelector('.answer-list');
-            root.appendChild(page);
-            pagesForThisQ.push(page);
-
-            ans.forEach(a => {
-              const li = document.createElement('li');
-              li.textContent = a.value;
-              listEl.appendChild(li);
-
-              // overflow spill logic
-              const tq = page.querySelector('.text-question');
-              if (tq.scrollHeight > tq.clientHeight) {
-                listEl.removeChild(li);
-                page   = createTextPage(prog, sec, qid, false);
-                listEl = page.querySelector('.answer-list');
-                root.appendChild(page);
-                pagesForThisQ.push(page);
-                listEl.appendChild(li);
-              }
-            });
-
-            // shrink each grey box
-            pagesForThisQ.forEach(pg => {
-              const tq = pg.querySelector('.text-question');
-              tq.style.height = tq.scrollHeight + 'px';
-            });
-          });
-
-        } // end for sec
-      }   // end for prog
-    
-      // ADD FINAL COVER PAGE
-      const endPage = document.createElement('div');
-      endPage.className = 'page hero';
-      endPage.innerHTML = `
-        <div class="hero">
-          <img class="bg" src="endpage-bg.png">
-        </div>`;
-      root.appendChild(endPage);
-    }
-   
-
-    // PDF
-    async function generatePdf() {
-      await build();
-      document.querySelectorAll('.chart-full, .chart-box').forEach(el=>{
-        const c = echarts.getInstanceByDom(el);
-        if (c) c.resize();
-      });
-      await new Promise(r=>setTimeout(r,100));
-
-      const pages  = Array.from(document.querySelectorAll('.page'));
-      const CANVAS_SCALE = 4;
-      const images = await Promise.all(pages.map(pg =>
-      html2canvas(pg, {
-        backgroundColor: '#fff',
-         useCORS: true,
-         scale: CANVAS_SCALE
-       }).then(cnv => cnv.toDataURL('image/png', 1.0))
-     ));
-      pdfMake.createPdf({
-        pageSize: { width:960, height:540 },
-        pageMargins: [0,0,0,0],
-        content: images.map((img,i)=>({
-          image: img, width: 960,
-          pageBreak: i<images.length-1 ? 'after' : undefined
-        }))
-      }).download('report.pdf');
-    }
-
-    document.addEventListener('DOMContentLoaded', ()=>{
-      document.getElementById('gerar-pdf').addEventListener('click', generatePdf);
-      build();
-    });
+    // Main
+    async function loadReport(){ /* … */ }
+    document.addEventListener('DOMContentLoaded', loadReport);
   </script>
 </body>
 </html>

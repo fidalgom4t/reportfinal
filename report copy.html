@@ -1,0 +1,970 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+  <meta charset="UTF-8"/>
+  <title>Training Report</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+
+  <!-- Roboto & ECharts -->
+  <link href="https://fonts.googleapis.com/css?family=Roboto:400,500,700&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/echarts@5/dist/echarts.min.js"></script>
+
+  <!-- html2canvas & pdfMake -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.7/pdfmake.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.7/vfs_fonts.js"></script>
+
+  <!-- PptxGenJS -->
+  <script src="https://cdn.jsdelivr.net/npm/pptxgenjs@3.11.0/dist/pptxgen.bundle.js"></script>
+
+
+
+  <style>
+    html, body { margin:0; padding:0; background:#333; font-family:'Roboto',sans-serif; }
+    @page { size:960px 540px; margin:0; }
+    @media print { .page { page-break-after: always; } }
+
+    .page {
+      position:relative;
+      width:960px; height:540px;
+      margin:20px auto; background:#fff;
+      overflow:hidden; box-sizing:border-box;
+    }
+
+    .header, .footer {
+      position:absolute; left:0; right:0;
+      display:flex; justify-content:space-between; align-items:center;
+      padding:0 30px; background:#349ca1; z-index:10;
+    }
+    .header { top:0; height:50px; border-bottom:1px solid #92C4C8; font-weight:bold; }
+    .header img { height:60px; }
+    .footer {
+      bottom:0; height:60px; border-top:1px solid #40a3a3;
+      color:#007c91; font-size:14px; font-weight:bold;
+    }
+
+    .page > .content {
+      position:absolute; top:60px; bottom:30px; left:0; right:0;
+      overflow:visible; box-sizing:border-box;
+    }
+
+    .content > * { width:100%; height:100%; position:relative; }
+
+    .page.hero {
+      position: relative;
+      overflow: hidden;
+      background-color: #0f2a2e;
+    }
+
+    .page.hero .bg {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      z-index: 1;
+    }
+
+    .page.hero .hero {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start; /* 👈 em vez de center */
+  z-index: 2;
+  padding: 60px 30px;
+  gap: 30px; /* 👈 espaçamento natural entre elementos */
+}
+
+
+   .report-logo-top {
+  display: block;
+  height: auto;
+  max-height: 100px;
+  width: auto;
+  max-width: 240px;
+  object-fit: contain;
+  margin: -20px auto 60px auto;
+  position: relative;
+  z-index: 2;
+}
+
+
+    .hero-content {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -30%);
+      z-index: 2;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+      color: white;
+    }
+
+    .hero-content h1 {
+      font-size: 2.8rem;
+      margin: 0;
+      font-weight: 700;
+      letter-spacing: 0.02em;
+    }
+
+    .hero-content .subtitle {
+      font-size: 1.2rem;
+      margin-top: 10px;
+      opacity: 0.9;
+    }
+
+    .hero-footer {
+      position: absolute;
+      bottom: 30px;
+      width: 100%;
+      text-align: center;
+      font-size: 0.95rem;
+      color: white;
+      z-index: 2;
+    }
+
+    .banner.white-layout {
+  background: white;
+  position: relative;
+  height: 100%;
+  box-sizing: border-box;
+  padding-top:20px; /* 👈 estava 60px antes — agora mais próximo do topo */
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.banner.white-layout .report-logo-top {
+  margin-top: -60px; /* 👈 ou -20px para subir mais */
+  margin-bottom: 60px;
+}
+
+
+    .banner-left {
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-start;
+      align-items: flex-start;
+      max-width: 700px;
+      text-align: left;
+      margin-top: -20px;
+    }
+
+    .banner-super {
+      font-size: 1rem;
+      font-weight: 400;
+      letter-spacing: 0.05em;
+      margin-bottom: 10px;
+      text-transform: uppercase;
+      color: #444;
+    }
+
+    .banner-title {
+      font-size: 3rem;
+      font-weight: 700;
+      color: #27828C;
+      margin: 0;
+      letter-spacing: 0.1em;
+    }
+
+    .banner-subtitle {
+      font-size: 1.2rem;
+      color: #333;
+      margin-top: 10px;
+      margin-bottom: 50px;
+      font-weight: 400;
+    }
+
+    .banner-details {
+      font-size: 1rem;
+      line-height: 1.6;
+      color: #000;
+      font-weight: 400;
+      text-align: left;
+    }
+
+    .banner-details strong {
+      font-weight: 700;
+    }
+
+
+
+    .chart-fullpage {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+      box-sizing: border-box;
+      overflow: visible;
+    }
+
+    .chart-full {
+      width:100%;
+      height: 100%;
+      overflow: visible;
+    }
+
+   .chart-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  grid-template-rows: 300px 300px; /* ou ajusta consoante o espaço */
+  gap: 20px;
+}
+
+
+    .chart-box {
+  width: 100%;
+  height: 400px;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+}
+.chart-turma-title {
+  font-size: 14px;
+  font-weight: bold;
+  text-align: center;
+  margin-bottom: 8px;
+  color: #000;
+}
+
+.chart-inner-box {
+  flex: 1;
+  width: 100%;
+}
+    .text-page {
+      padding: 20px;
+      box-sizing: border-box;
+    }
+
+    .text-question {
+      background: #fff;
+      box-sizing: border-box;
+      max-width: calc(100% - 200px);
+      max-height: 1500px;
+      overflow: visible;
+      page-break-inside: avoid;
+      break-inside: avoid;
+      margin: 50px auto;
+    }
+
+    .text-question-title {
+      font-size: 1.2rem;
+      margin-bottom: 10px;
+      color: #349ca1;
+    }
+
+    .text-question ul {
+      padding-left: 16px;
+      font-size: 0.75rem;
+      line-height: 1.6;
+    }
+
+    .text-question li {
+      margin-bottom: 8px;
+    }
+
+    .page.text-page .answer-list {
+      max-height: 100%;
+      overflow: hidden;
+    }
+
+    .page.text-page .content {
+      display: flex;
+      align-items: flex-start;
+      justify-content: center;
+    }
+
+    .page.text-page .content > .text-question {
+      height: auto;
+      max-height: 360px;
+      overflow-y: auto;
+      display: inline-block;
+    }
+
+    .header .section-title {
+      text-transform: uppercase;
+      color: #fff;
+      font-weight: 10;
+      letter-spacing: 0.05em;
+      font-size: 1rem;
+      font-style: none;
+    }
+
+    .page.hero > .header,
+    .page.hero > .footer {
+      display: none;
+    }
+
+    .page.hero > .content {
+      top: 0;
+      bottom: 0;
+    }
+
+    #gerar-pdf {
+      position: fixed;
+      top: 10px;
+      right: 10px;
+      z-index: 1000;
+      padding: 8px 16px;
+      background: #007c91;
+      color: #fff;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+    
+    
+    .page.banner {
+  overflow: visible;
+}
+.chart-responses {
+  text-align: center;
+  font-size: 0.95rem;
+  margin-top: -10px;
+  margin-bottom: 0px;
+  font-weight: 400;
+}
+.chart-responses strong {
+  font-weight: bold;
+}
+
+.site-footer-link {
+  position: absolute;
+  bottom: 30px;
+  width: 100%;
+  text-align: center;
+  font-size: 1.2rem;
+  color: white;
+  opacity: 0.85;
+  z-index: 2;
+}
+
+.end-hero {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  z-index: 2;
+}
+
+
+.end-hero .site-footer-link {
+  font-size: 1.2rem;
+  color: white;
+  text-align: center;
+  margin-bottom: 20px;
+  z-index: 10;
+  position: relative;
+}
+
+.page.hero.endpage .end-hero {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  z-index: 2;
+}
+
+.page.hero.endpage .end-logo {
+  max-width: 240px;
+  max-height: 100px;       /* 👈 aumenta o tamanho */
+  margin-bottom: 20px;
+}
+
+.page.hero.endpage .end-text {
+  font-size: 1.2rem;
+  color: white;
+  text-align: center;
+  margin-top: 10px;
+  z-index: 10;
+  position: relative;
+}
+
+    #color-picker-container {
+      position: fixed;
+      top: 60px;
+      right: 10px;
+      z-index: 2000;
+      background: #fff;
+      border: 1px solid #ccc;
+      padding: 10px;
+      display: none;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.3);
+    }
+.color-option {
+      width: 30px;
+      height: 30px;
+      border: none;
+      margin: 4px;
+      cursor: pointer;
+    }
+
+
+
+
+
+  </style>
+</head>
+<body>
+  <button id="gerar-pdf">Gerar Relatório (PDF)</button>
+  <div id="color-picker-container">
+    <label>Escolhe uma cor:</label>
+    <div>
+      <button class="color-option" style="background:#EA3323" data-color="#EA3323"></button>
+      <button class="color-option" style="background:#27828C" data-color="#27828C"></button>
+      <button class="color-option" style="background:#4CC9C4" data-color="#4CC9C4"></button>
+    </div>
+  </div>
+  <div id="report"></div>
+
+  <script>
+    const currentYear = new Date().getFullYear();
+
+    // UTILITIES
+    function createLabelMap(labels) {
+      return labels.reduce((m, l) => {
+        const k = l.questionId || l['QUESTION ID'];
+        m[k] = l.label || l['LABEL'];
+        return m;
+      }, {});
+    }
+    function createSortMap(labels) {
+      return labels.reduce((m, l) => {
+        const k = l.questionId || l['QUESTION ID'];
+        m[k] = +(l.sortOrder || l['SORT ORDER'] || l.sort_order);
+        return m;
+      }, {});
+    }
+    function groupBy(arr, key) {
+      return arr.reduce((o, i) => {
+        (o[i[key]] ||= []).push(i);
+        return o;
+      }, {});
+    }
+    function computeAverages(rows, LM, OM) {
+      const g = {};
+      rows.forEach(r => (g[r.question] ||= []).push(+r.value));
+      return Object.entries(g)
+        .map(([q, vals]) => ({
+          question: q,
+          label: LM[q] || q,
+          avg: +(vals.reduce((a,b)=>a+b,0)/vals.length).toFixed(1)
+        }))
+        .sort((a,b) => (OM[a.question]||0) - (OM[b.question]||0));
+    }
+    function countUnique(rows, sec) {
+      return new Set(
+        rows.filter(d => String(d.section||'').toLowerCase().includes(sec))
+            .map(d => d['Submission ID'])
+      ).size;
+    }
+    function formatMonthYear(v) {
+      const names = {
+        '01':'janeiro','02':'fevereiro','03':'março','04':'abril',
+        '05':'maio','06':'junho','07':'julho','08':'agosto',
+        '09':'setembro','10':'outubro','11':'novembro','12':'dezembro'
+      };
+      const [y,m] = v.split('-');
+      return { month:names[m], year:y };
+    }
+// CHART
+
+    const barColorMap = JSON.parse(localStorage.getItem('barColorMap') || '{}');
+    let currentChartId = null;
+    let currentBarLabel = null;
+
+    function showColorPicker(chartId, label) {
+      currentChartId = chartId;
+      currentBarLabel = label.toUpperCase();
+      document.getElementById('color-picker-container').style.display = 'block';
+    }
+
+    document.querySelectorAll('.color-option').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const newColor = btn.dataset.color;
+        if (currentChartId && currentBarLabel) {
+          if (!barColorMap[currentChartId]) barColorMap[currentChartId] = {};
+          barColorMap[currentChartId][currentBarLabel] = newColor;
+          localStorage.setItem('barColorMap', JSON.stringify(barColorMap));
+          document.getElementById('color-picker-container').style.display = 'none';
+          build();
+        }
+      });
+    });
+
+    function createBarChart(container, title, data, uniform) {
+      const chart = echarts.init(container, null, { renderer: 'svg' });
+      const chartId = container.id;
+      const labels = data.map(d => d.label.toUpperCase().replace(/\s*\-\s*/g, ' '));
+
+      chart.setOption({
+        title: {
+          text: title || '',
+          left: 'center',
+          textStyle: { fontSize: 20 }
+        },
+        grid: {
+          top: 30,
+          bottom: 120,
+          left: '5%',
+          right: '5%'
+        },
+        tooltip: {},
+        xAxis: {
+          type: 'category',
+          data: labels,
+          axisLabel: {
+            rotate: 53,
+            fontSize: 9,
+            color: '#000',
+            margin: 10,
+            interval: 0
+          },
+          axisTick: { show: false },
+          axisLine: { show: false }
+        },
+        yAxis: {
+          type: 'value',
+          min: 1,
+          max: 5,
+          axisLabel: { show: false },
+          axisLine: { show: false },
+          axisTick: { show: false },
+          splitLine: { show: false }
+        },
+        series: [{
+          type: 'bar',
+          barWidth: 30,
+          data: data.map(d => {
+            const labelKey = d.label.toUpperCase();
+            return {
+              value: d.avg,
+              itemStyle: {
+                color: (barColorMap[chartId] && barColorMap[chartId][labelKey]) || (uniform
+                  ? '#6A99D0'
+                  : d.avg < 3
+                    ? '#EA3323'
+                    : d.avg < 4
+                      ? '#27828C'
+                      : '#4CC9C4')
+              },
+              label: {
+                show: true,
+                position: 'top',
+                fontSize: 10,
+                color: '#000',
+                formatter: p => p.value.toFixed(1)
+              }
+            };
+          })
+        }]
+      });
+
+      chart.on('click', function (params) {
+        showColorPicker(chartId, params.name);
+      });
+
+      chart.resize();
+    }
+
+
+
+function createEvaluationChart(container, data, title = '') {
+  const chart = echarts.init(container, null, { renderer: 'svg' });
+  chart.setOption({
+    grid: { top: 80, bottom: 60, left: 190, right: 60 },
+    
+     title: {
+    text: title,
+    left: 'center',
+    top: 10,
+    textStyle: {
+      fontSize: 20,
+      fontWeight: 'bold',
+      color: '#000'
+    }
+  },
+    xAxis: {
+      type: 'value',
+      min: 1,
+      max: 5,
+      splitLine: { show: false },
+      axisLabel: { show: false },
+      axisTick: { show: false },
+      axisLine: { show: false }
+    },
+    yAxis: {
+      type: 'category',
+      data: data.map(d => d.label.toUpperCase()),
+      axisLabel: {
+        fontSize: 16,
+        color: '#000',
+        margin: 20,
+        align: 'right'
+      },
+      axisTick: { show: false },
+      axisLine: { show: false }
+    },
+    series: [{
+      type: 'bar',
+      barWidth: 35,
+      data: data.map(d => ({
+        value: d.avg,
+        itemStyle: {
+          color: d.avg >= 5.0 ? '#4CC9C4' : '#2d9da1',
+          borderRadius: 3
+        },
+        label: {
+          show: true,
+          position: 'right',
+          margin: '20px',
+          distance:20,
+          fontSize: 16,
+          fontWeight: 'normal',
+          color: '#000',
+          formatter: p => p.value.toFixed(1)
+        }
+      }))
+    }]
+  });
+  chart.resize();
+}
+
+// NOVO WRAPPER PARA ESCOLHER QUAL GRÁFICO USAR
+function renderChart(container, data, section, turmaCount, title = '') {
+  if (section === 'evaluation' && turmaCount >= 1) {
+    createEvaluationChart(container, data, title);
+  } else {
+    createBarChart(container, title, data, section === 'evaluation');
+  }
+}
+
+// TEXT PAGE BUILDER
+function createTextPage(prog, sec, qid, showTitle) {
+  const tp = document.createElement('div');
+  tp.className = 'page text-page';
+  tp.innerHTML = `
+    <div class="header">
+      <img src="logo-branco.png">
+      <div class="section-title">${sec==='assessment'?'Assessment':'Avaliação'}</div>
+    </div>
+    <div class="content">
+          <div class="text-question">
+            ${showTitle?`<div class="text-question-title">${qid}</div>`:``}
+            <ul class="answer-list"></ul>
+          </div>
+        `;
+      return tp;
+    }
+
+  async function getTextQuestions(section, program) {
+      try {
+        const res = await fetch('text_questions.json');
+        const json = await res.json();
+        if (section === 'evaluation') {
+          return json.evaluation || [];
+        } else if (section === 'assessment') {
+          return (json.assessment || {})[program] || [];
+        }
+        return [];
+      } catch (e) {
+        console.error('Erro ao carregar perguntas de texto:', e);
+        return [];
+      }
+    }
+  async function build() {
+  const f = JSON.parse(localStorage.getItem('reportFilters') || '{}');
+  const [data, meta] = await Promise.all([
+    fetch('data.json').then(r => r.json()),
+    fetch('meta.json').then(r => r.json())
+  ]);
+  const LM = createLabelMap(meta.labels),
+        OM = createSortMap(meta.labels);
+  const root = document.getElementById('report');
+  root.innerHTML = '';
+
+  // Agora DENTRO do ciclo
+  for (const prog of f.programs || []) {
+    // 👇 cálculo do timeScope aqui dentro
+    let timeScope = '';
+    const start = (f.starts || {})[prog];
+    const end   = (f.ends || {})[prog];
+
+    if (start && end) {
+      const s = formatMonthYear(start),
+            e = formatMonthYear(end);
+      timeScope = `${s.month} – ${e.month} ${e.year}`;
+    }
+
+    const selTur = f[`turmas_${prog}`] || [];
+    const rows = data.filter(d =>
+      (f.clients || []).includes(d.client) &&
+      d.program === prog &&
+      selTur.includes(d.turma)
+    );
+    const pm = meta.titles.find(t => t.program_id === prog) || {};
+  
+   const hero = document.createElement('div');
+hero.className = 'page hero';
+hero.innerHTML = `
+  <div class="hero">
+    <img class="bg" src="hourglass-bg.png" />
+    <img class="report-logo-top" src="logo-branco.png" />
+    <div class="hero-content">
+      <h1>TRAINING REPORT</h1>
+      <div class="subtitle">${timeScope}</div>
+    </div>
+    <div class="site-footer-link">www.mind4time.com</div>
+  </div>`;
+
+root.appendChild(hero);
+
+
+        // Program details
+        const bannerImg =
+  prog.toLowerCase() === 'p365'
+    ? 'p365-banner.png'
+    : prog.toLowerCase() === 'colab365'
+    ? 'colab365-banner.png'
+    : 'p365-banner.png';
+        
+const info = document.createElement('div');
+info.className = 'page banner';
+info.innerHTML = `
+  <div class="content">
+  <div class="banner white-layout">
+    <img class="report-logo-top" src="logo-verde.png" />
+    <div class="banner-left">
+      <div class="banner-super">CORPORATE TRAINING</div>
+      <h1 class="banner-title">${pm.TÍTULO || prog}</h1>
+      <div class="banner-subtitle">${pm.SUBTÍTULO || ''}</div>
+      <div class="banner-details">
+        <div><strong>Scope Temporal:</strong> ${timeScope}</div>
+        <div><strong>Trainers:</strong> ${(f.trainers || {})[prog] || 'N/A'}</div>
+      </div>
+    </div>
+  </div>
+</div>
+  </div>`;
+root.appendChild(info);
+
+
+        // Sections
+        for (const sec of ['assessment','evaluation']) {
+          const name    = sec==='assessment'?'Assessment':'Avaliação';
+          const total   = countUnique(rows, sec);
+          const numeric = rows.filter(d=>
+            String(d.section||'').toLowerCase().includes(sec) &&
+            /^\d+(\.\d+)?$/.test(String(d.value).trim())
+          );
+          const byT     = Object.entries(groupBy(numeric,'turma'));
+
+       
+        // Sections
+        for (const sec of ['assessment','evaluation']) {
+          const name    = sec==='assessment'?'Assessment':'Avaliação';
+          const total   = countUnique(rows, sec);
+          const numeric = rows.filter(d=>
+            String(d.section||'').toLowerCase().includes(sec) &&
+            /^\d+(\.\d+)?$/.test(String(d.value).trim())
+          );
+          const byT     = Object.entries(groupBy(numeric,'turma'));
+            }
+
+          // banner
+            if (['assessment', 'evaluation'].includes(sec)) {
+              const bg    = sec === 'assessment' ? 'assessment-bg.png' : 'evaluation-bg.png';
+              const title = sec === 'assessment' ? 'TRAINING ASSESSMENT' : 'TRAINING EVALUATION';
+              const cover = document.createElement('div');
+              cover.className = 'page hero';
+              cover.innerHTML = `
+                <div class="hero">
+                  <img class="bg" src="${bg}">
+                  <img class="report-logo-top" src="logo-branco.png">
+                  <div class="hero-content">
+                    <h1 style="font-size: 2.5rem; letter-spacing: 0.05em; white-space:nowrap">${title}</h1>
+                  </div>
+                </div>`;
+              root.appendChild(cover);
+            }
+
+          
+    
+
+
+      // GRÁFICOS POR TURMA
+// GRÁFICOS NUMÉRICOS — UNIFICADO
+if (numeric.length) {
+  const showGlobal = byT.length > 1;
+  const isEvaluation = sec === 'evaluation';
+
+  // GRÁFICO GLOBAL (só se houver mais do que uma turma)
+  if (showGlobal) {
+    const gp = document.createElement('div'); 
+    gp.className = 'page';
+    gp.innerHTML = `
+      <div class="header">
+        <img src="logo-branco.png">
+        <div class="section-title">${name}</div>
+      </div>
+      <div class="content">
+        <div class="chart-fullpage">
+          <div class="chart-full" id="chart-global-${prog}-${sec}"></div>
+        </div>
+        <div class="chart-responses">NÚMERO DE RESPOSTAS: <strong>${total}</strong></div>
+      </div>
+      <div>www.MIND4TIME.com</div>
+      <div>© MIND4TIME ${currentYear}</div>
+    `;
+    root.appendChild(gp);
+    const el = gp.querySelector('.chart-full');
+    const chartData = computeAverages(numeric, LM, OM);
+    renderChart(el, chartData, sec, byT.length, 'Global');
+  }
+
+  // GRÁFICOS POR TURMA
+  byT.forEach(([turma, values], idx) => {
+    const page = document.createElement('div');
+    page.className = 'page';
+    page.innerHTML = `
+      <div class="header">
+        <img src="logo-branco.png">
+        <div class="section-title">${name}</div>
+      </div>
+      <div class="content">
+        <div class="chart-fullpage">
+          <div class="chart-full" id="chart-${prog}-${sec}-turma-${idx}"></div>
+        </div>
+        <div class="chart-responses">NÚMERO DE RESPOSTAS: <strong>${countUnique(values, sec)}</strong></div>
+      </div>`;
+    root.appendChild(page);
+
+    const el = page.querySelector('.chart-full');
+    const chartData = computeAverages(values, LM, OM);
+    renderChart(el, chartData, sec, byT.length, turma);
+  });
+}
+
+
+
+
+          // — TEXT ANSWERS WITH SPILL + FIT‑TO‑SHRINK —
+          const selQs = await getTextQuestions(sec, prog);
+          selQs.forEach(qid => {
+            const ans = data.filter(d =>
+              (f.clients || []).includes(d.client) &&
+              d.program === prog &&
+              (f.clientInfos || []).includes(d.client_info) &&
+              (f[`turmas_${prog}`] || []).includes(d.turma) &&
+              String(d.section || '').toLowerCase().includes(sec) &&
+              d.question === qid &&
+              isNaN(+d.value)
+            );
+            if (!ans.length) return;
+
+            const pagesForThisQ = [];
+            let page   = createTextPage(prog, sec, qid, true);
+            let listEl = page.querySelector('.answer-list');
+            root.appendChild(page);
+            pagesForThisQ.push(page);
+
+            ans.forEach(a => {
+              const li = document.createElement('li');
+              li.textContent = a.value;
+              listEl.appendChild(li);
+
+              // overflow spill logic
+              const tq = page.querySelector('.text-question');
+              if (tq.scrollHeight > tq.clientHeight) {
+                listEl.removeChild(li);
+                page   = createTextPage(prog, sec, qid, false);
+                listEl = page.querySelector('.answer-list');
+                root.appendChild(page);
+                pagesForThisQ.push(page);
+                listEl.appendChild(li);
+              }
+            });
+
+            // shrink each grey box
+            pagesForThisQ.forEach(pg => {
+              const tq = pg.querySelector('.text-question');
+              tq.style.height = tq.scrollHeight + 'px';
+            });
+          });
+
+        } // end for sec
+      }   // end for prog
+    
+      // ADD FINAL COVER PAGE com logótipo e link
+const endPage = document.createElement('div');
+endPage.className = 'page hero endpage';
+endPage.innerHTML = `
+  <img class="bg" src="hourglass-bg.png">
+  <div class="hero end-hero">
+    <img class="report-logo-top end-logo" src="logo-branco.png" />
+    <div class="site-footer-link end-text">www.mind4time.com</div>
+  </div>`;
+
+root.appendChild(endPage);
+
+
+    }
+   
+
+    // PDF
+ async function generatePdf() {
+    await build();
+    document.querySelectorAll('.chart-full, .chart-box').forEach(el => {
+      const c = echarts.getInstanceByDom(el);
+      if (c) c.resize();
+    });
+    await new Promise(r => setTimeout(r, 100));
+
+    const pages = Array.from(document.querySelectorAll('.page'));
+    const CANVAS_SCALE = 2;
+    const images = await Promise.all(
+      pages.map(pg =>
+        html2canvas(pg, {
+          backgroundColor: '#fff',
+          useCORS: true,
+          scale: CANVAS_SCALE
+        }).then(cnv => cnv.toDataURL('image/png', 1.0))
+      )
+    );
+
+    // Get month label from selected program's "ends" value
+    const f = JSON.parse(localStorage.getItem('reportFilters') || '{}');
+    const prog = (f.programs && f.programs[0]) || null;
+    const endValue = (prog && f.ends && f.ends[prog]) || '2025-05';
+    const [year, month] = endValue.split('-');
+    const monthNames = {
+      '01': 'janeiro', '02': 'fevereiro', '03': 'março', '04': 'abril',
+      '05': 'maio', '06': 'junho', '07': 'julho', '08': 'agosto',
+      '09': 'setembro', '10': 'outubro', '11': 'novembro', '12': 'dezembro'
+    };
+    const formattedMonth = `${monthNames[month]}.${year.slice(-2)}`;
+    const fileName = `MIND4TIME Training Report ${formattedMonth}.pdf`;
+
+    pdfMake.createPdf({
+      pageSize: { width: 1920, height: 1080 },
+      pageMargins: [0, 0, 0, 0],
+      content: images.map((img, i) => ({
+        image: img, width: 1920,
+        pageBreak: i < images.length - 1 ? 'after' : undefined
+      }))
+    }).download(fileName);
+  }
+
+  document.addEventListener('DOMContentLoaded', () => {
+    document.getElementById('gerar-pdf').addEventListener('click', generatePdf);
+    build();
+  });
+  </script>
+</body>
+</html>

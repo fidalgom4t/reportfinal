@@ -20,7 +20,10 @@
 
 
   <style>
-    html, body { margin:0; padding:0; background:#333; font-family:'Roboto',sans-serif; }
+
+    /* RESET & PAGE SETUP */
+    html, body { margin:0; padding:0; background:#333; }
+    body { font-family:'Roboto',sans-serif; }
     @page { size:960px 540px; margin:0; }
     @media print { .page { page-break-after: always; } }
 
@@ -874,7 +877,7 @@ document.querySelectorAll('.resumo-btn-global:not(.eliminar-pagina-btn)').forEac
         summaryPage = createSummaryPage(titleEl.textContent.trim(), section);
         summaryPage.dataset.qid = qid;
         report.insertBefore(summaryPage, pg);
-        btn.textContent = 'Eliminar Resumo';
+        btn.textContent = 'Eliminar Resumo 
         btn.style.background = '#d9534f';
       } else {
         summaryPage.remove();
@@ -1158,6 +1161,17 @@ selQs.forEach(qid => {
 
 
   if (!ans.length) return;
+          selQs.forEach(qid => {
+            const ans = data.filter(d =>
+              (f.clients || []).includes(d.client) &&
+              d.program === prog &&
+              (f.clientInfos || []).includes(d.client_info) &&
+              (f[`turmas_${prog}`] || []).includes(d.turma) &&
+              String(d.section || '').toLowerCase().includes(sec) &&
+              d.question === qid &&
+              isNaN(+d.value)
+            );
+            if (!ans.length) return;
 
             const pagesForThisQ = [];
             let page   = createTextPage(prog, sec, qid, true);

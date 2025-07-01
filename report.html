@@ -1361,9 +1361,15 @@ for (const [qid, html] of Object.entries(summaryCache)) {
 
 
 
+async function generatePptx() {
+  // 👉 1. Guarda as páginas marcadas como “deleted”
+  const deletedQids = new Set(
+    Array.from(document.querySelectorAll('.page[data-qid]'))
+         .filter(pg => pg.dataset.deleted === 'true')
+         .map(pg => pg.dataset.qid)
+  );
 
- async function generatePptx() {
-  // 👉 1. Recolhe os resumos existentes
+  // 👉 2. Recolhe os resumos existentes
   const summaryCache = {};
   document.querySelectorAll('.summary-page').forEach(pg => {
     const qid = pg.dataset.qid;
@@ -1371,24 +1377,25 @@ for (const [qid, html] of Object.entries(summaryCache)) {
     if (qid) summaryCache[qid] = html;
   });
 
-  // 👉 2. Recolhe os edits em todos os contenteditable
+  // 👉 3. Recolhe os edits em todos os contenteditable
   const editCache = getEditableContentMap();
 
-  // 👉 3. Reconstrói o relatório
+  // 👉 4. Reconstrói o relatório
   await build();
-  
-for (const qid of deletedQids) {
-  document.querySelectorAll(`.page[data-qid="${qid}"]`).forEach(pg => pg.remove());
-  document.querySelectorAll(`[data-qid="${qid}"]`).forEach(btn => btn.remove());
-}
-  // 👉 4. Restaura os edits manuais
+
+  // 👉 5. Remove todas as páginas eliminadas do DOM
+  deletedQids.forEach(qid => {
+    document.querySelectorAll(`.page[data-qid="${qid}"]`).forEach(pg => pg.remove());
+    document.querySelectorAll(`[data-qid="${qid}"]`).forEach(el => el.remove());
+  });
+
+  // 👉 6. Restaura as edições manuais
   applyEditableContentMap(editCache);
 
-  // 👉 5. Reinsere os resumos
+  // 👉 7. Reinsere os resumos
   for (const [qid, html] of Object.entries(summaryCache)) {
     const target = [...document.querySelectorAll('.page.text-page')]
       .find(p => (p.dataset.qid || '').trim() === qid.trim());
-
     if (target) {
       const sectionTitle = target.querySelector('.section-title')?.textContent || 'Resumo';
       const summary = createSummaryPage(qid, sectionTitle);
@@ -1398,46 +1405,41 @@ for (const qid of deletedQids) {
     }
   }
 
-  // 👉 6. Atualiza tamanhos dos gráficos antes de capturar
+  // 👉 8. Redimensiona gráficos antes de capturar
   document.querySelectorAll('.chart-full, .chart-box').forEach(el => {
     const c = echarts.getInstanceByDom(el);
     if (c) c.resize();
   });
-
-
   await new Promise(r => setTimeout(r, 100));
 
-  // 👉 5. Gera os slides
+  // 👉 9. Gera os slides
   const pptx = new PptxGenJS();
-  const pages = document.querySelectorAll('.page');
-
-  for (const pg of pages) {
+  for (const pg of document.querySelectorAll('.page')) {
     const cnv = await html2canvas(pg, {
       backgroundColor: '#fff',
       useCORS: true,
       scale: 2
     });
-
     const dataUrl = cnv.toDataURL('image/png', 1.0);
     const slide = pptx.addSlide();
     slide.background = { color: 'FFFFFF' };
     slide.addImage({ data: dataUrl, x: 0, y: 0, w: 10, h: 5.625 }); // 16:9
   }
 
-  // 👉 6. Nome do ficheiro
+  // 👉 10. Nome do ficheiro
   const f = JSON.parse(localStorage.getItem('reportFilters') || '{}');
   const prog = (f.programs && f.programs[0]) || null;
   const endValue = (prog && f.ends && f.ends[prog]) || '2025-05';
   const [year, month] = endValue.split('-');
   const monthNames = {
-    '01': 'janeiro', '02': 'fevereiro', '03': 'março', '04': 'abril',
-    '05': 'maio', '06': 'junho', '07': 'julho', '08': 'agosto',
-    '09': 'setembro', '10': 'outubro', '11': 'novembro', '12': 'dezembro'
+    '01': 'janeiro','02': 'fevereiro','03': 'março','04': 'abril',
+    '05': 'maio','06': 'junho','07': 'julho','08': 'agosto',
+    '09': 'setembro','10': 'outubro','11': 'novembro','12': 'dezembro'
   };
   const formattedMonth = `${monthNames[month]}.${year.slice(-2)}`;
   const fileName = `MIND4TIME Training Report ${formattedMonth}.pptx`;
 
-  // 👉 7. Descarrega
+  // 👉 11. Descarrega
   pptx.writeFile({ fileName });
 }
 

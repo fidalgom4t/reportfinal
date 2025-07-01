@@ -722,24 +722,20 @@ function enableDeletePageButtons() {
 }
 
 
-
-
-
 function createEvaluationChart(container, data, title = '') {
   const chart = echarts.init(container, null, { renderer: 'svg' });
   chart.setOption({
     grid: { top: 80, bottom: 60, left: 190, right: 60 },
-    
-     title: {
-    text: title,
-    left: 'center',
-    top: 10,
-    textStyle: {
-      fontSize: 20,
-      fontWeight: 'bold',
-      color: '#000'
-    }
-  },
+    title: {
+      text: title,
+      left: 'center',
+      top: 10,
+      textStyle: {
+        fontSize: 20,
+        fontWeight: 'bold',
+        color: '#000'
+      }
+    },
     xAxis: {
       type: 'value',
       min: 1,
@@ -761,30 +757,49 @@ function createEvaluationChart(container, data, title = '') {
       axisTick: { show: false },
       axisLine: { show: false }
     },
-    series: [{
-      type: 'bar',
-      barWidth: 35,
-      data: data.map(d => ({
-        value: d.avg,
+    series: [
+      {
+        name: 'Avaliação',
+        type: 'bar',
+        barWidth: 35,
+        data: data.map(d => d.avg),
         itemStyle: {
-          color: d.avg >= 5.0 ? '#4CC9C4' : '#2d9da1',
+          color: params => params.value >= 5.0 ? '#4CC9C4' : '#2d9da1',
           borderRadius: 3
         },
         label: {
-          show: true,
-          position: 'right',
-          margin: '20px',
-          distance:20,
-          fontSize: 16,
-          fontWeight: 'normal',
-          color: '#000',
-          formatter: p => p.value.toFixed(1)
+          show: false
         }
-      }))
-    }]
+      },
+      {
+        name: 'Rótulo Fixo',
+        type: 'custom',
+        renderItem: function (params, api) {
+          const idx = params.dataIndex;
+          // Coordenadas da posição para valor 5.0
+        const coord = api.coord([5, idx]);
+        const x = coord[0] + 10;  // desloca 10px para a direita
+          const y = api.coord([0, idx])[1];
+          return {
+            type: 'text',
+            position: [x, y],
+            style: {
+              text: api.value(0).toFixed(1),
+              textAlign: 'left',
+              textVerticalAlign: 'middle',
+              fontSize: 16,
+              fill: '#000'
+            }
+          };
+        },
+        data: data.map(d => d.avg)
+      }
+    ]
   });
   chart.resize();
 }
+
+
 
 // NOVO WRAPPER PARA ESCOLHER QUAL GRÁFICO USAR
 function renderChart(container, data, section, turmaCount, title = '') {
@@ -848,6 +863,7 @@ document.querySelectorAll('.resumo-btn-global:not(.eliminar-pagina-btn)').forEac
     const btn = document.createElement('button');
     btn.textContent = 'Criar Resumo';
     btn.className = 'resumo-btn-global';
+    btn.dataset.qid = qid;
     btn.style.background = '#27828C';
     btn.style.position = 'fixed';
     btn.style.zIndex = '3000';

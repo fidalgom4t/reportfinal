@@ -747,6 +747,7 @@ function createEvaluationChart(container, data, title = '') {
     },
     yAxis: {
       type: 'category',
+      inverse:true,
       data: data.map(d => d.label.toUpperCase()),
       axisLabel: {
         fontSize: 16,

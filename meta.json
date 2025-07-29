@@ -563,6 +563,36 @@
       "LABEL": "RECOMENDARIA?",
       "": "",
       "sort order": 4
+    },
+    {
+      "QUESTION ID": "",
+      "LABEL": "",
+      "": "",
+      "sort order": ""
+    },
+    {
+      "QUESTION ID": "",
+      "LABEL": "",
+      "": "",
+      "sort order": ""
+    },
+    {
+      "QUESTION ID": "",
+      "LABEL": "",
+      "": "",
+      "sort order": ""
+    },
+    {
+      "QUESTION ID": "",
+      "LABEL": "",
+      "": "",
+      "sort order": ""
+    },
+    {
+      "QUESTION ID": "01. Considero que o programa teve impacto: tenho maior visibilidade sobre os meus projetos (timings, deliverables, milestones).",
+      "LABEL": "02. Considero que o programa teve impacto: há maior clareza nos acordos e decisões sobre assuntos/projetos",
+      "": "06. Qual a probabilidade de recomendar este programa a um colega ou amigo?",
+      "sort order": "04. Considero que o programa teve impacto: sinto maior alinhamento na equipa de direção."
     }
   ],
   "titles": [

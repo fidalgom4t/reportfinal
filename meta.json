@@ -592,37 +592,37 @@
       "QUESTION ID": "01. Considero que o programa teve impacto: tenho maior visibilidade sobre os meus projetos (timings, deliverables, milestones).",
       "LABEL": "VISIBILIDADE",
       "": "",
-      "sort order": ""
+      "sort order": 1
     },
     {
       "QUESTION ID": "02. Considero que o programa teve impacto: há maior clareza nos acordos e decisões sobre assuntos/projetos",
       "LABEL": "CLAREZA",
       "": "",
-      "sort order": ""
+      "sort order": 2
     },
     {
       "QUESTION ID": "03. Considero que o programa teve impacto: é mais fácil saber e/ou reportar o ponto de situação de projetos estratégicos de forma autónoma e assíncrona.",
       "LABEL": "REPORTING",
       "": "",
-      "sort order": ""
+      "sort order": 3
     },
     {
       "QUESTION ID": "04. Considero que o programa teve impacto: sinto maior alinhamento na equipa de direção.",
       "LABEL": "ALINHAMENTO",
       "": "",
-      "sort order": ""
+      "sort order": 4
     },
     {
       "QUESTION ID": "05. Sinto que tenho maior sensação de controlo sobre os principais projetos em curso.",
       "LABEL": "CONTROLO",
       "": "",
-      "sort order": ""
+      "sort order": 5
     },
     {
       "QUESTION ID": "06. Qual a probabilidade de recomendar este programa a um colega ou amigo?",
       "LABEL": "RECOMENDARIA",
       "": "",
-      "sort order": ""
+      "sort order": 6
     }
   ],
   "titles": [

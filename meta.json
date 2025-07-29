@@ -590,13 +590,13 @@
     },
     {
       "QUESTION ID": "01. Considero que o programa teve impacto: tenho maior visibilidade sobre os meus projetos (timings, deliverables, milestones).",
-      "LABEL": "",
+      "LABEL": "VISIBILIDADE",
       "": "",
       "sort order": ""
     },
     {
       "QUESTION ID": "02. Considero que o programa teve impacto: há maior clareza nos acordos e decisões sobre assuntos/projetos",
-      "LABEL": "",
+      "LABEL": "CLAREZA",
       "": "",
       "sort order": ""
     },

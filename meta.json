@@ -620,7 +620,7 @@
     },
     {
       "QUESTION ID": "06. Qual a probabilidade de recomendar este programa a um colega ou amigo?",
-      "LABEL": "",
+      "LABEL": "RECOMENDARIA",
       "": "",
       "sort order": ""
     }

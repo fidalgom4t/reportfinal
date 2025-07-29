@@ -1040,10 +1040,16 @@ info.innerHTML = `
       <div class="banner-super">CORPORATE TRAINING</div>
       <h1 class="banner-title"contenteditable="true" data-edit-id="banner-title-main" spellcheck="true">${pm.TÍTULO || prog}</h1>
       <div class="banner-subtitle" contenteditable="true" data-edit-id="banner-subtitle-main">${pm.SUBTÍTULO || ''}</div>
-      <div class="banner-details">
-        <div><strong>Scope Temporal:</strong> ${timeScope}</div>
-        <div><strong>Trainers:</strong> ${(f.trainers || {})[prog] || 'N/A'}</div>
-      </div>
+     <div class="banner-details">
+  <div>
+    <strong>Scope Temporal:</strong>
+    <span contenteditable="true" spellcheck="true" data-edit-id="time-scope-${prog}">${timeScope}</span>
+  </div>
+  <div>
+    <strong>Trainers:</strong>
+    <span contenteditable="true" spellcheck="true" data-edit-id="trainers-${prog}">${(f.trainers || {})[prog] || 'N/A'}</span>
+  </div>
+</div>
     </div>
   </div>
 </div>

@@ -29,4 +29,10 @@
     "05. What are the main reasons for your recommendation?",
     "06. Any additional comments or suggestions?"
   ]
+    },
+ "CUSTOM": [
+    "07. Quais as principais razões da sua avaliação na pergunta anterior?",
+    "08. Na sua opinião quais foram os principais benefícios / mais valias do programa? O que ficou melhor? ",
+    "09. Algum comentário ou sugestão adicional?",
+  ]
 }

@@ -15,487 +15,178 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.7/vfs_fonts.js"></script>
 
   <!-- PptxGenJS -->
-<script src="https://cdn.jsdelivr.net/npm/pptxgenjs@3.11.0/dist/pptxgen.bundle.js"></script>
-
-
+  <script src="https://cdn.jsdelivr.net/npm/pptxgenjs@3.11.0/dist/pptxgen.bundle.js"></script>
 
   <style>
     html, body { margin:0; padding:0; background:#333; font-family:'Roboto',sans-serif; }
     @page { size:960px 540px; margin:0; }
     @media print { .page { page-break-after: always; } }
 
-    .page {
-      position:relative;
-      width:960px; height:540px;
-      margin:20px auto; background:#fff;
-      overflow:hidden; box-sizing:border-box;
-    }
-
+    .page { position:relative; width:960px; height:540px; margin:20px auto; background:#fff; overflow:hidden; box-sizing:border-box; }
     .header, .footer {
-      position:absolute; left:0; right:0;
-      display:flex; justify-content:space-between; align-items:center;
+      position:absolute; left:0; right:0; display:flex; justify-content:space-between; align-items:center;
       padding:0 30px; background:#349ca1; z-index:10;
     }
     .header { top:0; height:50px; font-weight:bold; }
     .header img { height:60px; }
-    .footer {
-      bottom:0; height:60px; border-top:1px solid #40a3a3;
-      color:#007c91; font-size:14px; font-weight:bold;
-    }
+    .footer { bottom:0; height:60px; border-top:1px solid #40a3a3; color:#007c91; font-size:14px; font-weight:bold; }
 
-    .page > .content {
-      position:absolute; top:60px; bottom:30px; left:0; right:0;
-      overflow:visible; box-sizing:border-box;
-    }
-
+    .page > .content { position:absolute; top:60px; bottom:30px; left:0; right:0; overflow:visible; box-sizing:border-box; }
     .content > * { width:100%; height:100%; position:relative; }
 
-    .page.hero {
-      position: relative;
-      overflow: hidden;
-      background-color: #0f2a2e;
-    }
+    .page.hero { position: relative; overflow: hidden; background-color: #0f2a2e; }
+    .page.hero .bg { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; z-index: 1; }
+    .page.hero .hero { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: flex-start; z-index: 2; padding: 60px 30px; gap: 30px; }
+    .report-logo-top { display:block; height:auto; max-height:100px; width:auto; max-width:240px; object-fit:contain; margin:-20px auto 60px auto; position:relative; z-index:2; }
+    .hero-content { position:absolute; top:50%; left:50%; transform: translate(-50%, -30%); z-index:2; display:flex; flex-direction:column; align-items:center; text-align:center; color:white; }
+    .hero-content h1 { font-size:2.8rem; margin:0; font-weight:700; letter-spacing:0.02em; }
+    .hero-content .subtitle { font-size:1.2rem; margin-top:10px; opacity:0.9; }
 
-    .page.hero .bg {
-      position: absolute;
-      inset: 0;
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-      z-index: 1;
-    }
+    .banner.white-layout { background:white; position:relative; height:100%; box-sizing:border-box; padding-top:20px; display:flex; flex-direction:column; align-items:center; }
+    .banner.white-layout .report-logo-top { margin-top:-60px; margin-bottom:60px; }
+    .banner-left { display:flex; flex-direction:column; justify-content:flex-start; align-items:flex-start; max-width:700px; text-align:left; margin-top:-20px; }
+    .banner-super { font-size:1rem; font-weight:400; letter-spacing:0.05em; margin-bottom:10px; text-transform:uppercase; color:#444; }
+    .banner-title { font-size:3rem; font-weight:700; color:#27828C; margin:0; letter-spacing:0.1em; }
+    .banner-subtitle { font-size:1.2rem; color:#333; margin-top:10px; margin-bottom:50px; font-weight:400; }
 
-    .page.hero .hero {
-  position: absolute;
-  inset: 0;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: flex-start; /* 👈 em vez de center */
-  z-index: 2;
-  padding: 60px 30px;
-  gap: 30px; /* 👈 espaçamento natural entre elementos */
-}
+    .banner-details { font-size:1rem; line-height:1.6; color:#000; font-weight:400; text-align:left; }
+    .banner-details strong { font-weight:700; }
 
+    .chart-fullpage { display:flex; align-items:center; justify-content:center; padding:20px; box-sizing:border-box; overflow:visible; }
+    .chart-full { width:100%; height:100%; overflow:visible; }
 
-   .report-logo-top {
-  display: block;
-  height: auto;
-  max-height: 100px;
-  width: auto;
-  max-width: 240px;
-  object-fit: contain;
-  margin: -20px auto 60px auto;
-  position: relative;
-  z-index: 2;
-}
-
-
-    .hero-content {
-      position: absolute;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -30%);
-      z-index: 2;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      text-align: center;
-      color: white;
-    }
-
-    .hero-content h1 {
-      font-size: 2.8rem;
-      margin: 0;
-      font-weight: 700;
-      letter-spacing: 0.02em;
-    }
-
-    .hero-content .subtitle {
-      font-size: 1.2rem;
-      margin-top: 10px;
-      opacity: 0.9;
-    }
-
-    .hero-footer {
-      position: absolute;
-      bottom: 30px;
-      width: 100%;
-      text-align: center;
-      font-size: 0.95rem;
-      color: white;
-      z-index: 2;
-    }
-
-    .banner.white-layout {
-  background: white;
-  position: relative;
-  height: 100%;
-  box-sizing: border-box;
-  padding-top:20px; /* 👈 estava 60px antes — agora mais próximo do topo */
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-}
-
-.banner.white-layout .report-logo-top {
-  margin-top: -60px; /* 👈 ou -20px para subir mais */
-  margin-bottom: 60px;
-}
-
-
-    .banner-left {
-      display: flex;
-      flex-direction: column;
-      justify-content: flex-start;
-      align-items: flex-start;
-      max-width: 700px;
-      text-align: left;
-      margin-top: -20px;
-    }
-
-    .banner-super {
-      font-size: 1rem;
-      font-weight: 400;
-      letter-spacing: 0.05em;
-      margin-bottom: 10px;
-      text-transform: uppercase;
-      color: #444;
-    }
-
-    .banner-title {
-      font-size: 3rem;
-      font-weight: 700;
-      color: #27828C;
-      margin: 0;
-      letter-spacing: 0.1em;
-    }
-
-    .banner-subtitle {
-      font-size: 1.2rem;
-      color: #333;
-      margin-top: 10px;
-      margin-bottom: 50px;
-      font-weight: 400;
-    }
-
-    .banner-details {
-      font-size: 1rem;
-      line-height: 1.6;
-      color: #000;
-      font-weight: 400;
-      text-align: left;
-    }
-
-    .banner-details strong {
-      font-weight: 700;
-    }
-
-
-
-    .chart-fullpage {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      padding: 20px;
-      box-sizing: border-box;
-      overflow: visible;
-    }
-
-    .chart-full {
-      width:100%;
-      height: 100%;
-      overflow: visible;
-    }
-
-   .chart-grid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  grid-template-rows: 300px 300px; /* ou ajusta consoante o espaço */
-  gap: 20px;
-}
-
-
-    .chart-box {
-  width: 100%;
-  height: 400px;
-  display: flex;
-  flex-direction: column;
-  justify-content: flex-start;
-}
-.chart-turma-title {
-  font-size: 14px;
-  font-weight: bold;
-  text-align: center;
-  margin-bottom: 8px;
-  color: #000;
-}
-
-.chart-inner-box {
-  flex: 1;
-  width: 100%;
-}
-    .text-page {
-      padding: 20px;
-      box-sizing: border-box;
-    }
-
+    .text-page { padding:20px; box-sizing:border-box; }
     .text-question {
-      background: #fff;
-      box-sizing: border-box;
-      max-width: calc(100% - 200px);
-      max-height: 100%;
-      overflow: visible;
-      page-break-inside: avoid;
-      break-inside: avoid;
-      margin: 50px auto;
+      background:#fff; box-sizing:border-box;
+      max-width:calc(100% - 200px);
+      height:360px;
+      overflow:hidden;
+      page-break-inside:avoid; break-inside:avoid;
+      margin:50px auto;
+      padding-right:8px;
+    }
+    .text-question-title { font-size:1.2rem; margin-bottom:10px; color:#349ca1; }
+    .text-question ul { padding-left:16px; font-size:0.75rem; line-height:1.6; }
+    .text-question li { margin-bottom:8px; }
+
+    .page.text-page .content { display:flex; align-items:flex-start; justify-content:center; }
+
+    .header .section-title { text-transform:uppercase; color:#fff; letter-spacing:0.05em; font-size:1rem; }
+    .page.hero > .header, .page.hero > .footer { display:none; }
+    .page.hero > .content { top:0; bottom:0; }
+    .page.banner { overflow:visible; }
+
+    .chart-responses { text-align:center; font-size:0.95rem; margin-top:-10px; margin-bottom:0px; font-weight:400; }
+    .chart-responses strong { font-weight:bold; }
+
+    .site-footer-link { position:absolute; bottom:30px; width:100%; text-align:center; font-size:1.2rem; color:white; opacity:0.85; z-index:2; }
+    .end-hero { display:flex; flex-direction:column; align-items:center; justify-content:center; height:100%; z-index:2; }
+    .end-hero .site-footer-link { font-size:1.2rem; color:white; text-align:center; margin-bottom:20px; z-index:10; position:relative; }
+    .page.hero.endpage .end-hero { display:flex; flex-direction:column; align-items:center; justify-content:center; height:100%; z-index:2; }
+    .page.hero.endpage .end-logo { max-width:240px; max-height:100px; margin-bottom:20px; }
+    .page.hero.endpage .end-text { font-size:1.2rem; color:white; text-align:center; margin-top:10px; z-index:10; position:relative; }
+
+    /* Export buttons */
+    #export-buttons{
+      position:fixed !important;
+      top:10px !important;
+      right:10px !important;
+      z-index:1000 !important;
+      display:flex !important;
+      gap:10px !important;
+    }
+    #export-buttons button{
+      padding:8px 16px !important;
+      background:#007c91 !important;
+      color:#fff !important;
+      border:none !important;
+      border-radius:6px !important;
+      cursor:pointer !important;
+      font-family:'Roboto',sans-serif !important;
+      font-size:14px !important;
+      box-shadow:0 1px 3px rgba(0,0,0,.25);
     }
 
-    .text-question-title {
-      font-size: 1.2rem;
-      margin-bottom: 10px;
-      color: #349ca1;
-    }
-
-    .text-question ul {
-      padding-left: 16px;
-      font-size: 0.75rem;
-      line-height: 1.6;
-    }
-
-    .text-question li {
-      margin-bottom: 8px;
-    }
-
-    .page.text-page .answer-list {
-      max-height: 100%;
-      overflow: hidden;
-    }
-
-    .page.text-page .content {
-      display: flex;
-      align-items: flex-start;
-      justify-content: center;
-    }
-
-    .page.text-page .content > .text-question {
-      height: auto;
-      max-height: 360px;
-      overflow-y: auto;
-      display: inline-block;
-    }
-
-    .header .section-title {
-      text-transform: uppercase;
-      color: #fff;
-      font-weight: 10;
-      letter-spacing: 0.05em;
-      font-size: 1rem;
-      font-style: none;
-    }
-
-    .page.hero > .header,
-    .page.hero > .footer {
-      display: none;
-    }
-
-    .page.hero > .content {
-      top: 0;
-      bottom: 0;
-    }
-
-    .page.banner {
-  overflow: visible;
-}
-.chart-responses {
-  text-align: center;
-  font-size: 0.95rem;
-  margin-top: -10px;
-  margin-bottom: 0px;
-  font-weight: 400;
-}
-.chart-responses strong {
-  font-weight: bold;
-}
-
-.site-footer-link {
-  position: absolute;
-  bottom: 30px;
-  width: 100%;
-  text-align: center;
-  font-size: 1.2rem;
-  color: white;
-  opacity: 0.85;
-  z-index: 2;
-}
-
-.end-hero {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  height: 100%;
-  z-index: 2;
-}
-
-
-.end-hero .site-footer-link {
-  font-size: 1.2rem;
-  color: white;
-  text-align: center;
-  margin-bottom: 20px;
-  z-index: 10;
-  position: relative;
-}
-
-.page.hero.endpage .end-hero {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  height: 100%;
-  z-index: 2;
-}
-
-.page.hero.endpage .end-logo {
-  max-width: 240px;
-  max-height: 100px;       /* 👈 aumenta o tamanho */
-  margin-bottom: 20px;
-}
-
-.page.hero.endpage .end-text {
-  font-size: 1.2rem;
-  color: white;
-  text-align: center;
-  margin-top: 10px;
-  z-index: 10;
-  position: relative;
-}
-
+    /* Paleta de cores (barras) */
     #color-picker-container {
-      position: fixed;
-      top: 60px;
-      right: 10px;
-      z-index: 2000;
-      background: #fff;
-      border: 1px solid #ccc;
-      padding: 10px;
-      display: none;
-      box-shadow: 0 2px 10px rgba(0,0,0,0.3);
+      position: fixed; top: 60px; right: 10px; z-index: 2000; background: #fff; border: 1px solid #ccc;
+      padding: 10px; display: none; box-shadow: 0 2px 10px rgba(0,0,0,0.3);
     }
-.color-option {
-      width: 30px;
-      height: 30px;
-      border: none;
-      margin: 4px;
-      cursor: pointer;
-    }
+    .color-option { width: 30px; height: 30px; border: none; margin: 4px; cursor: pointer; }
 
-.summary-page {
-      position: relative;
-      width: 960px;
-      height: 540px;
-      margin: 20px auto;
-      box-sizing: border-box;
-      padding: 40px;
-      background: #fff;
-      font-family: 'Roboto', sans-serif;
-      font-size: 14px;
-      color: #000;
-    }
-    .summary-page .header {
+    /* Botões flutuantes por página */
+    .floating-btn {
       position:absolute;
-      top:0; left:0; right:0;
-      height:50px;
-      background:#349ca1;
-      display:flex;
-      align-items:center;
-      justify-content:space-between;
-      padding:0 30px;
-      color:#fff;
-      font-weight:bold;
-    }
-    .summary-page .footer {
-      position:absolute;
-      bottom:0; left:0; right:0;
-      height:30px;
-      background:#349ca1;
-      display:flex;
-      align-items:center;
-      justify-content:center;
-      color:#fff;
+      z-index:5000;
+      background:#fff;
+      color:#27828C;
+      border:1px solid #27828C;
+      border-radius:6px;
+      padding:6px 10px;
       font-size:12px;
+      cursor:pointer;
+      box-shadow:0 2px 6px rgba(0,0,0,.15);
     }
-    .summary-page h2 {
-      color: #349ca1;
-      font-size: 18px;
-      margin: 60px 0 10px;
-    }
-    .summary-page ul {
-      padding-left: 20px;
-    }
-    .summary-page li {
-      margin-bottom: 8px;
-    }
-    .editable {
-      min-height: 280px;
-      padding: 10px;
-      outline: none;
-    }
+    .floating-btn:hover { background:#27828C; color:#fff; }
+    .eliminar-pagina-btn { background:#d9534f; color:#fff; border:none; box-shadow:0 2px 6px rgba(0,0,0,.2); }
 
-    .resumo-btn-global {
-      position: absolute;
-      z-index: 3000;
-      top: 20px;
-      right: 120px;
-      background: #27828C;
-      color: white;
-      border: none;
-      padding: 6px 12px;
-      font-size: 13px;
-      cursor: pointer;
+    /* Painel de rótulos */
+    #labels-panel {
+      position:fixed;
+      top:80px; right:10px;
+      width:320px; max-height:70vh; overflow:auto;
+      background:#fff; border:1px solid #ddd; border-radius:8px;
+      box-shadow:0 4px 16px rgba(0,0,0,.2);
+      padding:10px; z-index:3000; display:none;
+      font-size:12px; color:#333;
     }
+    #labels-panel h4 { margin:0 0 8px 0; font-size:14px; color:#27828C; }
+    #labels-panel .row { display:flex; gap:6px; align-items:center; margin-bottom:6px; }
+    #labels-panel .row code { font-size:10px; background:#f4f4f4; padding:1px 4px; border-radius:4px; color:#666; }
+    #labels-panel input[type="text"]{ flex:1; padding:6px 8px; border:1px solid #ddd; border-radius:4px; font-size:12px; }
+    #labels-panel .actions{ display:flex; gap:8px; margin-top:8px; flex-wrap:wrap; }
+    #labels-panel button{ border:1px solid #ddd; background:#fff; padding:6px 10px; border-radius:4px; cursor:pointer; font-size:12px; }
+    #labels-panel .hint{ color:#777; font-size:11px; margin-top:4px; }
 
- #export-buttons {
-      position: fixed;
-      top: 10px;
-      right: 10px;
-      z-index: 1000;
-      display: flex;
-      gap: 10px;
+    /* Painel de perguntas (modo editável) */
+    #questions-panel {
+      position:fixed;
+      top:80px; right:350px;
+      width:360px; max-height:70vh; overflow:auto;
+      background:#fff; border:1px solid #ddd; border-radius:8px;
+      box-shadow:0 4px 16px rgba(0,0,0,.2);
+      padding:10px; z-index:3000; display:none;
+      font-size:12px; color:#333;
     }
+    #questions-panel h4 { margin:0 0 8px 0; font-size:14px; color:#27828C; }
+    #questions-panel .q-list { display:flex; flex-direction:column; gap:6px; }
+    #questions-panel .q-item { display:flex; align-items:center; gap:8px; }
+    #questions-panel .actions { display:flex; gap:8px; margin-top:8px; }
+    #questions-panel button { border:1px solid #ddd; background:#fff; padding:6px 10px; border-radius:4px; cursor:pointer; font-size:12px; }
 
-    #export-buttons button {
-      padding: 8px 16px;
-      background: #007c91;
-      color: #fff;
-      border: none;
-      border-radius: 6px;
-      cursor: pointer;
-      font-family: 'Roboto', sans-serif;
-      font-size: 14px;
+    /* Painel Largura Barras */
+    #width-panel {
+      position:fixed;
+      top:80px; right:730px;
+      width:300px; background:#fff; border:1px solid #ddd; border-radius:8px;
+      box-shadow:0 4px 16px rgba(0,0,0,.2);
+      padding:12px; z-index:3000; display:none; font-size:12px; color:#333;
     }
-
- .eliminar-pagina-btn {
-  top: 10px;
-  right: 120px;
-  z-index: 5000;
-  background: #d9534f;
-  color: white;
-  border: none;
-  padding: 6px 12px;
-  font-size: 13px;
-  cursor: pointer;
-}
-
+    #width-panel h4 { margin:0 0 10px 0; font-size:14px; color:#27828C; }
+    #width-panel .row { display:flex; align-items:center; gap:8px; }
+    #width-panel input[type="range"]{ flex:1; }
+    #width-panel .actions{ display:flex; gap:8px; margin-top:10px; flex-wrap:wrap; }
+    #width-panel button{ border:1px solid #ddd; background:#fff; padding:6px 10px; border-radius:4px; cursor:pointer; font-size:12px; }
   </style>
 </head>
 <body>
+  <!-- Botões export -->
   <div id="export-buttons">
-  <button id="gerar-pdf">Gerar Relatório (PDF)</button>
-  <button id="gerar-pptx">Gerar Relatório (PPTX)</button>
-</div>
+    <button id="gerar-pdf">Gerar Relatório (PDF)</button>
+    <button id="gerar-pptx">Gerar Relatório (PPTX)</button>
+  </div>
 
+  <!-- Paleta de cores (barras) -->
   <div id="color-picker-container">
     <label>Escolhe uma cor:</label>
     <div>
@@ -504,56 +195,171 @@
       <button class="color-option" style="background:#4CC9C4" data-color="#4CC9C4"></button>
     </div>
   </div>
+
+  <!-- Painéis flutuantes -->
+  <div id="labels-panel">
+    <h4 id="labels-panel-title">Rótulos do gráfico</h4>
+    <div id="labels-panel-body"></div>
+    <div class="actions">
+      <button id="labels-apply-all">Aplicar rótulos a todos</button>
+      <button id="labels-reset">Repor rótulos</button>
+      <button id="labels-close">Fechar</button>
+    </div>
+    <div class="hint">Dica: Enter ou sair do campo para aplicar</div>
+  </div>
+
+  <div id="questions-panel">
+    <h4 id="questions-panel-title">Selecionar perguntas</h4>
+    <div style="display:flex; gap:8px; margin-bottom:8px;">
+      <button id="q-select-all">Selecionar todas</button>
+      <button id="q-clear-all">Limpar</button>
+    </div>
+    <div id="questions-panel-body" class="q-list"></div>
+    <div class="actions">
+      <button id="questions-close">Fechar</button>
+    </div>
+  </div>
+
+  <!-- Painel de largura de barras -->
+  <div id="width-panel">
+    <h4>Largura das barras</h4>
+    <div class="row">
+      <input id="barWidthRange" type="range" min="10" max="80" step="1" value="30">
+      <span id="barWidthValue">30px</span>
+    </div>
+    <div class="actions">
+      <button id="width-apply-all">Aplicar a todos</button>
+      <button id="width-close">Fechar</button>
+    </div>
+  </div>
+
   <div id="report"></div>
 
   <script>
+    /* ======================== CONFIG ======================== */
+    const LOCKED_PROGRAMS = ['p365','colab365','cio'];
+    const TEXT_BOX_MAX_HEIGHT = 360;
 
-function enableDeletePageButtons() {
-  // Remove anteriores
-  document.querySelectorAll('.eliminar-pagina-btn').forEach(btn => btn.remove());
+    /* ======================== BOTÕES FLOTANTES ======================== */
+    function enablePerPageButtons() {
+      document.querySelectorAll('.eliminar-pagina-btn, .editar-rotulos-btn, .selecionar-perguntas-btn, .resumo-btn-global, .alternar-orientacao-btn, .largura-barras-btn')
+        .forEach(btn => btn.remove());
 
-  document.querySelectorAll('.page').forEach(pg => {
-    const btn = document.createElement('button');
-    btn.textContent = 'apagar';
-    btn.className = 'resumo-btn-global eliminar-pagina-btn';
-    btn.style.background = '#d9534f';
+      document.querySelectorAll('.page').forEach(pg => {
+        const rectUpdate = () => {
+          const rect = pg.getBoundingClientRect();
+          const scrollTop = window.scrollY || document.documentElement.scrollTop;
+          const scrollLeft = window.scrollX || document.documentElement.scrollLeft;
+          return { top: rect.top + scrollTop, left: rect.left + scrollLeft, right: rect.right + scrollLeft };
+        };
 
-    // ⏱ Atualiza posição com base na localização da página
-    function updatePosition() {
-      const rect = pg.getBoundingClientRect();
-      const scrollTop = window.scrollY || document.documentElement.scrollTop;
-      const scrollLeft = window.scrollX || document.documentElement.scrollLeft;
+        // apagar
+        const delBtn = document.createElement('button');
+        delBtn.textContent = 'apagar';
+        delBtn.className = 'floating-btn eliminar-pagina-btn';
+        function placeDel() {
+          const r = rectUpdate();
+          delBtn.style.top = `${r.top + 60}px`;
+          delBtn.style.left = `${r.right + 10}px`;
+        }
+        delBtn.addEventListener('click', () => {
+          if (confirm('Deseja mesmo eliminar esta página do relatório?')) {
+            const qid = pg.dataset.qid;
+            pg.dataset.deleted = 'true';
+            pg.style.display = 'none';
+            delBtn.remove();
+            document.querySelectorAll(`.resumo-btn-global[data-qid="${qid}"]`).forEach(b => b.remove());
+          }
+        });
+        document.body.appendChild(delBtn);
+        requestAnimationFrame(placeDel);
+        window.addEventListener('scroll', placeDel);
+        window.addEventListener('resize', placeDel);
 
-      btn.style.position = 'absolute';
-      btn.style.top = `${rect.top + scrollTop + 50}px`; // 50px abaixo do topo da página
-      btn.style.left = `${rect.right + scrollLeft + 10}px`; // 10px à direita da página
+        const chartEl = pg.querySelector('.chart-full');
+        if (chartEl) {
+          const ctx = window.__chartCtx[chartEl.id] || {};
+          // Editar rótulos
+          const editBtn = document.createElement('button');
+          editBtn.textContent = 'Editar rótulos';
+          editBtn.className = 'floating-btn editar-rotulos-btn';
+          function placeEdit() {
+            const r = rectUpdate();
+            editBtn.style.top = `${r.top + 100}px`;
+            editBtn.style.left = `${r.right + 10}px`;
+          }
+          editBtn.addEventListener('click', () => openLabelsPanel(chartEl.id));
+          document.body.appendChild(editBtn);
+          requestAnimationFrame(placeEdit);
+          window.addEventListener('scroll', placeEdit);
+          window.addEventListener('resize', placeEdit);
+
+          // Selecionar perguntas (apenas se gráfico for editável)
+          if (ctx.editable) {
+            const selBtn = document.createElement('button');
+            selBtn.textContent = 'Selecionar perguntas';
+            selBtn.className = 'floating-btn selecionar-perguntas-btn';
+            function placeSel() {
+              const r = rectUpdate();
+              selBtn.style.top = `${r.top + 140}px`;
+              selBtn.style.left = `${r.right + 10}px`;
+            }
+            selBtn.addEventListener('click', () => openQuestionsPanel(chartEl.id));
+            document.body.appendChild(selBtn);
+            requestAnimationFrame(placeSel);
+            window.addEventListener('scroll', placeSel);
+            window.addEventListener('resize', placeSel);
+          }
+
+          // Alternar orientação SÓ para evaluation
+          if (ctx.section === 'evaluation') {
+            const orientBtn = document.createElement('button');
+            function setOrientBtnLabel() {
+              const o = (window.__chartCtx[chartEl.id]?.orientation || 'horizontal');
+              orientBtn.textContent = (o === 'horizontal') ? 'Barras verticais' : 'Barras horizontais';
+            }
+            setOrientBtnLabel();
+            orientBtn.className = 'floating-btn alternar-orientacao-btn';
+            function placeOrient() {
+              const r = rectUpdate();
+              orientBtn.style.top = `${r.top + 180}px`;
+              orientBtn.style.left = `${r.right + 10}px`;
+            }
+            orientBtn.addEventListener('click', () => {
+              const ctx2 = window.__chartCtx[chartEl.id];
+              if (!ctx2) return;
+              ctx2.orientation = (ctx2.orientation === 'horizontal') ? 'vertical' : 'horizontal';
+              setOrientBtnLabel();
+              renderChartFromCtx(chartEl.id);
+            });
+            document.body.appendChild(orientBtn);
+            requestAnimationFrame(placeOrient);
+            window.addEventListener('scroll', placeOrient);
+            window.addEventListener('resize', placeOrient);
+          }
+
+          // Largura barras (todas as secções)
+          {
+            const widthBtn = document.createElement('button');
+            widthBtn.textContent = 'Largura barras';
+            widthBtn.className = 'floating-btn largura-barras-btn';
+            function placeWidth() {
+              const r = rectUpdate();
+              const base = ctx.section === 'evaluation' ? 220 : (ctx.editable ? 180 : 140);
+              widthBtn.style.top = `${r.top + base}px`;
+              widthBtn.style.left = `${r.right + 10}px`;
+            }
+            widthBtn.addEventListener('click', () => openWidthPanel(chartEl.id));
+            document.body.appendChild(widthBtn);
+            requestAnimationFrame(placeWidth);
+            window.addEventListener('scroll', placeWidth);
+            window.addEventListener('resize', placeWidth);
+          }
+        }
+      });
     }
 
-    btn.addEventListener('click', () => {
-  if (confirm('Deseja mesmo eliminar esta página do relatório?')) {
-    const qid = pg.dataset.qid;
-    pg.dataset.deleted = 'true';
-    pg.style.display = 'none';
-    btn.remove();
-
-    // 🔁 Remover outros botões associados ao mesmo QID
-    document.querySelectorAll(`.resumo-btn-global[data-qid="${qid}"]`).forEach(b => b.remove());
-    document.querySelectorAll(`.eliminar-pagina-btn[data-qid="${qid}"]`).forEach(b => b.remove());
-  }
-});
-
-    document.body.appendChild(btn);
-    requestAnimationFrame(updatePosition);
-    window.addEventListener('scroll', updatePosition);
-    window.addEventListener('resize', updatePosition);
-  });
-}
-
-
-    const currentYear = new Date().getFullYear();
-    
-
-    // UTILITIES
+    /* ======================== UTILS ======================== */
     function createLabelMap(labels) {
       return labels.reduce((m, l) => {
         const k = l.questionId || l['QUESTION ID'];
@@ -564,861 +370,865 @@ function enableDeletePageButtons() {
     function createSortMap(labels) {
       return labels.reduce((m, l) => {
         const k = l.questionId || l['QUESTION ID'];
-        m[k] = +(l.sortOrder || l['SORT ORDER'] || l.sort_order);
+        const v = +(l.sortOrder || l['SORT ORDER'] || l.sort_order);
+        m[k] = isNaN(v) ? undefined : v;
         return m;
       }, {});
     }
-
     function normalizeLabel(str) {
-  return str
-    .normalize("NFD")                    // separa acentos
-    .replace(/[\u0300-\u036f]/g, "")     // remove acentos
-    .replace(/\s+/g, ' ')                // normaliza múltiplos espaços
-    .trim()                              // remove espaços à volta
-    .toUpperCase();                      // tudo em maiúsculas
-}
-
-    function groupBy(arr, key) {
-      return arr.reduce((o, i) => {
-        (o[i[key]] ||= []).push(i);
-        return o;
-      }, {});
+      return (str || '').normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/\s+/g, ' ').trim().toUpperCase();
     }
-    function computeAverages(rows, LM, OM) {
+    function groupBy(arr, key) {
+      return arr.reduce((o, i) => { (o[i[key]] ||= []).push(i); return o; }, {});
+    }
+
+    // Normalizador de IDs de submissão
+    const normalizeId = (r) =>
+      String(r['Submission ID'] || r.submission_id || r.id || r.OP_ID || '')
+        .trim().toLowerCase();
+
+    /* ======================== STATE ======================== */
+    window.sessionChartLabelOverrides = { assessment: {}, evaluation: {} };
+    window.__chartCtx = {}; // containerId -> { section, turmaCount, title, rawRows, LM, OM, editable, selectedQids:Set, orientation, barWidth, totalResponses }
+
+    /* ======================== LABEL OVERRIDES ======================== */
+    function getChartLabel(section, qid, LabelMap){
+      return (window.sessionChartLabelOverrides[section]?.[qid]) || LabelMap[qid] || qid;
+    }
+
+    function computeAverages(rows, LM, OM, section, selectedQids=null) {
       const g = {};
-      rows.forEach(r => (g[r.question] ||= []).push(+r.value));
+      rows.forEach(r => {
+        if (selectedQids && !selectedQids.has(r.question)) return;
+        (g[r.question] ||= []).push(+r.value);
+      });
       return Object.entries(g)
         .map(([q, vals]) => ({
           question: q,
-          label: LM[q] || q,
+          label: getChartLabel(section, q, LM),
           avg: +(vals.reduce((a,b)=>a+b,0)/vals.length).toFixed(1)
         }))
-        .sort((a,b) => (OM[a.question]||0) - (OM[b.question]||0));
+        .sort((a,b) => ((OM[a.question] ?? 9999) - (OM[b.question] ?? 9999)));
     }
-    function countUnique(rows, sec) {
-      return new Set(
-        rows.filter(d => String(d.section||'').toLowerCase().includes(sec))
-            .map(d => d['Submission ID'])
-      ).size;
-    }
-    function formatMonthYear(v) {
-      const names = {
-        '01':'janeiro','02':'fevereiro','03':'março','04':'abril',
-        '05':'maio','06':'junho','07':'julho','08':'agosto',
-        '09':'setembro','10':'outubro','11':'novembro','12':'dezembro'
-      };
-      const [y,m] = v.split('-');
-      return { month:names[m], year:y };
-    }
-// CHART
 
+    /* ======================== CORES DAS BARRAS ======================== */
     const barColorMap = JSON.parse(localStorage.getItem('barColorMap') || '{}');
-    let currentChartId = null;
-    let currentBarLabel = null;
-
+    let currentChartIdColor = null, currentBarLabel = null;
     function showColorPicker(chartId, label) {
-  const normalized = normalizeLabel(label);
-  currentChartId = chartId;
-  currentBarLabel = normalized;
-
-  console.log("🎯 Label clicada:", label);
-  console.log("🔑 Normalizada:", normalized);
-  console.log("📦 Estado atual do barColorMap:", barColorMap);
-
-  document.getElementById('color-picker-container').style.display = 'block';
-}
-
-
+      const normalized = normalizeLabel(label);
+      currentChartIdColor = chartId; currentBarLabel = normalized;
+      document.getElementById('color-picker-container').style.display = 'block';
+    }
     document.querySelectorAll('.color-option').forEach(btn => {
       btn.addEventListener('click', () => {
         const newColor = btn.dataset.color;
-        if (currentChartId && currentBarLabel) {
-          if (!barColorMap[currentChartId]) barColorMap[currentChartId] = {};
-          barColorMap[currentChartId][currentBarLabel] = newColor;
+        if (currentChartIdColor && currentBarLabel) {
+          if (!barColorMap[currentChartIdColor]) barColorMap[currentChartIdColor] = {};
+          barColorMap[currentChartIdColor][currentBarLabel] = newColor;
           localStorage.setItem('barColorMap', JSON.stringify(barColorMap));
           document.getElementById('color-picker-container').style.display = 'none';
-          build();
+          if (window.__chartCtx[currentChartIdColor]) renderChartFromCtx(currentChartIdColor);
         }
       });
     });
 
-    function createBarChart(container, title, data, uniform) {
-  const chart = echarts.init(container, null, { renderer: 'svg' });
-  const chartId = container.id;
+    /* ======================== ECHARTS: ciclo de vida ======================== */
+    function disposeChart(container) {
+      const inst = echarts.getInstanceByDom(container);
+      if (inst) inst.dispose();
+    }
+    function initChart(container) {
+      disposeChart(container);
+      return echarts.init(container, null, { renderer: 'svg' });
+    }
 
-  chart.setOption({
-    title: {
-      text: title || '',
-      left: 'center',
-      textStyle: { fontSize: 20 }
-    },
-    grid: {
-      top: 30,
-      bottom: 120,
-      left: '5%',
-      right: '5%'
-    },
-    tooltip: {},
-    xAxis: {
-      type: 'category',
-      data: data.map(d => d.label), // eixo X visível
-      axisLabel: {
-        rotate: 53,
-        fontSize: 9,
-        color: '#000',
-        margin: 10,
-        interval: 0
-      },
-      axisTick: { show: false },
-      axisLine: { show: false }
-    },
-    yAxis: {
-      type: 'value',
-      min: 1,
-      max: 5,
-      axisLabel: { show: false },
-      axisLine: { show: false },
-      axisTick: { show: false },
-      splitLine: { show: false }
-    },
-    series: [{
-      type: 'bar',
-      barWidth: 30,
-      data: data.map(d => {
+    /* ======================== RENDER CHARTS ======================== */
+    function createBarChart(container, title, data, uniform, barWidth) {
+      const chart = initChart(container);
+      const chartId = container.id;
+      chart.setOption({
+        title: { text: title || '', left: 'center', textStyle: { fontSize: 20 } },
+        grid: { top: 30, bottom: 120, left: '5%', right: '5%' },
+        tooltip: {},
+        xAxis: {
+          type: 'category',
+          data: data.map(d => d.label),
+          axisLabel: { rotate: 53, fontSize: 9, color: '#000', margin: 10, interval: 0 },
+          axisTick: { show: false }, axisLine: { show: false }
+        },
+        yAxis: { type: 'value', min: 1, max: 5, axisLabel: { show: false }, axisLine: { show: false }, axisTick: { show: false }, splitLine: { show: false } },
+        series: [{
+          type: 'bar',
+          barWidth: barWidth || 30,
+          data: data.map(d => {
+            const labelKey = normalizeLabel(d.label);
+            const colorFromMap = barColorMap[chartId]?.[labelKey];
+            return {
+              value: d.avg, name: labelKey, originalLabel: d.label,
+              itemStyle: { color: colorFromMap || (uniform ? '#6A99D0' : d.avg < 3 ? '#EA3323' : d.avg < 4 ? '#27828C' : '#4CC9C4') },
+              label: { show: true, position: 'top', fontSize: 10, color: '#000', formatter: p => p.value.toFixed(1) }
+            };
+          })
+        }]
+      });
+      chart.on('click', function (params) {
+        if (params.componentType === 'series' && params.seriesType === 'bar') {
+          const label = params.data?.originalLabel || params.name;
+          showColorPicker(chartId, label);
+        }
+      });
+      chart.resize();
+    }
+
+    // HORIZONTAL (evaluation) com color picker + série custom silenciosa
+    function createEvaluationChart(container, data, title = '', barWidth) {
+      const chart = initChart(container);
+      const chartId = container.id;
+
+      const yLabels = data.map(d => d.label.toUpperCase());
+      const seriesData = data.map(d => {
         const labelKey = normalizeLabel(d.label);
         const colorFromMap = barColorMap[chartId]?.[labelKey];
-
         return {
           value: d.avg,
-          name: labelKey,          // usado como ID interno
-          originalLabel: d.label,  // preserva a label original
-          itemStyle: {
-            color: colorFromMap || (uniform
-              ? '#6A99D0'
-              : d.avg < 3
-                ? '#EA3323'
-                : d.avg < 4
-                  ? '#27828C'
-                  : '#4CC9C4')
-          },
-          label: {
-            show: true,
-            position: 'top',
-            fontSize: 10,
-            color: '#000',
-            formatter: p => p.value.toFixed(1)
-          }
+          name: labelKey,
+          originalLabel: d.label,
+          itemStyle: { color: colorFromMap || (d.avg >= 5.0 ? '#4CC9C4' : '#2d9da1') }
         };
-      })
-    }]
-  });
+      });
 
-  chart.on('click', function (params) {
-    const label = params.data?.originalLabel || params.name; // garante label segura
-    showColorPicker(chartId, label);
-  });
-
-  chart.resize();
-}
-
-
-function createEvaluationChart(container, data, title = '') {
-  const chart = echarts.init(container, null, { renderer: 'svg' });
-  chart.setOption({
-    grid: { top: 80, bottom: 60, left: 190, right: 60 },
-    title: {
-      text: title,
-      left: 'center',
-      top: 10,
-      textStyle: {
-        fontSize: 20,
-        fontWeight: 'bold',
-        color: '#000'
-      }
-    },
-    xAxis: {
-      type: 'value',
-      min: 1,
-      max: 5,
-      splitLine: { show: false },
-      axisLabel: { show: false },
-      axisTick: { show: false },
-      axisLine: { show: false }
-    },
-    yAxis: {
-      type: 'category',
-      inverse:true,
-      data: data.map(d => d.label.toUpperCase()),
-      axisLabel: {
-        fontSize: 16,
-        color: '#000',
-        margin: 20,
-        align: 'right'
-      },
-      axisTick: { show: false },
-      axisLine: { show: false }
-    },
-    series: [
-      {
-        name: 'Avaliação',
-        type: 'bar',
-        barWidth: 35,
-        data: data.map(d => d.avg),
-        itemStyle: {
-          color: params => params.value >= 5.0 ? '#4CC9C4' : '#2d9da1',
-          borderRadius: 3
+      chart.setOption({
+        grid: { top: 80, bottom: 60, left: 190, right: 60 },
+        title: { text: title, left: 'center', top: 10, textStyle: { fontSize: 20, fontWeight: 'bold', color: '#000' } },
+        xAxis: { type: 'value', min: 1, max: 5, splitLine: { show: false }, axisLabel: { show: false }, axisTick: { show: false }, axisLine: { show: false } },
+        yAxis: {
+          type: 'category', inverse:true, data: yLabels,
+          axisLabel: { fontSize: 16, color: '#000', margin: 20, align: 'right' },
+          axisTick: { show: false }, axisLine: { show: false }
         },
-        label: {
-          show: false
+        series: [
+          {
+            name:'Avaliação', type:'bar', z:2, cursor:'pointer',
+            barWidth:(barWidth || 35), data: seriesData, label:{ show:false }
+          },
+          {
+            name:'Rótulo Fixo', type:'custom', z:0, silent:true,
+            renderItem: function (params, api) {
+              const idx = params.dataIndex;
+              const coord = api.coord([5, idx]); const x = coord[0] + 10; const y = api.coord([0, idx])[1];
+              return { type:'text', position:[x,y], style:{ text: api.value(0).toFixed(1), textAlign:'left', textVerticalAlign:'middle', fontSize:16, fill:'#000' } };
+            },
+            data: data.map(d => d.avg)
+          }
+        ],
+        tooltip: {}
+      });
+
+      chart.on('click', function (params) {
+        if (params.componentType === 'series' && params.seriesType === 'bar') {
+          const label = params.data?.originalLabel || params.name;
+          showColorPicker(chartId, label);
         }
-      },
-      {
-        name: 'Rótulo Fixo',
-        type: 'custom',
-        renderItem: function (params, api) {
-          const idx = params.dataIndex;
-          // Coordenadas da posição para valor 5.0
-        const coord = api.coord([5, idx]);
-        const x = coord[0] + 10;  // desloca 10px para a direita
-          const y = api.coord([0, idx])[1];
-          return {
-            type: 'text',
-            position: [x, y],
-            style: {
-              text: api.value(0).toFixed(1),
-              textAlign: 'left',
-              textVerticalAlign: 'middle',
-              fontSize: 16,
-              fill: '#000'
-            }
-          };
-        },
-        data: data.map(d => d.avg)
-      }
-    ]
-  });
-  chart.resize();
-}
+      });
 
-
-
-// NOVO WRAPPER PARA ESCOLHER QUAL GRÁFICO USAR
-function renderChart(container, data, section, turmaCount, title = '') {
-  if (section === 'evaluation' && turmaCount >= 1) {
-    createEvaluationChart(container, data, title);
-  } else {
-    createBarChart(container, title, data, section === 'evaluation');
-  }
-}
-
-function createSummaryPage(questionTitle, sectionName) {
-  const page = document.createElement('div');
-  page.className = 'page text-page summary-page';
-
-  // ⚠️ Define o data-qid com base no título (ou outro identificador, se necessário)
-  page.dataset.qid = questionTitle.trim();
-
-  page.innerHTML = `
-    <div class="header">
-      <img src="logo-branco.png">
-      <div class="section-title">${sectionName}</div>
-    </div>
-    <div class="content">
-      <div class="text-question">
-        <div class="text-question-title"> ${questionTitle} (RESUMO)</div>
-        <ul class="answer-list editable" contenteditable="true">
-          <li></li>
-        </ul>
-      </div>
-    </div>
-  `;
-
-  // Enter cria novo <li>
-  page.querySelector('.editable').addEventListener('keydown', e => {
-    if (e.key === 'Enter') {
-      e.preventDefault();
-      document.execCommand('insertHTML', false, '<li><br></li>');
-    }
-  });
-
-  return page;
-}
-
-
-function enableSummaryButtons() {
-  const report = document.getElementById('report');
-  
-
-
-
-  // Limpa botões antigos
-document.querySelectorAll('.resumo-btn-global:not(.eliminar-pagina-btn)').forEach(b => b.remove());
-
-  document.querySelectorAll('.page.text-page:not(.summary-page)').forEach(pg => {
-    const qid = pg.dataset.qid;
-    const titleEl = pg.querySelector('.text-question-title');
-    const sectionTitle = pg.querySelector('.section-title');
-
-    if (!qid || !titleEl || pg.dataset.summaryBtnAdded) return;
-
-    const btn = document.createElement('button');
-    btn.textContent = 'Criar Resumo';
-    btn.className = 'resumo-btn-global';
-    btn.dataset.qid = qid;
-    btn.style.background = '#27828C';
-    btn.style.position = 'fixed';
-    btn.style.zIndex = '3000';
-
-    let summaryPage = null;
-
-    // ⏱ função que posiciona dinamicamente o botão
-    function updateButtonPosition() {
-      const rect = pg.getBoundingClientRect();
-      btn.style.top = `${rect.top + 10}px`;
-      btn.style.left = `${rect.right + 10}px`;
+      chart.resize();
     }
 
-    // ⏲️ Aguarda layout
-    requestAnimationFrame(updateButtonPosition);
-
-    // Atualiza com scroll e resize
-    window.addEventListener('scroll', updateButtonPosition);
-    window.addEventListener('resize', updateButtonPosition);
-
-    btn.addEventListener('click', () => {
-      if (!summaryPage) {
-        const section = sectionTitle?.textContent?.trim() || 'Resumo';
-        summaryPage = createSummaryPage(titleEl.textContent.trim(), section);
-        summaryPage.dataset.qid = qid;
-        report.insertBefore(summaryPage, pg);
-        btn.textContent = 'Eliminar Resumo';
-        btn.style.background = '#d9534f';
+    function renderChart(container, data, section, turmaCount, title = '', orientation = 'vertical', barWidth = null) {
+      if (orientation === 'horizontal') {
+        createEvaluationChart(container, data, title, barWidth);
       } else {
-        summaryPage.remove();
-        summaryPage = null;
-        btn.textContent = 'Criar Resumo';
-        btn.style.background = '#27828C';
+        createBarChart(container, title, data, section === 'evaluation', barWidth);
       }
+    }
+
+    // Atualiza rodapé com o total correto do contexto (global ou por turma)
+    function updateResponsesCount(chartId) {
+      const ctx = window.__chartCtx[chartId];
+      const el = document.querySelector(`.chart-responses[data-for="${CSS.escape(chartId)}"]`);
+      if (ctx && el) el.innerHTML = `NÚMERO DE RESPOSTAS: <strong>${ctx.totalResponses ?? 0}</strong>`;
+    }
+
+    function renderChartFromCtx(containerId) {
+      const ctx = window.__chartCtx[containerId];
+      if (!ctx) return;
+      const el = document.getElementById(containerId);
+      if (!el) return;
+
+      const { section, turmaCount, title, rawRows, LM, OM, editable, selectedQids, orientation, barWidth } = ctx;
+      const chartData = computeAverages(rawRows, LM, OM, section, editable ? selectedQids : null);
+
+      renderChart(el, chartData, section, turmaCount, title, (orientation || 'vertical'), barWidth ?? null);
+
+      // Rodapé com o total adequado (global ou por turma, conforme ctx.totalResponses)
+      updateResponsesCount(containerId);
+
+      if (activeChartId === containerId) openLabelsPanel(containerId);
+      if (activeQuestionsChartId === containerId) openQuestionsPanel(containerId);
+      if (activeWidthChartId === containerId) openWidthPanel(containerId);
+    }
+
+    /* ======================== LABELS PANEL ======================== */
+    const labelsPanel = document.getElementById('labels-panel');
+    const labelsPanelBody = document.getElementById('labels-panel-body');
+    const labelsPanelTitle = document.getElementById('labels-panel-title');
+    const labelsApplyAll = document.getElementById('labels-apply-all');
+    const labelsReset = document.getElementById('labels-reset');
+    const labelsClose = document.getElementById('labels-close');
+    let activeChartId = null;
+
+    function reRenderAllInSection(section) {
+      Object.keys(window.__chartCtx).forEach(id => {
+        if (window.__chartCtx[id]?.section === section) renderChartFromCtx(id);
+      });
+    }
+
+    function openLabelsPanel(chartId) {
+      activeChartId = chartId;
+      const ctx = window.__chartCtx[chartId];
+      if (!ctx) return;
+      const { section, rawRows, LM, OM, title, editable, selectedQids } = ctx;
+      labelsPanelTitle.textContent = `Rótulos: ${title} (${section === 'assessment' ? 'Assessment' : 'Avaliação'})`;
+
+      const data = computeAverages(rawRows, LM, OM, section, editable ? selectedQids : null);
+      labelsPanelBody.innerHTML = '';
+      data.forEach(item => {
+        const row = document.createElement('div');
+        row.className = 'row';
+        row.innerHTML = `<code>${item.question}</code>`;
+        const inp = document.createElement('input');
+        inp.type = 'text';
+        inp.value = item.label;
+        inp.placeholder = '(rótulo)';
+        inp.addEventListener('keydown', (e) => {
+          if (e.key === 'Enter') { e.preventDefault(); inp.blur(); }
+        });
+        inp.addEventListener('blur', () => {
+          const newLabel = inp.value.trim();
+          const base = LM[item.question] || item.question;
+          if (newLabel && newLabel !== base) {
+            if (!window.sessionChartLabelOverrides[section]) window.sessionChartLabelOverrides[section] = {};
+            window.sessionChartLabelOverrides[section][item.question] = newLabel;
+          } else {
+            if (window.sessionChartLabelOverrides[section]) delete window.sessionChartLabelOverrides[section][item.question];
+          }
+          renderChartFromCtx(chartId);
+        });
+        row.appendChild(inp);
+        labelsPanelBody.appendChild(row);
+      });
+
+      // botão "Aplicar a todos" — força re-render de todos os gráficos da secção
+      labelsApplyAll.onclick = () => {
+        const sec = window.__chartCtx[activeChartId]?.section;
+        if (!sec) return;
+        reRenderAllInSection(sec);
+      };
+
+      labelsPanel.style.display = 'block';
+    }
+
+    labelsReset.addEventListener('click', () => {
+      if (!activeChartId) return;
+      const ctx = window.__chartCtx[activeChartId];
+      if (!ctx) return;
+      window.sessionChartLabelOverrides[ctx.section] = {};
+      reRenderAllInSection(ctx.section);
     });
+    labelsClose.addEventListener('click', () => { labelsPanel.style.display = 'none'; activeChartId = null; });
 
-    document.body.appendChild(btn);
-    pg.dataset.summaryBtnAdded = true;
-  });
-}
+    /* ======================== QUESTIONS PANEL ======================== */
+    const questionsPanel = document.getElementById('questions-panel');
+    const questionsPanelBody = document.getElementById('questions-panel-body');
+    const questionsPanelTitle = document.getElementById('questions-panel-title');
+    const qSelectAll = document.getElementById('q-select-all');
+    const qClearAll = document.getElementById('q-clear-all');
+    const qClose = document.getElementById('questions-close');
+    let activeQuestionsChartId = null;
 
+    function getNumericQuestionsSet(rows) {
+      const s = new Set();
+      rows.forEach(r => s.add(r.question));
+      return Array.from(s);
+    }
 
+    function openQuestionsPanel(chartId) {
+      activeQuestionsChartId = chartId;
+      const ctx = window.__chartCtx[chartId];
+      if (!ctx || !ctx.editable) return;
+      const { section, rawRows, LM, OM, title } = ctx;
+      const allQ = getNumericQuestionsSet(rawRows);
+      questionsPanelTitle.textContent = `Perguntas no gráfico: ${title} (${section==='assessment'?'Assessment':'Avaliação'})`;
+      questionsPanelBody.innerHTML = '';
 
+      if (!ctx.selectedQids) ctx.selectedQids = new Set(allQ);
 
+      allQ.sort((a,b)=>(OM[a] ?? 9999)-(OM[b] ?? 9999)).forEach(qid => {
+        const wrapper = document.createElement('label');
+        wrapper.className = 'q-item';
+        const cb = document.createElement('input');
+        cb.type = 'checkbox';
+        cb.checked = ctx.selectedQids.has(qid);
+        cb.addEventListener('change', () => {
+          if (cb.checked) ctx.selectedQids.add(qid);
+          else ctx.selectedQids.delete(qid);
+          renderChartFromCtx(chartId);
+        });
+        const span = document.createElement('span');
+        span.textContent = LM[qid] || qid;
+        wrapper.appendChild(cb);
+        wrapper.appendChild(span);
+        questionsPanelBody.appendChild(wrapper);
+      });
 
-// TEXT PAGE BUILDER
-function createTextPage(prog, sec, qid, showTitle) {
-  const tp = document.createElement('div');
-  tp.className = 'page text-page';
-  tp.dataset.qid = qid;
+      qSelectAll.onclick = () => {
+        const ctx2 = window.__chartCtx[chartId];
+        const all = getNumericQuestionsSet(ctx2.rawRows);
+        ctx2.selectedQids = new Set(all);
+        renderChartFromCtx(chartId);
+      };
+      qClearAll.onclick = () => {
+        const ctx2 = window.__chartCtx[chartId];
+        ctx2.selectedQids = new Set();
+        renderChartFromCtx(chartId);
+      };
+      qClose.onclick = () => { questionsPanel.style.display = 'none'; activeQuestionsChartId = null; };
 
-  tp.innerHTML = `
-    <div class="header">
-      <img src="logo-branco.png">
-      <div class="section-title">${sec==='assessment'?'Assessment':'Avaliação'}</div>
-    </div>
-    <div class="content">
-      <div class="text-question">
-        ${showTitle ? `<div class="text-question-title">${qid}</div>` : ''}
-        <ul class="answer-list" contenteditable="true" spellcheck="true" data-qid="${qid}"></ul>
-      </div>
-    </div>
-  `;
-  return tp;
-}
+      questionsPanel.style.display = 'block';
+    }
 
-  async function getTextQuestions(section, program) {
+    /* ======================== WIDTH PANEL (Slider) ======================== */
+    const widthPanel = document.getElementById('width-panel');
+    const barWidthRange = document.getElementById('barWidthRange');
+    const barWidthValue = document.getElementById('barWidthValue');
+    const widthApplyAll = document.getElementById('width-apply-all');
+    const widthClose = document.getElementById('width-close');
+    let activeWidthChartId = null;
+
+    function openWidthPanel(chartId) {
+      activeWidthChartId = chartId;
+      const ctx = window.__chartCtx[chartId];
+      if (!ctx) return;
+      const def = (ctx.section === 'evaluation' && (ctx.orientation || 'horizontal') === 'horizontal') ? 35 : 30;
+      const cur = Number.isFinite(ctx.barWidth) ? ctx.barWidth : def;
+      barWidthRange.value = String(cur);
+      barWidthValue.textContent = `${cur}px`;
+      widthPanel.style.display = 'block';
+
+      barWidthRange.oninput = () => {
+        const v = parseInt(barWidthRange.value, 10);
+        barWidthValue.textContent = `${v}px`;
+        ctx.barWidth = v;
+        renderChartFromCtx(chartId);
+      };
+
+      // Aplicar a todos da SECÇÃO (assessment/evaluation)
+      widthApplyAll.onclick = () => {
+        const refCtx = window.__chartCtx[activeWidthChartId];
+        if (!refCtx) return;
+        const targetSection = refCtx.section;
+        const widthToApply = refCtx.barWidth;
+        Object.keys(window.__chartCtx).forEach(id => {
+          const c = window.__chartCtx[id];
+          if (c?.section === targetSection) {
+            c.barWidth = widthToApply;
+            renderChartFromCtx(id);
+          }
+        });
+      };
+    }
+    widthClose.addEventListener('click', () => { widthPanel.style.display = 'none'; activeWidthChartId = null; });
+
+    /* ======================== TEXT PAGES ======================== */
+    function createTextPage(prog, sec, qid, titleText, headerLabel) {
+      const tp = document.createElement('div');
+      tp.className = 'page text-page text-q-page';
+      tp.dataset.qid = qid;
+      tp.dataset.section = sec;
+      tp.dataset.prog = prog;
+      tp.innerHTML = `
+        <div class="header">
+          <img src="logo-branco.png">
+          <div class="section-title">${headerLabel}</div>
+        </div>
+        <div class="content">
+          <div class="text-question">
+            ${titleText ? `<div class="text-question-title">${qid}</div>` : ''}
+            <ul class="answer-list" contenteditable="true" spellcheck="true" data-qid="${qid}"></ul>
+          </div>
+        </div>`;
+      return tp;
+    }
+
+    function paginateAnswersIntoPages(root, prog, sec, qid, headerLabel, answersTexts) {
+      document.querySelectorAll(`.text-q-page[data-qid="${CSS.escape(qid)}"][data-section="${sec}"][data-prog="${prog}"]`).forEach(p => p.remove());
+
+      const pages = [];
+      let page = createTextPage(prog, sec, qid, true, headerLabel);
+      let listEl = page.querySelector('.answer-list');
+      root.appendChild(page);
+      pages.push(page);
+
+      const measureOverflow = () => {
+        const box = page.querySelector('.text-question');
+        return box.scrollHeight > TEXT_BOX_MAX_HEIGHT + 1;
+      };
+
+      answersTexts.forEach(txt => {
+        const li = document.createElement('li');
+        li.textContent = txt;
+        li.setAttribute('contenteditable','true');
+        li.setAttribute('spellcheck','true');
+        listEl.appendChild(li);
+
+        if (measureOverflow()) {
+          listEl.removeChild(li);
+          page = createTextPage(prog, sec, qid, false, headerLabel);
+          listEl = page.querySelector('.answer-list');
+          root.appendChild(page);
+          pages.push(page);
+          listEl.appendChild(li);
+        }
+      });
+
+      return pages;
+    }
+
+    function repaginateAllTextPages() {
+      const root = document.getElementById('report');
+      const groups = {};
+      document.querySelectorAll('.text-q-page').forEach(p => {
+        const key = `${p.dataset.prog}|${p.dataset.section}|${p.dataset.qid}`;
+        if (!groups[key]) groups[key] = { prog:p.dataset.prog, sec:p.dataset.section, qid:p.dataset.qid, header: p.querySelector('.section-title')?.textContent || '' , texts:[] };
+        const lis = Array.from(p.querySelectorAll('.answer-list > li'));
+        lis.forEach(li => {
+          const t = (li.innerText || '').trim();
+          if (t) groups[key].texts.push(t);
+        });
+      });
+      Object.values(groups).forEach(g => {
+        paginateAnswersIntoPages(root, g.prog, g.sec, g.qid, g.header, g.texts);
+      });
+    }
+
+    /* ======================== SUMMARY (TEXTO) ======================== */
+    function createSummaryPage(questionTitle, sectionName) {
+      const page = document.createElement('div');
+      page.className = 'page text-page summary-page';
+      page.dataset.qid = questionTitle.trim();
+      page.innerHTML = `
+        <div class="header">
+          <img src="logo-branco.png">
+          <div class="section-title">${sectionName}</div>
+        </div>
+        <div class="content">
+          <div class="text-question">
+            <div class="text-question-title">${questionTitle} (RESUMO)</div>
+            <ul class="answer-list editable" contenteditable="true"><li></li></ul>
+          </div>
+        </div>`;
+      page.querySelector('.editable').addEventListener('keydown', e => {
+        if (e.key === 'Enter') { e.preventDefault(); document.execCommand('insertHTML', false, '<li><br></li>'); }
+      });
+      return page;
+    }
+
+    function enableSummaryButtons() {
+      document.querySelectorAll('.resumo-btn-global').forEach(b => b.remove());
+      const report = document.getElementById('report');
+      document.querySelectorAll('.page.text-page:not(.summary-page)').forEach(pg => {
+        const qid = pg.dataset.qid;
+        const titleEl = pg.querySelector('.text-question-title');
+        const sectionTitle = pg.querySelector('.section-title');
+        if (!qid || !titleEl || pg.dataset.summaryBtnAdded) return;
+
+        const btn = document.createElement('button');
+        btn.textContent = 'Criar Resumo';
+        btn.className = 'floating-btn resumo-btn-global';
+        btn.style.background = '#27828C';
+        btn.style.color = '#fff';
+
+        let summaryPage = null;
+        function place() {
+          const rect = pg.getBoundingClientRect();
+          const scrollTop = window.scrollY || document.documentElement.scrollTop;
+          const scrollLeft = window.scrollX || document.documentElement.scrollLeft;
+          btn.style.top = `${rect.top + scrollTop + 180}px`;
+          btn.style.left = `${rect.right + scrollLeft + 10}px`;
+        }
+        btn.addEventListener('click', () => {
+          if (!summaryPage) {
+            const section = sectionTitle?.textContent?.trim() || 'Resumo';
+            summaryPage = createSummaryPage(titleEl.textContent.trim(), section);
+            summaryPage.dataset.qid = qid;
+            report.insertBefore(summaryPage, pg);
+            btn.textContent = 'Eliminar Resumo';
+            btn.style.background = '#d9534f';
+          } else {
+            summaryPage.remove();
+            summaryPage = null;
+            btn.textContent = 'Criar Resumo';
+            btn.style.background = '#27828C';
+          }
+        });
+
+        document.body.appendChild(btn);
+        requestAnimationFrame(place);
+        window.addEventListener('scroll', place);
+        window.addEventListener('resize', place);
+
+        pg.dataset.summaryBtnAdded = true;
+      });
+    }
+
+    /* ======================== BUILD ======================== */
+    function makeAllTextEditable() {
+      document.querySelectorAll('.banner-title, .banner-subtitle, .banner-super, .section-title, .text-question-title, h1')
+        .forEach(el => { el.setAttribute('contenteditable','true'); el.setAttribute('spellcheck','true'); });
+
+      document.querySelectorAll('.answer-list').forEach(ul => {
+        ul.setAttribute('contenteditable','true'); ul.setAttribute('spellcheck','true');
+        ul.addEventListener('keydown', e => {
+          if (e.key === 'Enter') { e.preventDefault(); document.execCommand('insertHTML', false, '<li><br></li>'); }
+        });
+      });
+    }
+
+    async function getTextQuestions(section, program) {
       try {
         const res = await fetch('text_questions.json');
         const json = await res.json();
-        if (section === 'evaluation') {
-          return json.evaluation || [];
-        } else if (section === 'assessment') {
-          return (json.assessment || {})[program] || [];
-        }
+        if (section === 'evaluation') return json.evaluation || [];
+        else if (section === 'assessment') return (json.assessment || {})[program] || [];
         return [];
       } catch (e) {
         console.error('Erro ao carregar perguntas de texto:', e);
         return [];
       }
     }
-  
-  const skipAssessmentChartsForPrograms = ['cio', 'xman', 'ux'];
 
-  function makeAllTextEditable() {
-  // 1. Headings and titles
-  document.querySelectorAll(
-    '.banner-title, .banner-subtitle, .banner-super, .section-title, .text-question-title, h1'
-  ).forEach(el => {
-    el.setAttribute('contenteditable', 'true');
-    el.setAttribute('spellcheck', 'true');
-  });
+    const skipAssessmentChartsForPrograms = ['cio', 'xman', 'ux'];
 
-  // 2. Answer lists (bullet lists)
-  document.querySelectorAll('.answer-list').forEach(ul => {
-    ul.setAttribute('contenteditable', 'true');
-    ul.setAttribute('spellcheck', 'true');
+    async function build() {
+      const f = JSON.parse(localStorage.getItem('reportFilters') || '{}');
+      const [data, meta] = await Promise.all([
+        fetch('data.json').then(r => r.json()),
+        fetch('meta.json').then(r => r.json())
+      ]);
+      const LM = createLabelMap(meta.labels), OM = createSortMap(meta.labels);
+      const root = document.getElementById('report');
+      root.innerHTML = '';
+      window.__chartCtx = {};
 
-    ul.addEventListener('keydown', e => {
-      if (e.key === 'Enter') {
-        e.preventDefault();
-        document.execCommand('insertHTML', false, '<li><br></li>');
-      }
-    });
-  });
+      for (const prog of f.programs || []) {
+        const progId = (prog||'').toLowerCase();
+        const isLocked = LOCKED_PROGRAMS.includes(progId);
 
-  // 3. Summary editable areas already have handlers — no change needed
-}
+        // scope temporal
+        let timeScope = '';
+        const start = (f.starts || {})[prog];
+        const end   = (f.ends || {})[prog];
+        if (start && end) {
+          const names = {'01':'janeiro','02':'fevereiro','03':'março','04':'abril','05':'maio','06':'junho','07':'julho','08':'agosto','09':'setembro','10':'outubro','11':'novembro','12':'dezembro'};
+          const [ys,ms] = start.split('-'); const [ye,me] = end.split('-');
+          timeScope = `${names[ms]} – ${names[me]} ${ye}`;
+        }
 
-  async function build() {
-  const f = JSON.parse(localStorage.getItem('reportFilters') || '{}');
-  const [data, meta] = await Promise.all([
-    fetch('data.json').then(r => r.json()),
-    fetch('meta.json').then(r => r.json())
-  ]);
-  const LM = createLabelMap(meta.labels),
-        OM = createSortMap(meta.labels);
-  const root = document.getElementById('report');
-  root.innerHTML = '';
+        // filtrar linhas deste programa
+        const selTur = f[`turmas_${prog}`] || [];
+        const rows = data.filter(d =>
+          (f.clients || []).includes(d.client) &&
+          d.program === prog &&
+          selTur.includes(d.turma)
+        );
+        const pm = meta.titles.find(t => t.program_id === prog) || {};
 
-  // Agora DENTRO do ciclo
-  for (const prog of f.programs || []) {
-    // 👇 cálculo do timeScope aqui dentro
-    let timeScope = '';
-    const start = (f.starts || {})[prog];
-    const end   = (f.ends || {})[prog];
+        // hero
+        const hero = document.createElement('div');
+        hero.className = 'page hero';
+        hero.innerHTML = `
+          <div class="hero">
+            <img class="bg" src="hourglass-bg.png" />
+            <img class="report-logo-top" src="logo-branco.png" />
+            <div class="hero-content">
+              <h1 contenteditable="true" data-edit-id="hero-title">TRAINING REPORT</h1>
+              <div class="subtitle" contenteditable="true" data-edit-id="hero-subtitle">${timeScope}</div>
+            </div>
+            <div class="site-footer-link">www.mind4time.com</div>
+          </div>`;
+        root.appendChild(hero);
 
-    if (start && end) {
-      const s = formatMonthYear(start),
-            e = formatMonthYear(end);
-      timeScope = `${s.month} – ${e.month} ${e.year}`;
-    }
+        // banner
+        const info = document.createElement('div');
+        info.className = 'page banner';
+        info.innerHTML = `
+          <div class="content">
+            <div class="banner white-layout">
+              <img class="report-logo-top" src="logo-verde.png" />
+              <div class="banner-left">
+                <div class="banner-super">CORPORATE TRAINING</div>
+                <h1 class="banner-title" contenteditable="true" data-edit-id="banner-title-main" spellcheck="true">${pm.TÍTULO || prog}</h1>
+                <div class="banner-subtitle" contenteditable="true" data-edit-id="banner-subtitle-main">${pm.SUBTÍTULO || ''}</div>
+                <div class="banner-details">
+                  <div><strong>Scope Temporal:</strong> <span contenteditable="true" spellcheck="true" data-edit-id="time-scope-${prog}">${timeScope}</span></div>
+                  <div><strong>Trainers:</strong> <span contenteditable="true" spellcheck="true" data-edit-id="trainers-${prog}">${(f.trainers || {})[prog] || 'N/A'}</span></div>
+                </div>
+              </div>
+            </div>
+          </div>`;
+        root.appendChild(info);
 
-    const selTur = f[`turmas_${prog}`] || [];
-    const rows = data.filter(d =>
-      (f.clients || []).includes(d.client) &&
-      d.program === prog &&
-      selTur.includes(d.turma)
-    );
-    const pm = meta.titles.find(t => t.program_id === prog) || {};
-  
-   const hero = document.createElement('div');
-hero.className = 'page hero';
-hero.innerHTML = `
-  <div class="hero">
-    <img class="bg" src="hourglass-bg.png" />
-    <img class="report-logo-top" src="logo-branco.png" />
-    <div class="hero-content">
-      <h1 contenteditable="true" data-edit-id="hero-title">TRAINING REPORT</h1>
-      <div class="subtitle" contenteditable="true" data-edit-id="hero-subtitle">${timeScope}</div>
-    </div>
-    <div class="site-footer-link">www.mind4time.com</div>
-  </div>`;
-
-root.appendChild(hero);
-
-
-        // Program details
-        const bannerImg =
-  prog.toLowerCase() === 'p365'
-    ? 'p365-banner.png'
-    : prog.toLowerCase() === 'colab365'
-    ? 'colab365-banner.png'
-    : 'p365-banner.png';
-        
-const info = document.createElement('div');
-info.className = 'page banner';
-info.innerHTML = `
-  <div class="content">
-  <div class="banner white-layout">
-    <img class="report-logo-top" src="logo-verde.png" />
-    <div class="banner-left">
-      <div class="banner-super">CORPORATE TRAINING</div>
-      <h1 class="banner-title"contenteditable="true" data-edit-id="banner-title-main" spellcheck="true">${pm.TÍTULO || prog}</h1>
-      <div class="banner-subtitle" contenteditable="true" data-edit-id="banner-subtitle-main">${pm.SUBTÍTULO || ''}</div>
-     <div class="banner-details">
-  <div>
-    <strong>Scope Temporal:</strong>
-    <span contenteditable="true" spellcheck="true" data-edit-id="time-scope-${prog}">${timeScope}</span>
-  </div>
-  <div>
-    <strong>Trainers:</strong>
-    <span contenteditable="true" spellcheck="true" data-edit-id="trainers-${prog}">${(f.trainers || {})[prog] || 'N/A'}</span>
-  </div>
-</div>
-    </div>
-  </div>
-</div>
-  </div>`;
-root.appendChild(info);
-
-
-       
-        // Sections
         for (const sec of ['assessment','evaluation']) {
-          const progId = prog.toLowerCase();
-          // ⚠️ OMITIR APENAS OS GRÁFICOS da secção "assessment"
-          const omitCharts = sec === 'assessment' && skipAssessmentChartsForPrograms.includes(progId);
           const name    = sec==='assessment'?'Assessment':'Avaliação';
-          const total   = countUnique(rows, sec);
-          const numeric = rows.filter(d=>
+
+          // === TOTAL GLOBAL DA SECÇÃO (para o gráfico Global) ===
+          const totalResponsesGlobal = new Set(
+            rows
+              .filter(d => String(d.section || '').toLowerCase().includes(sec))
+              .map(normalizeId)
+          ).size;
+
+          // dados numéricos e por turma
+          const numeric = rows.filter(d =>
             String(d.section||'').toLowerCase().includes(sec) &&
             /^\d+(\.\d+)?$/.test(String(d.value).trim())
           );
-          const byT     = Object.entries(groupBy(numeric,'turma'));
-            
+          const byT = Object.entries(groupBy(numeric,'turma'));
 
-          // banner
-           if (['assessment', 'evaluation'].includes(sec)) {
-  const bg    = sec === 'assessment' ? 'assessment-bg.png' : 'evaluation-bg.png';
-  const title = sec === 'assessment' ? 'TRAINING ASSESSMENT' : 'TRAINING EVALUATION';
-  const cover = document.createElement('div');
-  cover.className = 'page hero';
-  cover.innerHTML = `
-    <div class="hero">
-      <img class="bg" src="${bg}">
-      <img class="report-logo-top" src="logo-branco.png">
-      <div class="hero-content">
-        <h1 contenteditable="true"
-            spellcheck="true"
-            data-edit-id="section-title-${sec}"
-            style="font-size: 2.5rem; letter-spacing: 0.05em; white-space:nowrap">
-          ${title}
-        </h1>
-      </div>
-    </div>`;
-  root.appendChild(cover);
-}
+          // capa da secção
+          const bg = sec === 'assessment' ? 'assessment-bg.png' : 'evaluation-bg.png';
+          const titleSec = sec === 'assessment' ? 'TRAINING ASSESSMENT' : 'TRAINING EVALUATION';
+          const cover = document.createElement('div');
+          cover.className = 'page hero';
+          cover.innerHTML = `
+            <div class="hero">
+              <img class="bg" src="${bg}">
+              <img class="report-logo-top" src="logo-branco.png">
+              <div class="hero-content">
+                <h1 contenteditable="true" spellcheck="true" data-edit-id="section-title-${sec}" style="font-size:2.5rem; letter-spacing:0.05em; white-space:nowrap">${titleSec}</h1>
+              </div>
+            </div>`;
+          root.appendChild(cover);
 
+          if (numeric.length) {
+            const omitCharts = sec === 'assessment' && skipAssessmentChartsForPrograms.includes(progId);
 
-          
-    
-
-
-      // GRÁFICOS POR TURMA
-// GRÁFICOS NUMÉRICOS — UNIFICADO
-if (numeric.length && !omitCharts) {
-  const showGlobal = byT.length > 1;
-  const isEvaluation = sec === 'evaluation';
-
-  // GRÁFICO GLOBAL (só se houver mais do que uma turma)
-  if (showGlobal) {
-    const gp = document.createElement('div'); 
-    gp.className = 'page';
-    gp.innerHTML = `
-      <div class="header">
-        <img src="logo-branco.png">
-        <div class="section-title">${name}</div>
-      </div>
-      <div class="content">
-        <div class="chart-fullpage">
-          <div class="chart-full" id="chart-global-${prog}-${sec}"></div>
-        </div>
-        <div class="chart-responses">NÚMERO DE RESPOSTAS: <strong>${total}</strong></div>
-      </div>
-      <div>www.MIND4TIME.com</div>
-      <div>© MIND4TIME ${currentYear}§</div>
-    `;
-    root.appendChild(gp);
-    const el = gp.querySelector('.chart-full');
-    const chartData = computeAverages(numeric, LM, OM);
-    renderChart(el, chartData, sec, byT.length, 'Global');
-  }
-
-  // GRÁFICOS POR TURMA
-  byT.forEach(([turma, values], idx) => {
-    const page = document.createElement('div');
-    page.className = 'page';
-    page.innerHTML = `
-      <div class="header">
-        <img src="logo-branco.png">
-        <div class="section-title">${name}</div>
-      </div>
-      <div class="content">
-        <div class="chart-fullpage">
-          <div class="chart-full" id="chart-${prog}-${sec}-turma-${idx}"></div>
-        </div>
-        <div class="chart-responses">NÚMERO DE RESPOSTAS: <strong>${countUnique(values, sec)}</strong></div>
-      </div>`;
-    root.appendChild(page);
-
-    const el = page.querySelector('.chart-full');
-    const chartData = computeAverages(values, LM, OM);
-    renderChart(el, chartData, sec, byT.length, turma);
-  });
-}
-
-
-
-
-          // — TEXT ANSWERS WITH SPILL + FIT‑TO‑SHRINK —
-          const selQs = await getTextQuestions(sec, prog);
-
-selQs.forEach(qid => {
-  
-
-  const ans = data.filter(d => {
-    const conds = {
-      client: (f.clients || []).includes(d.client),
-      program: d.program === prog,
-      clientInfo: (f.clientInfos || []).includes(d.client_info),
-      turma: (f[`turmas_${prog}`] || []).includes(d.turma),
-      section: String(d.section || '').toLowerCase().includes(sec),
-      question: d.question === qid,
-      text: isNaN(+d.value)
-    };
-
-    const isMatch = Object.values(conds).every(Boolean);
-
-   
-
-    return isMatch;
-  });
-
-
-  if (!ans.length) return;
-
-            const pagesForThisQ = [];
-            let page   = createTextPage(prog, sec, qid, true);
-            let listEl = page.querySelector('.answer-list');
-            root.appendChild(page);
-            pagesForThisQ.push(page);
-
-            ans.forEach(a => {
-              const li = document.createElement('li');
-              li.textContent = a.value;
-              li.setAttribute('contenteditable', 'true');
-li.setAttribute('spellcheck', 'true');
-
-              listEl.appendChild(li);
-
-              // overflow spill logic
-              const tq = page.querySelector('.text-question');
-              if (tq.scrollHeight > tq.clientHeight) {
-                listEl.removeChild(li);
-                page   = createTextPage(prog, sec, qid, false);
-                listEl = page.querySelector('.answer-list');
-                root.appendChild(page);
-                pagesForThisQ.push(page);
-                listEl.appendChild(li);
+            // LOCKED
+            if (isLocked && !omitCharts) {
+              const showGlobal = byT.length > 1;
+              if (showGlobal) {
+                const gp = document.createElement('div');
+                gp.className = 'page';
+                const chartId = `chart-global-${prog}-${sec}`;
+                gp.innerHTML = `
+                  <div class="header">
+                    <img src="logo-branco.png">
+                    <div class="section-title">${name}</div>
+                  </div>
+                  <div class="content">
+                    <div class="chart-fullpage">
+                      <div class="chart-full" id="${chartId}"></div>
+                    </div>
+                    <div class="chart-responses" data-for="${chartId}">NÚMERO DE RESPOSTAS: <strong>—</strong></div>
+                  </div>`;
+                root.appendChild(gp);
+                window.__chartCtx[chartId] = {
+                  section:sec, turmaCount:byT.length, title:'Global', rawRows:numeric, LM, OM,
+                  editable:false,
+                  orientation:(sec==='evaluation'?'horizontal':'vertical'),
+                  barWidth:(sec==='evaluation'?35:30),
+                  totalResponses: totalResponsesGlobal
+                };
+                renderChartFromCtx(chartId);
               }
+              byT.forEach(([turma, values], idx) => {
+                const totalResponsesTurma = new Set(values.map(normalizeId)).size;
+                const page = document.createElement('div');
+                page.className = 'page';
+                const chartId = `chart-${prog}-${sec}-turma-${idx}`;
+                page.innerHTML = `
+                  <div class="header">
+                    <img src="logo-branco.png">
+                    <div class="section-title">${name}</div>
+                  </div>
+                  <div class="content">
+                    <div class="chart-fullpage">
+                      <div class="chart-full" id="${chartId}"></div>
+                    </div>
+                    <div class="chart-responses" data-for="${chartId}">NÚMERO DE RESPOSTAS: <strong>—</strong></div>
+                  </div>`;
+                root.appendChild(page);
+                window.__chartCtx[chartId] = {
+                  section:sec, turmaCount:byT.length, title:turma, rawRows:values, LM, OM,
+                  editable:false,
+                  orientation:(sec==='evaluation'?'horizontal':'vertical'),
+                  barWidth:(sec==='evaluation'?35:30),
+                  totalResponses: totalResponsesTurma
+                };
+                renderChartFromCtx(chartId);
+              });
+            }
+
+            // UNLOCKED: gráfico global editável
+            if (!isLocked) {
+              const gp = document.createElement('div');
+              gp.className = 'page';
+              const chartId = `chart-editable-global-${prog}-${sec}`;
+              gp.innerHTML = `
+                <div class="header">
+                  <img src="logo-branco.png">
+                  <div class="section-title">${name}</div>
+                </div>
+                <div class="content">
+                  <div class="chart-fullpage">
+                    <div class="chart-full" id="${chartId}"></div>
+                  </div>
+                  <div class="chart-responses" data-for="${chartId}">NÚMERO DE RESPOSTAS: <strong>—</strong></div>
+                </div>`;
+              root.appendChild(gp);
+              const selected = new Set(numeric.map(r=>r.question));
+              window.__chartCtx[chartId] = {
+                section:sec, turmaCount:byT.length, title:'Global', rawRows:numeric, LM, OM,
+                editable:true, selectedQids:selected,
+                orientation:(sec==='evaluation'?'horizontal':'vertical'),
+                barWidth:(sec==='evaluation'?35:30),
+                totalResponses: totalResponsesGlobal
+              };
+              renderChartFromCtx(chartId);
+            }
+          }
+
+          // TEXTO
+          if (isLocked) {
+            const selQs = await getTextQuestions(sec, prog);
+            selQs.forEach(qid => {
+              const ans = rows.filter(d =>
+                String(d.section||'').toLowerCase().includes(sec) &&
+                d.question === qid &&
+                isNaN(+d.value)
+              ).map(d => d.value);
+              if (!ans.length) return;
+              paginateAnswersIntoPages(root, prog, sec, qid, name, ans);
             });
+          } else {
+            const textRows = rows.filter(d => String(d.section||'').toLowerCase().includes(sec) && isNaN(+d.value));
+            const byQ = groupBy(textRows, 'question');
+            Object.keys(byQ).forEach(qid => {
+              const ans = byQ[qid].map(x => x.value);
+              if (!ans.length) return;
+              paginateAnswersIntoPages(root, prog, sec, qid, name, ans);
+            });
+          }
+        }
+      }
 
-            // shrink each grey box
-           // after all answers are added
-pagesForThisQ.forEach(pg => {
-  const ul = pg.querySelector('.answer-list');
-  const tq = pg.querySelector('.text-question');
+      // end page
+      const endPage = document.createElement('div');
+      endPage.className = 'page hero endpage';
+      endPage.innerHTML = `
+        <img class="bg" src="hourglass-bg.png">
+        <div class="hero end-hero">
+          <img class="report-logo-top end-logo" src="logo-branco.png" />
+          <div class="site-footer-link end-text">www.mind4time.com</div>
+        </div>`;
+      document.getElementById('report').appendChild(endPage);
 
-  // Make editable
-  ul.setAttribute('contenteditable', 'true');
-  ul.setAttribute('spellcheck', 'true');
-
-  // Handle Enter key to insert new <li>
-  ul.addEventListener('keydown', e => {
-    if (e.key === 'Enter') {
-      e.preventDefault();
-      document.execCommand('insertHTML', false, '<li><br></li>');
-
-      // ⏫ Resize after new bullet
-      requestAnimationFrame(() => {
-        tq.style.height = ul.scrollHeight + 60 + 'px'; // +60 for padding/margin
-      });
+      // ligar botões e editar texto
+      enablePerPageButtons();
+      enableSummaryButtons();
+      makeAllTextEditable();
     }
-  });
 
-  // 🔄 Resize on input (also if user pastes or deletes)
-  ul.addEventListener('input', () => {
-    tq.style.height = ul.scrollHeight + 60 + 'px';
-  });
+    /* ======================== EXPORT ======================== */
+    async function generatePdf() {
+      repaginateAllTextPages();
 
-  // Initial height
-  tq.style.height = ul.scrollHeight + 60 + 'px';
-});
+      const labelsPrev = labelsPanel.style.display;
+      const qPrev = document.getElementById('questions-panel').style.display;
+      const wPrev = widthPanel.style.display;
+      labelsPanel.style.display = 'none';
+      document.getElementById('questions-panel').style.display = 'none';
+      widthPanel.style.display = 'none';
 
+      const tempHidden = [];
+      document.querySelectorAll('.floating-btn').forEach(b=>{ tempHidden.push({el:b,display:b.style.display}); b.style.display='none'; });
 
-          });
+      const pages = Array.from(document.querySelectorAll('.page')).filter(pg => pg.dataset.deleted !== 'true' && pg.style.display !== 'none');
+      const images = await Promise.all(pages.map(pg =>
+        html2canvas(pg, { backgroundColor:'#fff', useCORS:true, scale:2 }).then(cnv => cnv.toDataURL('image/png',1.0))
+      ));
 
-        } // end for sec
-      }   // end for prog
-    
-      // ADD FINAL COVER PAGE com logótipo e link
-const endPage = document.createElement('div');
-endPage.className = 'page hero endpage';
-endPage.innerHTML = `
-  <img class="bg" src="hourglass-bg.png">
-  <div class="hero end-hero">
-    <img class="report-logo-top end-logo" src="logo-branco.png" />
-    <div class="site-footer-link end-text">www.mind4time.com</div>
-  </div>`;
+      const f = JSON.parse(localStorage.getItem('reportFilters') || '{}');
+      const prog = (f.programs && f.programs[0]) || null;
+      const endValue = (prog && f.ends && f.ends[prog]) || '2025-05';
+      const [year, month] = endValue.split('-');
+      const monthNames = {'01':'janeiro','02':'fevereiro','03':'março','04':'abril','05':'maio','06':'junho','07':'julho','08':'agosto','09':'setembro','10':'outubro','11':'novembro','12':'dezembro'};
+      const formattedMonth = `${monthNames[month]}.${year.slice(-2)}`;
+      const fileName = `MIND4TIME Training Report ${formattedMonth}.pdf`;
 
-root.appendChild(endPage);
-makeAllTextEditable();
-enableDeletePageButtons();  // ← sempre depois do conteúdo estar no DOM
-enableSummaryButtons();     // ← chamada depois, mas não deve limpar os outros
+      pdfMake.createPdf({
+        pageSize: { width: 1920, height: 1080 },
+        pageMargins: [0,0,0,0],
+        content: images.map((img, i) => ({ image: img, width: 1920, pageBreak: i < images.length - 1 ? 'after' : undefined }))
+      }).download(fileName);
 
+      labelsPanel.style.display = labelsPrev;
+      document.getElementById('questions-panel').style.display = qPrev;
+      widthPanel.style.display = wPrev;
+      tempHidden.forEach(({el,display})=>{ el.style.display = display; });
     }
-   
 
-    // PDF
- 
- // GERAÇÃO DE PDF
-async function generatePdf() {
-  // 1. Remove botões de resumo/exclusão para não aparecerem no output
-  document.querySelectorAll('.resumo-btn-global, .eliminar-pagina-btn')
-          .forEach(btn => btn.remove());
+    async function generatePptx() { 
+      repaginateAllTextPages();
 
-  // 2. Seleciona apenas as páginas VIVAS (não deletadas e visíveis)
-  const pages = Array.from(document.querySelectorAll('.page'))
-    .filter(pg =>
-      pg.dataset.deleted !== 'true' &&
-      pg.style.display  !== 'none'
-    );
+      const labelsPrev = labelsPanel.style.display;
+      const qPrev = document.getElementById('questions-panel').style.display;
+      const wPrev = widthPanel.style.display;
+      labelsPanel.style.display = 'none';
+      document.getElementById('questions-panel').style.display = 'none';
+      widthPanel.style.display = 'none';
 
-  // 3. Captura cada página como imagem
-  const images = await Promise.all(
-    pages.map(pg =>
-      html2canvas(pg, {
-        backgroundColor: '#fff',
-        useCORS: true,
-        scale: 2
-      }).then(cnv => cnv.toDataURL('image/png', 1.0))
-    )
-  );
+      const tempHidden = [];
+      document.querySelectorAll('.floating-btn').forEach(b=>{ tempHidden.push({el:b,display:b.style.display}); b.style.display='none'; });
 
-  // 4. Monta o nome do ficheiro
-  const f = JSON.parse(localStorage.getItem('reportFilters') || '{}');
-  const prog = (f.programs && f.programs[0]) || null;
-  const endValue = (prog && f.ends && f.ends[prog]) || '2025-05';
-  const [year, month] = endValue.split('-');
-  const monthNames = {
-    '01': 'janeiro','02': 'fevereiro','03': 'março','04': 'abril',
-    '05': 'maio','06': 'junho','07': 'julho','08': 'agosto',
-    '09': 'setembro','10': 'outubro','11': 'novembro','12': 'dezembro'
-  };
-  const formattedMonth = `${monthNames[month]}.${year.slice(-2)}`;
-  const fileName = `MIND4TIME Training Report ${formattedMonth}.pdf`;
+      const allPages = Array.from(document.querySelectorAll('.page')).filter(pg => pg.dataset.deleted !== 'true' && pg.style.display !== 'none');
+      await new Promise(r => setTimeout(r, 100));
+      const scale = allPages.length > 20 ? 1 : 2;
+      const dataUrls = await Promise.all(allPages.map(pg =>
+        html2canvas(pg, { backgroundColor:'#fff', useCORS:true, scale }).then(cnv => cnv.toDataURL('image/png',1.0))
+      ));
 
-  // 5. Gera o PDF direto das imagens
-  pdfMake.createPdf({
-    pageSize: { width: 1920, height: 1080 },
-    pageMargins: [0, 0, 0, 0],
-    content: images.map((img, i) => ({
-      image: img,
-      width: 1920,
-      pageBreak: i < images.length - 1 ? 'after' : undefined
-    }))
-  }).download(fileName);
-}
+      const pptx = new PptxGenJS();
+      dataUrls.forEach(url => { const slide = pptx.addSlide(); slide.background = { color:'FFFFFF' }; slide.addImage({ data:url, x:0, y:0, w:10, h:5.625 }); });
 
-// GERAÇÃO DE PPTX
-async function generatePptx() {
-  // 1. Remove summary/delete buttons so they don't appear in slides
-  document.querySelectorAll('.resumo-btn-global, .eliminar-pagina-btn')
-          .forEach(btn => btn.remove());
+      const f = JSON.parse(localStorage.getItem('reportFilters') || '{}');
+      const prog = (f.programs && f.programs[0]) || null;
+      const endValue = (prog && f.ends && f.ends[prog]) || '2025-05';
+      const [year, month] = endValue.split('-');
+      const monthNames = {'01':'janeiro','02':'fevereiro','03':'março','04':'abril','05':'maio','06':'junho','07':'julho','08':'agosto','09':'setembro','10':'outubro','11':'novembro','12':'dezembro'};
+      const fileName = `MIND4TIME Training Report ${monthNames[month]}.${year.slice(-2)}.pptx`;
+      await pptx.writeFile({ fileName });
 
-  // 2. Gather only live pages (not deleted and visible)
-  const allPages = Array.from(document.querySelectorAll('.page'))
-    .filter(pg =>
-      pg.dataset.deleted !== 'true' &&
-      pg.style.display  !== 'none'
-    );
-
-  // 3. Let charts resize if needed
-  await new Promise(r => setTimeout(r, 100));
-
-  // 4. Capture each page to dataURL at dynamic scale
-  const scale = allPages.length > 20 ? 1 : 2;
-  const dataUrls = await Promise.all(
-    allPages.map(pg =>
-      html2canvas(pg, {
-        backgroundColor: '#fff',
-        useCORS: true,
-        scale
-      }).then(cnv => cnv.toDataURL('image/png', 1.0))
-    )
-  );
-
-  // 5. Build the PPTX slides
-  const pptx = new PptxGenJS();
-  dataUrls.forEach(url => {
-    const slide = pptx.addSlide();
-    slide.background = { color: 'FFFFFF' };
-    slide.addImage({ data: url, x: 0, y: 0, w: 10, h: 5.625 }); // 16:9 aspect
-  });
-
-  // 6. Determine filename from current filters
-  const f    = JSON.parse(localStorage.getItem('reportFilters') || '{}');
-  const prog = (f.programs && f.programs[0]) || null;
-  const endValue = (prog && f.ends && f.ends[prog]) || '2025-05';
-  const [year, month] = endValue.split('-');
-  const monthNames = {
-    '01': 'janeiro','02': 'fevereiro','03': 'março','04': 'abril',
-    '05': 'maio','06': 'junho','07': 'julho','08': 'agosto',
-    '09': 'setembro','10': 'outubro','11': 'novembro','12': 'dezembro'
-  };
-  const formattedMonth = `${monthNames[month]}.${year.slice(-2)}`;
-  const fileName = `MIND4TIME Training Report ${formattedMonth}.pptx`;
-
-  // 7. Download
-  await pptx.writeFile({ fileName });
-}
-
-
-function getEditableContentMap() {
-  const map = {};
-  document.querySelectorAll('[contenteditable="true"]').forEach(el => {
-    const key = el.dataset.qid || el.dataset.editId;
-    if (key) {
-      map[key] = el.innerHTML.trim();
+      labelsPanel.style.display = labelsPrev;
+      document.getElementById('questions-panel').style.display = qPrev;
+      widthPanel.style.display = wPrev;
+      tempHidden.forEach(({el,display})=>{ el.style.display = display; });
     }
-  });
-  return map;
-}
-
-
-function applyEditableContentMap(map) {
-  document.querySelectorAll('[contenteditable="true"]').forEach(el => {
-    const key = el.dataset.qid || el.dataset.editId;
-    if (key && map[key]) {
-      el.innerHTML = map[key];
-    }
-  });
-}
-
-
-
-document.addEventListener('DOMContentLoaded', () => {
-  document.getElementById('gerar-pdf').addEventListener('click', generatePdf);
-  document.getElementById('gerar-pptx').addEventListener('click', generatePptx); // 👈 este é o novo
-  build();
-});
-
-document.addEventListener('DOMContentLoaded', () => {
-  const slider = document.getElementById('titleFontSize');
-  const valueDisplay = document.getElementById('fontSizeValue');
-
-  slider.addEventListener('input', () => {
-    const size = slider.value + 'px';
-    valueDisplay.textContent = size;
-
-    document.querySelectorAll('.banner-title').forEach(el => {
-      el.style.fontSize = size;
-    });
-  });
-});
-
   </script>
-  
-  <div id="font-sizer" style="position:fixed; top:20px; left:20px; background:#fff; padding:10px; border-radius:6px; z-index:3000; box-shadow:0 0 5px rgba(0,0,0,0.3);">
-  <label for="titleFontSize">Title font size: </label>
-  <input type="range" id="titleFontSize" min="20" max="60" value="48" step="1" />
-  <span id="fontSizeValue">48px</span>
-</div>
 
+  <!-- Font size controller (opcional) -->
+  <div id="font-sizer" style="position:fixed;top:20px;left:20px;background:#fff;padding:10px;border-radius:6px;z-index:3000;box-shadow:0 0 5px rgba(0,0,0,0.3);">
+    <label for="titleFontSize">Title font size: </label>
+    <input type="range" id="titleFontSize" min="20" max="60" value="48" step="1" />
+    <span id="fontSizeValue">48px</span>
+  </div>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      document.getElementById('gerar-pdf').addEventListener('click', generatePdf);
+      document.getElementById('gerar-pptx').addEventListener('click', generatePptx);
+      build();
+    });
+  </script>
 </body>
 </html>

@@ -146,7 +146,7 @@
     #labels-panel input[type="text"]{ flex:1; padding:6px 8px; border:1px solid #ddd; border-radius:4px; font-size:12px; }
     #labels-panel .actions{ display:flex; gap:8px; margin-top:8px; flex-wrap:wrap; }
     #labels-panel button{ border:1px solid #ddd; background:#fff; padding:6px 10px; border-radius:4px; cursor:pointer; font-size:12px; }
-    #labels-panel .hint{ color:#777; font-size:11px; margin-top:4px; }
+    #labels-panel .hint{ color:#777; font-size:11px; }
 
     /* Painel de perguntas (modo editável) */
     #questions-panel {
@@ -242,10 +242,14 @@
 
     /* ======================== BOTÕES FLOTANTES ======================== */
     function enablePerPageButtons() {
-      document.querySelectorAll('.eliminar-pagina-btn, .editar-rotulos-btn, .selecionar-perguntas-btn, .resumo-btn-global, .alternar-orientacao-btn, .largura-barras-btn')
+      // remove todos os botões existentes antes de recalcular
+      document.querySelectorAll('.eliminar-pagina-btn, .editar-rotulos-btn, .selecionar-perguntas-btn, .alternar-orientacao-btn, .largura-barras-btn')
         .forEach(btn => btn.remove());
 
       document.querySelectorAll('.page').forEach(pg => {
+        // ⛔ NÃO criar botões para páginas apagadas ou escondidas
+        if (pg.dataset.deleted === 'true' || pg.style.display === 'none') return;
+
         const rectUpdate = () => {
           const rect = pg.getBoundingClientRect();
           const scrollTop = window.scrollY || document.documentElement.scrollTop;
@@ -265,10 +269,24 @@
         delBtn.addEventListener('click', () => {
           if (confirm('Deseja mesmo eliminar esta página do relatório?')) {
             const qid = pg.dataset.qid;
+
+            // marcar página como apagada e esconder
             pg.dataset.deleted = 'true';
             pg.style.display = 'none';
+
+            // remover botão apagar desta página
             delBtn.remove();
-            document.querySelectorAll(`.resumo-btn-global[data-qid="${qid}"]`).forEach(b => b.remove());
+
+            // remover botões de resumo ligados a esta pergunta (se existirem)
+            document
+              .querySelectorAll(`.resumo-btn-global[data-qid="${qid}"]`)
+              .forEach(b => b.remove());
+
+            // Recalcular todos os botões para as páginas ainda visíveis
+            setTimeout(() => {
+              enablePerPageButtons();
+              enableSummaryButtons();
+            }, 50);
           }
         });
         document.body.appendChild(delBtn);
@@ -761,146 +779,149 @@
     }
 
     function paginateAnswersIntoPages(root, prog, sec, qid, headerLabel, answersTexts, insertBeforeElement = null) {
-  // Remover páginas existentes deste grupo
-  document.querySelectorAll(`.text-q-page[data-qid="${CSS.escape(qid)}"][data-section="${sec}"][data-prog="${prog}"]`).forEach(p => p.remove());
+      // Remover páginas existentes deste grupo
+      document.querySelectorAll(`.text-q-page[data-qid="${CSS.escape(qid)}"][data-section="${sec}"][data-prog="${prog}"]`).forEach(p => p.remove());
 
-  if (!answersTexts || answersTexts.length === 0) return [];
+      if (!answersTexts || answersTexts.length === 0) return [];
 
-  const pages = [];
-  let page = createTextPage(prog, sec, qid, true, headerLabel);
-  let listEl = page.querySelector('.answer-list');
-  
-  // Inserir na posição correta
-  if (insertBeforeElement && insertBeforeElement.parentNode === root) {
-    root.insertBefore(page, insertBeforeElement);
-  } else {
-    // Fallback: encontrar posição correta baseada na secção
-    const endPage = root.querySelector('.page.hero.endpage');
-    if (endPage) {
-      root.insertBefore(page, endPage);
-    } else {
-      root.appendChild(page);
-    }
-  }
-  pages.push(page);
-
-  const measureOverflow = () => {
-    const box = page.querySelector('.text-question');
-    return box.scrollHeight > TEXT_BOX_MAX_HEIGHT + 1;
-  };
-
-  answersTexts.forEach(txt => {
-    const li = document.createElement('li');
-    li.textContent = txt;
-    li.setAttribute('contenteditable', 'true');
-    li.setAttribute('spellcheck', 'true');
-    listEl.appendChild(li);
-
-    if (measureOverflow()) {
-      listEl.removeChild(li);
-      page = createTextPage(prog, sec, qid, false, headerLabel);
-      listEl = page.querySelector('.answer-list');
+      const pages = [];
+      let page = createTextPage(prog, sec, qid, true, headerLabel);
+      let listEl = page.querySelector('.answer-list');
       
-      // Inserir logo após a página anterior
-      const prevPage = pages[pages.length - 1];
-      if (prevPage.nextElementSibling) {
-        root.insertBefore(page, prevPage.nextElementSibling);
+      // Inserir na posição correta
+      if (insertBeforeElement && insertBeforeElement.parentNode === root) {
+        root.insertBefore(page, insertBeforeElement);
       } else {
-        root.appendChild(page);
+        // Fallback: encontrar posição correta baseada na secção
+        const endPage = root.querySelector('.page.hero.endpage');
+        if (endPage) {
+          root.insertBefore(page, endPage);
+        } else {
+          root.appendChild(page);
+        }
       }
       pages.push(page);
-      listEl.appendChild(li);
-    }
-  });
 
-  return pages;
-}
+      const measureOverflow = () => {
+        const box = page.querySelector('.text-question');
+        return box.scrollHeight > TEXT_BOX_MAX_HEIGHT + 1;
+      };
+
+      answersTexts.forEach(txt => {
+        const li = document.createElement('li');
+        li.textContent = txt;
+        li.setAttribute('contenteditable', 'true');
+        li.setAttribute('spellcheck', 'true');
+        listEl.appendChild(li);
+
+        if (measureOverflow()) {
+          listEl.removeChild(li);
+          page = createTextPage(prog, sec, qid, false, headerLabel);
+          listEl = page.querySelector('.answer-list');
+          
+          // Inserir logo após a página anterior
+          const prevPage = pages[pages.length - 1];
+          if (prevPage.nextElementSibling) {
+            root.insertBefore(page, prevPage.nextElementSibling);
+          } else {
+            root.appendChild(page);
+          }
+          pages.push(page);
+          listEl.appendChild(li);
+        }
+      });
+
+      return pages;
+    }
 
     function repaginateAllTextPages() {
-  const root = document.getElementById('report');
-  
-  // Agrupar páginas de texto por programa/secção/pergunta
-  const groups = {};
-  
-  document.querySelectorAll('.text-q-page').forEach(p => {
-    const key = `${p.dataset.prog}|${p.dataset.section}|${p.dataset.qid}`;
-    if (!groups[key]) {
-      groups[key] = { 
-        prog: p.dataset.prog, 
-        sec: p.dataset.section, 
-        qid: p.dataset.qid, 
-        header: p.querySelector('.section-title')?.textContent || '', 
-        texts: [],
-        firstPage: p  // Guardar referência à primeira página do grupo
-      };
+      const root = document.getElementById('report');
+      
+      // Agrupar páginas de texto por programa/secção/pergunta
+      const groups = {};
+      
+      document.querySelectorAll('.text-q-page').forEach(p => {
+        const key = `${p.dataset.prog}|${p.dataset.section}|${p.dataset.qid}`;
+        if (!groups[key]) {
+          groups[key] = { 
+            prog: p.dataset.prog, 
+            sec: p.dataset.section, 
+            qid: p.dataset.qid, 
+            header: p.querySelector('.section-title')?.textContent || '', 
+            texts: [],
+            firstPage: p  // Guardar referência à primeira página do grupo
+          };
+        }
+        const lis = Array.from(p.querySelectorAll('.answer-list > li'));
+        lis.forEach(li => {
+          const t = (li.innerText || '').trim();
+          if (t) groups[key].texts.push(t);
+        });
+      });
+      
+      // Para cada grupo, encontrar onde inserir (mantendo posição original)
+      Object.values(groups).forEach(g => {
+        // Encontrar o próximo elemento após este grupo (antes de remover)
+        let insertBefore = null;
+        const existingPages = document.querySelectorAll(
+          `.text-q-page[data-qid="${CSS.escape(g.qid)}"][data-section="${g.sec}"][data-prog="${g.prog}"]`
+        );
+        
+        if (existingPages.length > 0) {
+          const lastPage = existingPages[existingPages.length - 1];
+          insertBefore = lastPage.nextElementSibling;
+        }
+        
+        // Recriar na posição correta
+        paginateAnswersIntoPages(root, g.prog, g.sec, g.qid, g.header, g.texts, insertBefore);
+      });
     }
-    const lis = Array.from(p.querySelectorAll('.answer-list > li'));
-    lis.forEach(li => {
-      const t = (li.innerText || '').trim();
-      if (t) groups[key].texts.push(t);
-    });
-  });
-  
-  // Para cada grupo, encontrar onde inserir (mantendo posição original)
-  Object.values(groups).forEach(g => {
-    // Encontrar o próximo elemento após este grupo (antes de remover)
-    let insertBefore = null;
-    const existingPages = document.querySelectorAll(
-      `.text-q-page[data-qid="${CSS.escape(g.qid)}"][data-section="${g.sec}"][data-prog="${g.prog}"]`
-    );
-    
-    if (existingPages.length > 0) {
-      const lastPage = existingPages[existingPages.length - 1];
-      insertBefore = lastPage.nextElementSibling;
-    }
-    
-    // Recriar na posição correta
-    paginateAnswersIntoPages(root, g.prog, g.sec, g.qid, g.header, g.texts, insertBefore);
-  });
-}
 
     /* ======================== SUMMARY (TEXTO) ======================== */
-   function createSummaryPage(questionTitle, sectionName) {
-  const page = document.createElement('div');
-  page.className = 'page text-page summary-page';
-  page.dataset.qid = questionTitle.trim();
-  page.innerHTML = `
-    <div class="header">
-      <img src="logo-branco.png">
-      <div class="section-title" contenteditable="true" spellcheck="true">${sectionName}</div>
-    </div>
-    <div class="content">
-      <div class="text-question">
-        <div class="text-question-title" contenteditable="true" spellcheck="true">${questionTitle} (RESUMO)</div>
-        <ul class="answer-list" contenteditable="true" spellcheck="true">
-          <li>Clique aqui para adicionar o resumo...</li>
-        </ul>
-      </div>
-    </div>`;
-  
-  // Handler para Enter criar novo item de lista
-  const answerList = page.querySelector('.answer-list');
-  answerList.addEventListener('keydown', e => {
-    if (e.key === 'Enter') { 
-      e.preventDefault(); 
-      document.execCommand('insertHTML', false, '<li><br></li>'); 
+    function createSummaryPage(questionTitle, sectionName) {
+      const page = document.createElement('div');
+      page.className = 'page text-page summary-page';
+      page.dataset.qid = questionTitle.trim();
+      page.innerHTML = `
+        <div class="header">
+          <img src="logo-branco.png">
+          <div class="section-title" contenteditable="true" spellcheck="true">${sectionName}</div>
+        </div>
+        <div class="content">
+          <div class="text-question">
+            <div class="text-question-title" contenteditable="true" spellcheck="true">${questionTitle} (RESUMO)</div>
+            <ul class="answer-list" contenteditable="true" spellcheck="true">
+              <li>Clique aqui para adicionar o resumo...</li>
+            </ul>
+          </div>
+        </div>`;
+      
+      // Handler para Enter criar novo item de lista
+      const answerList = page.querySelector('.answer-list');
+      answerList.addEventListener('keydown', e => {
+        if (e.key === 'Enter') { 
+          e.preventDefault(); 
+          document.execCommand('insertHTML', false, '<li><br></li>'); 
+        }
+      });
+      
+      // Limpar texto placeholder ao focar
+      answerList.addEventListener('focus', function() {
+        if (this.innerText.trim() === 'Clique aqui para adicionar o resumo...') {
+          this.innerHTML = '<li></li>';
+        }
+      }, { once: true });
+      
+      return page;
     }
-  });
-  
-  // Limpar texto placeholder ao focar
-  answerList.addEventListener('focus', function() {
-    if (this.innerText.trim() === 'Clique aqui para adicionar o resumo...') {
-      this.innerHTML = '<li></li>';
-    }
-  }, { once: true });
-  
-  return page;
-}
 
     function enableSummaryButtons() {
       document.querySelectorAll('.resumo-btn-global').forEach(b => b.remove());
       const report = document.getElementById('report');
       document.querySelectorAll('.page.text-page:not(.summary-page)').forEach(pg => {
+        // não adicionar em páginas apagadas
+        if (pg.dataset.deleted === 'true' || pg.style.display === 'none') return;
+
         const qid = pg.dataset.qid;
         const titleEl = pg.querySelector('.text-question-title');
         const sectionTitle = pg.querySelector('.section-title');
@@ -911,6 +932,7 @@
         btn.className = 'floating-btn resumo-btn-global';
         btn.style.background = '#27828C';
         btn.style.color = '#fff';
+        btn.dataset.qid = qid;
 
         let summaryPage = null;
         function place() {
@@ -1077,7 +1099,7 @@
           if (numeric.length) {
             const omitCharts = sec === 'assessment' && skipAssessmentChartsForPrograms.includes(progId);
 
-            // LOCKED
+            // PROGRAMAS LOCKED (ex: colab365)
             if (isLocked && !omitCharts) {
               const showGlobal = byT.length > 1;
               if (showGlobal) {
@@ -1133,8 +1155,9 @@
               });
             }
 
-            // UNLOCKED: gráfico global editável
-            if (!isLocked) {
+            // PROGRAMAS NÃO LOCKED: global editável + gráficos por turma
+            if (!isLocked && !omitCharts) {
+              // Global editável
               const gp = document.createElement('div');
               gp.className = 'page';
               const chartId = `chart-editable-global-${prog}-${sec}`;
@@ -1159,6 +1182,34 @@
                 totalResponses: totalResponsesGlobal
               };
               renderChartFromCtx(chartId);
+
+              // Gráficos por turma também para programas não locked
+              byT.forEach(([turma, values], idx) => {
+                const totalResponsesTurma = new Set(values.map(normalizeId)).size;
+                const page = document.createElement('div');
+                page.className = 'page';
+                const turmaChartId = `chart-${prog}-${sec}-turma-${idx}`;
+                page.innerHTML = `
+                  <div class="header">
+                    <img src="logo-branco.png">
+                    <div class="section-title">${name}</div>
+                  </div>
+                  <div class="content">
+                    <div class="chart-fullpage">
+                      <div class="chart-full" id="${turmaChartId}"></div>
+                    </div>
+                    <div class="chart-responses" data-for="${turmaChartId}">NÚMERO DE RESPOSTAS: <strong>—</strong></div>
+                  </div>`;
+                root.appendChild(page);
+                window.__chartCtx[turmaChartId] = {
+                  section:sec, turmaCount:byT.length, title:turma, rawRows:values, LM, OM,
+                  editable:false,
+                  orientation:(sec==='evaluation'?'horizontal':'vertical'),
+                  barWidth:(sec==='evaluation'?35:30),
+                  totalResponses: totalResponsesTurma
+                };
+                renderChartFromCtx(turmaChartId);
+              });
             }
           }
 
@@ -1205,97 +1256,98 @@
 
     /* ======================== EXPORT ======================== */
     async function generatePdf() {
-  repaginateAllTextPages();
+      repaginateAllTextPages();
 
-  const labelsPrev = labelsPanel.style.display;
-  const qPrev = document.getElementById('questions-panel').style.display;
-  const wPrev = widthPanel.style.display;
-  labelsPanel.style.display = 'none';
-  document.getElementById('questions-panel').style.display = 'none';
-  widthPanel.style.display = 'none';
+      const labelsPrev = labelsPanel.style.display;
+      const qPrev = document.getElementById('questions-panel').style.display;
+      const wPrev = widthPanel.style.display;
+      labelsPanel.style.display = 'none';
+      document.getElementById('questions-panel').style.display = 'none';
+      widthPanel.style.display = 'none';
 
-  const tempHidden = [];
-  document.querySelectorAll('.floating-btn').forEach(b=>{ tempHidden.push({el:b,display:b.style.display}); b.style.display='none'; });
+      const tempHidden = [];
+      document.querySelectorAll('.floating-btn').forEach(b=>{ tempHidden.push({el:b,display:b.style.display}); b.style.display='none'; });
 
-  const pages = Array.from(document.querySelectorAll('.page')).filter(pg => pg.dataset.deleted !== 'true' && pg.style.display !== 'none');
-  
-  // MELHORIA: scale aumentado de 2 para 3 (ou usa 4 para máxima qualidade)
-  const images = await Promise.all(pages.map(pg =>
-    html2canvas(pg, { 
-      backgroundColor:'#fff', 
-      useCORS:true, 
-      scale: 3,           // Era 2, agora é 3 para maior qualidade
-      logging: false,     // Desliga logs para melhor performance
-      imageTimeout: 0     // Sem timeout para imagens
-    }).then(cnv => cnv.toDataURL('image/jpeg', 0.75))
-  ));
+      const pages = Array.from(document.querySelectorAll('.page')).filter(pg => pg.dataset.deleted !== 'true' && pg.style.display !== 'none');
+      
+      // MELHORIA: scale aumentado de 2 para 3 (ou usa 4 para máxima qualidade)
+      const images = await Promise.all(pages.map(pg =>
+        html2canvas(pg, { 
+          backgroundColor:'#fff', 
+          useCORS:true, 
+          scale: 3,           // Era 2, agora é 3 para maior qualidade
+          logging: false,     // Desliga logs para melhor performance
+          imageTimeout: 0     // Sem timeout para imagens
+        }).then(cnv => cnv.toDataURL('image/jpeg', 0.75))
+      ));
 
-  const f = JSON.parse(localStorage.getItem('reportFilters') || '{}');
-  const prog = (f.programs && f.programs[0]) || null;
-  const endValue = (prog && f.ends && f.ends[prog]) || '2025-05';
-  const [year, month] = endValue.split('-');
-  const monthNames = {'01':'janeiro','02':'fevereiro','03':'março','04':'abril','05':'maio','06':'junho','07':'julho','08':'agosto','09':'setembro','10':'outubro','11':'novembro','12':'dezembro'};
-  const formattedMonth = `${monthNames[month]}.${year.slice(-2)}`;
-  const fileName = `MIND4TIME Training Report ${formattedMonth}.pdf`;
+      const f = JSON.parse(localStorage.getItem('reportFilters') || '{}');
+      const prog = (f.programs && f.programs[0]) || null;
+      const endValue = (prog && f.ends && f.ends[prog]) || '2025-05';
+      const [year, month] = endValue.split('-');
+      const monthNames = {'01':'janeiro','02':'fevereiro','03':'março','04':'abril','05':'maio','06':'junho','07':'julho','08':'agosto','09':'setembro','10':'outubro','11':'novembro','12':'dezembro'};
+      const formattedMonth = `${monthNames[month]}.${year.slice(-2)}`;
+      const fileName = `MIND4TIME Training Report ${formattedMonth}.pdf`;
 
-  pdfMake.createPdf({
-    pageSize: { width: 1920, height: 1080 },
-    pageMargins: [0,0,0,0],
-    content: images.map((img, i) => ({ image: img, width: 1920, pageBreak: i < images.length - 1 ? 'after' : undefined }))
-  }).download(fileName);
+      pdfMake.createPdf({
+        pageSize: { width: 1920, height: 1080 },
+        pageMargins: [0,0,0,0],
+        content: images.map((img, i) => ({ image: img, width: 1920, pageBreak: i < images.length - 1 ? 'after' : undefined }))
+      }).download(fileName);
 
-  labelsPanel.style.display = labelsPrev;
-  document.getElementById('questions-panel').style.display = qPrev;
-  widthPanel.style.display = wPrev;
-  tempHidden.forEach(({el,display})=>{ el.style.display = display; });
-}
-async function generatePptx() { 
-  repaginateAllTextPages();
+      labelsPanel.style.display = labelsPrev;
+      document.getElementById('questions-panel').style.display = qPrev;
+      widthPanel.style.display = wPrev;
+      tempHidden.forEach(({el,display})=>{ el.style.display = display; });
+    }
 
-  const labelsPrev = labelsPanel.style.display;
-  const qPrev = document.getElementById('questions-panel').style.display;
-  const wPrev = widthPanel.style.display;
-  labelsPanel.style.display = 'none';
-  document.getElementById('questions-panel').style.display = 'none';
-  widthPanel.style.display = 'none';
+    async function generatePptx() { 
+      repaginateAllTextPages();
 
-  const tempHidden = [];
-  document.querySelectorAll('.floating-btn').forEach(b=>{ tempHidden.push({el:b,display:b.style.display}); b.style.display='none'; });
+      const labelsPrev = labelsPanel.style.display;
+      const qPrev = document.getElementById('questions-panel').style.display;
+      const wPrev = widthPanel.style.display;
+      labelsPanel.style.display = 'none';
+      document.getElementById('questions-panel').style.display = 'none';
+      widthPanel.style.display = 'none';
 
-  const allPages = Array.from(document.querySelectorAll('.page')).filter(pg => pg.dataset.deleted !== 'true' && pg.style.display !== 'none');
-  await new Promise(r => setTimeout(r, 100));
-  
-  // MELHORIA: scale fixo em 3, removida a condição que baixava para 1
-  const dataUrls = await Promise.all(allPages.map(pg =>
-    html2canvas(pg, { 
-      backgroundColor:'#fff', 
-      useCORS:true, 
-      scale: 3,           // Era 1 ou 2 condicional, agora é sempre 3
-      logging: false,
-      imageTimeout: 0
-    }).then(cnv => cnv.toDataURL('image/jpeg', 0.75))
-  ));
+      const tempHidden = [];
+      document.querySelectorAll('.floating-btn').forEach(b=>{ tempHidden.push({el:b,display:b.style.display}); b.style.display='none'; });
 
-  const pptx = new PptxGenJS();
-  dataUrls.forEach(url => { 
-    const slide = pptx.addSlide(); 
-    slide.background = { color:'FFFFFF' }; 
-    slide.addImage({ data:url, x:0, y:0, w:10, h:5.625 }); 
-  });
+      const allPages = Array.from(document.querySelectorAll('.page')).filter(pg => pg.dataset.deleted !== 'true' && pg.style.display !== 'none');
+      await new Promise(r => setTimeout(r, 100));
+      
+      // MELHORIA: scale fixo em 3, removida a condição que baixava para 1
+      const dataUrls = await Promise.all(allPages.map(pg =>
+        html2canvas(pg, { 
+          backgroundColor:'#fff', 
+          useCORS:true, 
+          scale: 3,           // Era 1 ou 2 condicional, agora é sempre 3
+          logging: false,
+          imageTimeout: 0
+        }).then(cnv => cnv.toDataURL('image/jpeg', 0.75))
+      ));
 
-  const f = JSON.parse(localStorage.getItem('reportFilters') || '{}');
-  const prog = (f.programs && f.programs[0]) || null;
-  const endValue = (prog && f.ends && f.ends[prog]) || '2025-05';
-  const [year, month] = endValue.split('-');
-  const monthNames = {'01':'janeiro','02':'fevereiro','03':'março','04':'abril','05':'maio','06':'junho','07':'julho','08':'agosto','09':'setembro','10':'outubro','11':'novembro','12':'dezembro'};
-  const fileName = `MIND4TIME Training Report ${monthNames[month]}.${year.slice(-2)}.pptx`;
-  await pptx.writeFile({ fileName });
+      const pptx = new PptxGenJS();
+      dataUrls.forEach(url => { 
+        const slide = pptx.addSlide(); 
+        slide.background = { color:'FFFFFF' }; 
+        slide.addImage({ data:url, x:0, y:0, w:10, h:5.625 }); 
+      });
 
-  labelsPanel.style.display = labelsPrev;
-  document.getElementById('questions-panel').style.display = qPrev;
-  widthPanel.style.display = wPrev;
-  tempHidden.forEach(({el,display})=>{ el.style.display = display; });
-}
+      const f = JSON.parse(localStorage.getItem('reportFilters') || '{}');
+      const prog = (f.programs && f.programs[0]) || null;
+      const endValue = (prog && f.ends && f.ends[prog]) || '2025-05';
+      const [year, month] = endValue.split('-');
+      const monthNames = {'01':'janeiro','02':'fevereiro','03':'março','04':'abril','05':'maio','06':'junho','07':'julho','08':'agosto','09':'setembro','10':'outubro','11':'novembro','12':'dezembro'};
+      const fileName = `MIND4TIME Training Report ${monthNames[month]}.${year.slice(-2)}.pptx`;
+      await pptx.writeFile({ fileName });
+
+      labelsPanel.style.display = labelsPrev;
+      document.getElementById('questions-panel').style.display = qPrev;
+      widthPanel.style.display = wPrev;
+      tempHidden.forEach(({el,display})=>{ el.style.display = display; });
+    }
   </script>
 
   <!-- Font size controller (opcional) -->

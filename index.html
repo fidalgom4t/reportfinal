@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="pt">
 <head>
-  <meta charset="UTF-8">
+  <meta charset="UTF-8" />
   <title>Generate Report</title>
   <style>
     :root {
@@ -11,8 +11,10 @@
       --border: #ccc;
       --radius: 6px;
       --gap: 12px;
+      --text-secondary: #555;
     }
     *, *::before, *::after { box-sizing: border-box; }
+
     body {
       margin: 40px auto;
       padding: 0 var(--gap);
@@ -21,29 +23,34 @@
       background: var(--bg);
       color: #333;
     }
+
     h2 {
       text-align: center;
       color: var(--primary);
       margin-bottom: var(--gap);
     }
+
     form {
       display: grid;
       grid-template-columns: repeat(3, 1fr);
       gap: var(--gap);
       margin-bottom: var(--gap);
     }
+
     .checkbox-list {
       background: var(--card);
       border: 1px solid var(--border);
       border-radius: var(--radius);
       padding: var(--gap);
     }
+
     .checkbox-list label {
       font-weight: bold;
       color: var(--primary);
       margin-bottom: 8px;
       display: block;
     }
+
     .styled-checkbox-list {
       list-style: none;
       margin: 0;
@@ -51,12 +58,27 @@
       max-height: 160px;
       overflow-y: auto;
     }
+
     .styled-checkbox-list li {
       margin-bottom: 6px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 6px;
     }
+
+    .styled-checkbox-list span.option-label {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      flex: 1;
+      font-size: 0.95rem;
+    }
+
     .styled-checkbox-list input[type="checkbox"] {
-      margin-right: 8px;
+      margin-right: 4px;
     }
+
     .select-all-btn {
       background: transparent;
       border: 1px solid var(--primary);
@@ -65,14 +87,36 @@
       margin-bottom: 8px;
       border-radius: var(--radius);
       cursor: pointer;
-      font-size: 0.9rem;
+      font-size: 0.85rem;
     }
-    .actions,
-    .toggle-container {
+
+    .select-all-btn:hover {
+      background: rgba(0, 124, 145, 0.06);
+    }
+
+    .archive-btn {
+      border: 1px solid var(--border);
+      background: #f7f7f7;
+      border-radius: 999px;
+      padding: 2px 8px;
+      font-size: 0.85rem;
+      cursor: pointer;
+      color: var(--text-secondary);
+      white-space: nowrap;
+    }
+
+    .archive-btn:hover {
+      background: #ffe9c7;
+      border-color: #f0b15c;
+      color: #b36a00;
+    }
+
+    .actions {
       text-align: center;
       margin-top: var(--gap);
     }
-    button {
+
+    button#viewReport {
       padding: 10px 24px;
       background: var(--primary);
       color: #fff;
@@ -81,10 +125,12 @@
       cursor: pointer;
       font-size: 1rem;
     }
-    button:disabled {
+
+    button#viewReport:disabled {
       background: #999;
       cursor: not-allowed;
     }
+
     .dynamic-block {
       background: var(--card);
       border: 1px solid var(--border);
@@ -92,18 +138,21 @@
       padding: var(--gap);
       margin-bottom: var(--gap);
     }
+
     .dynamic-block h3,
     .dynamic-block h4 {
       color: var(--primary);
       margin: 0 0 var(--gap) 0;
       font-weight: bold;
     }
+
     .dynamic-block label {
       display: block;
       margin-bottom: 6px;
       font-weight: normal;
       color: #333;
     }
+
     .dynamic-block input[type="text"],
     .dynamic-block input[type="month"] {
       width: calc(100% - 12px);
@@ -113,22 +162,52 @@
       font-size: 1rem;
       margin-bottom: var(--gap);
     }
+
     .dynamic-block .styled-checkbox-list,
     .dynamic-block ol {
       list-style: none;
       margin: 0;
-      padding: 0 0 0 20px;
+      padding: 0;
     }
-    .dynamic-block .styled-checkbox-list li,
+
     .dynamic-block ol li {
-      margin-bottom: 8px;
-      line-height: 1.5;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 6px;
+      margin-bottom: 6px;
     }
+
+    .dynamic-block ol li span.option-label {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      flex: 1;
+    }
+
     .dynamic-block input[type="checkbox"] {
-      margin-right: 8px;
+      margin-right: 4px;
+    }
+
+    .info-archived {
+      font-size: 0.8rem;
+      color: var(--text-secondary);
+      margin-bottom: 4px;
+    }
+
+    .archived-pill {
+      display: inline-block;
+      background: #ffe9c7;
+      color: #b36a00;
+      border-radius: 999px;
+      padding: 2px 8px;
+      font-size: 0.75rem;
+      margin-right: 4px;
+      margin-top: 2px;
     }
   </style>
 </head>
+
 <body>
   <h2>Generate Report</h2>
 
@@ -155,102 +234,193 @@
     <button id="viewReport" disabled>Ver Relatório</button>
   </div>
 
-
   <script>
-    let data = [];
+    /**********************************************
+     * 1) CONFIG GERAL + ARQUIVOS NO GITHUB
+     **********************************************/
+    const WEBAPP_URL =
+      "https://script.google.com/a/macros/mind4time.com/s/AKfycbyOIdN-kMoznVUywAWu1-VWWFT9pnosM4aflDtD4-k_ZAaTtGI2LVShsqqGDEf6DkgJ5Q/exec";
 
+    // >>>>> CONFIGURAR PARA O TEU REPO GITHUB <<<<<
+    const GH_OWNER  = "fidalgom4t";          // ex: "mind4time"
+    const GH_REPO   = "reportfinal";               // ex: "training-report"
+    const GH_PATH   = "archived.json";          // caminho do ficheiro na raíz (ou "data/archived.json")
+    const GH_BRANCH = "testing-2.0";             // branch onde gravar (normalmente "main" ou "master")
+    const GH_TOKEN  = "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";         // ⚠ NÃO COMITAR EM REPO PÚBLICO
+
+    let data = [];
+    let archived = { clients: [], programs: [], turmas: [] };
+
+    /**********************************************
+     * 2) LOCALSTORAGE PARA FILTROS (JÁ EXISTENTE)
+     **********************************************/
     function loadFilters() {
-      return JSON.parse(localStorage.getItem('filters') || '{}');
+      return JSON.parse(localStorage.getItem("filters") || "{}");
     }
+
     function saveFilters(f) {
-      localStorage.setItem('filters', JSON.stringify(f));
+      localStorage.setItem("filters", JSON.stringify(f));
     }
+
     function updateFilter(key, val) {
       const f = loadFilters();
       f[key] = val;
       saveFilters(f);
     }
 
-    function init() {
-      // preserve textQuestions, clear only clients/programs/infos
+    /**********************************************
+     * 3) CARREGAR DATA + ARCHIVED.JSON
+     **********************************************/
+    async function init() {
+      // reset minimal (não queremos restos velhos de clients/programs/clientInfos)
       const f = loadFilters() || {};
       delete f.clients;
       delete f.programs;
       delete f.clientInfos;
       saveFilters(f);
-      fetchDataAndInitUI();
+
+      await fetchDataAndInitUI();
     }
 
     async function fetchDataAndInitUI() {
       try {
-        data = await fetch('data.json').then(r => r.json());
-      } catch {
-        alert('Erro ao carregar dados.');
+        data = await fetch("data.json").then((r) => r.json());
+      } catch (e) {
+        console.error(e);
+        alert("Erro ao carregar dados (data.json).");
         return;
       }
+
+      // Tentar carregar archived.json (se não existir, usamos vazio)
+      try {
+        archived = await fetch("archived.json").then((r) => r.json());
+      } catch (e) {
+        console.warn("Não foi possível carregar archived.json, a usar vazio.", e);
+        archived = { clients: [], programs: [], turmas: [] };
+      }
+
       populateClients();
       initFilters();
       attachSelectAll();
     }
 
+    function isArchived(type, value) {
+      if (!archived || !archived[type]) return false;
+      return archived[type].includes(value);
+    }
+
+    /**********************************************
+     * 4) SELECT ALL / UI BASICA
+     **********************************************/
     function attachSelectAll() {
-      document.getElementById('selectAllPrograms').onclick = () => {
-        const cbs = document.querySelectorAll('#programList input[type="checkbox"]');
+      document.getElementById("selectAllPrograms").onclick = () => {
+        const cbs = document.querySelectorAll("#programList input[type='checkbox']");
         const vals = [];
-        cbs.forEach(cb => { cb.checked = true; vals.push(cb.value); });
-        updateFilter('programs', vals);
-        // also refresh infos and dynamic blocks
+        cbs.forEach((cb) => {
+          cb.checked = true;
+          vals.push(cb.value);
+        });
+        updateFilter("programs", vals);
+
         const client = loadFilters().clients?.[0];
         updateInfoList(client);
         refreshDynamic();
       };
-      document.getElementById('selectAllInfos').onclick = () => {
-        const cbs = document.querySelectorAll('#infoList input[type="checkbox"]');
+
+      document.getElementById("selectAllInfos").onclick = () => {
+        const cbs = document.querySelectorAll("#infoList input[type='checkbox']");
         const vals = [];
-        cbs.forEach(cb => { cb.checked = true; vals.push(cb.value); });
-        updateFilter('clientInfos', vals);
+        cbs.forEach((cb) => {
+          cb.checked = true;
+          vals.push(cb.value);
+        });
+        updateFilter("clientInfos", vals);
         refreshDynamic();
       };
     }
 
+    /**********************************************
+     * 5) CLIENTES / PROGRAMAS / INFOS
+     **********************************************/
     function populateClients() {
-      const clients = [...new Set(data.map(d => d.client))].sort();
-      const list = document.getElementById('clientList');
-      list.innerHTML = '';
-      clients.forEach(c => createListItem(list, c, 'clients', initFilters));
+      const clients = [...new Set(data.map((d) => d.client))].sort();
+      const list = document.getElementById("clientList");
+      list.innerHTML = "";
+
+      clients
+        .filter((c) => !isArchived("clients", c))
+        .forEach((c) =>
+          createListItem(list, c, "clients", initFilters, "clients")
+        );
     }
 
-    function createListItem(container, text, key, onChange) {
-      const li = document.createElement('li');
-      const lbl = document.createElement('label');
-      const cb = document.createElement('input');
-      cb.type = 'checkbox'; cb.value = text;
+    function populateList(id, items, key, cb, archiveType = null) {
+      const list = document.getElementById(id);
+      list.innerHTML = "";
+
+      items
+        .filter((v) => !archiveType || !isArchived(archiveType, v))
+        .forEach((i) => createListItem(list, i, key, cb, archiveType));
+    }
+
+    function createListItem(container, text, key, onChange, archiveType) {
+      const li = document.createElement("li");
+
+      const labelSpan = document.createElement("span");
+      labelSpan.className = "option-label";
+
+      const cb = document.createElement("input");
+      cb.type = "checkbox";
+      cb.value = text;
       cb.checked = (loadFilters()[key] || []).includes(text);
       cb.onchange = () => {
-        const vals = Array.from(container.querySelectorAll('input:checked'))
-                          .map(i => i.value);
+        const vals = Array.from(
+          container.querySelectorAll("input[type='checkbox']:checked")
+        ).map((i) => i.value);
         updateFilter(key, vals);
         onChange();
       };
-      lbl.append(cb, text);
-      li.appendChild(lbl);
+
+      const txt = document.createTextNode(text);
+      labelSpan.append(cb, txt);
+
+      li.appendChild(labelSpan);
+
+      if (archiveType) {
+        const archBtn = document.createElement("button");
+        archBtn.className = "archive-btn";
+        archBtn.type = "button";
+        archBtn.textContent = "🗄 arquivar";
+        archBtn.title = "Arquivar este item (deixa de aparecer na lista)";
+        archBtn.onclick = () => archiveItem(archiveType, text);
+        li.appendChild(archBtn);
+      }
+
       container.appendChild(li);
     }
 
     function initFilters() {
       const f = loadFilters();
       const client = f.clients?.[0];
-      populateList(
-        'programList',
+
+      const programItems =
         client
-          ? [...new Set(data
-              .filter(d => d.client === client)
-              .map(d => d.program)
+          ? [...new Set(
+              data.filter((d) => d.client === client).map((d) => d.program)
             )].sort()
-          : [],
-        'programs',
-        () => { updateInfoList(client); refreshDynamic(); }
+          : [];
+
+      populateList(
+        "programList",
+        programItems,
+        "programs",
+        () => {
+          updateInfoList(client);
+          refreshDynamic();
+        },
+        "programs"
       );
+
       updateInfoList(client);
       refreshDynamic();
     }
@@ -258,46 +428,57 @@
     function updateInfoList(client) {
       const f = loadFilters();
       const progs = f.programs || [];
-      const infos = (client && progs.length)
-        ? [...new Set(data
-            .filter(d => d.client === client && progs.includes(d.program))
-            .map(d => d.client_info)
-          )].sort()
-        : [];
-      populateList('infoList', infos, 'clientInfos', refreshDynamic);
+
+      const infos =
+        client && progs.length
+          ? [...new Set(
+              data
+                .filter(
+                  (d) => d.client === client && progs.includes(d.program)
+                )
+                .map((d) => d.client_info)
+            )].sort()
+          : [];
+
+      // para infos não vamos arquivar (apenas clients/programs/turmas)
+      populateList("infoList", infos, "clientInfos", refreshDynamic, null);
     }
 
-    function populateList(id, items, key, cb) {
-      const list = document.getElementById(id);
-      list.innerHTML = '';
-      items.forEach(i => createListItem(list, i, key, cb));
-      // do not reset filter here, preserve existing selections
-    }
-
+    /**********************************************
+     * 6) CAMPOS DINÂMICOS (FORMADOR / PERÍODO / TURMAS)
+     **********************************************/
     function createInputField(label, prog, key) {
-      const w = document.createElement('div');
-      const l = document.createElement('label'); l.textContent = label;
-      const i = document.createElement('input'); i.type = 'text';
-      i.value = (loadFilters()[key] || {})[prog] || '';
-      i.oninput = e => {
+      const w = document.createElement("div");
+      const l = document.createElement("label");
+      l.textContent = label;
+
+      const i = document.createElement("input");
+      i.type = "text";
+      i.value = (loadFilters()[key] || {})[prog] || "";
+      i.oninput = (e) => {
         const o = loadFilters()[key] || {};
         o[prog] = e.target.value;
         updateFilter(key, o);
       };
+
       w.append(l, i);
       return w;
     }
 
     function createMonthField(label, prog, key) {
-      const w = document.createElement('div');
-      const l = document.createElement('label'); l.textContent = label;
-      const i = document.createElement('input'); i.type = 'month';
-      i.value = (loadFilters()[key] || {})[prog] || '';
-      i.onchange = e => {
+      const w = document.createElement("div");
+      const l = document.createElement("label");
+      l.textContent = label;
+
+      const i = document.createElement("input");
+      i.type = "month";
+      i.value = (loadFilters()[key] || {})[prog] || "";
+      i.onchange = (e) => {
         const o = loadFilters()[key] || {};
         o[prog] = e.target.value;
         updateFilter(key, o);
       };
+
       w.append(l, i);
       return w;
     }
@@ -305,169 +486,92 @@
     function refreshDynamic() {
       const f = loadFilters();
       const client = f.clients?.[0];
-      const progs  = f.programs   || [];
-      const infos  = f.clientInfos|| [];
-      const db     = document.getElementById('dynamicBlocks');
-      const vb     = document.getElementById('viewReport');
-// botão toggleQuestions já não existe, portanto removido
+      const progs = f.programs || [];
+      const infos = f.clientInfos || [];
 
-      // toggle always enabled
-      // tb.disabled = false;
-      // report only when all filters filled
-      vb.disabled = (!client || !progs.length || !infos.length);
+      const db = document.getElementById("dynamicBlocks");
+      const vb = document.getElementById("viewReport");
 
-      db.innerHTML = '';
+      vb.disabled = !client || !progs.length || !infos.length;
+
+      db.innerHTML = "";
       if (!client || !progs.length || !infos.length) return;
 
-      progs.forEach(p => db.appendChild(renderBlock(client, p, infos)));
-      //renderTextQuestions();
+      progs.forEach((p) => db.appendChild(renderBlock(client, p, infos)));
     }
 
     function renderBlock(client, program, infos) {
-      const block = document.createElement('div');
-      block.className = 'dynamic-block';
-      const h3 = document.createElement('h3');
+      const block = document.createElement("div");
+      block.className = "dynamic-block";
+
+      const h3 = document.createElement("h3");
       h3.textContent = `Programa: ${program}`;
       block.appendChild(h3);
 
-      block.appendChild(createInputField('Formador', program, 'trainers'));
-      block.appendChild(createMonthField('Início', program, 'starts'));
-      block.appendChild(createMonthField('Fim', program, 'ends'));
+      block.appendChild(createInputField("Formador", program, "trainers"));
+      block.appendChild(createMonthField("Início", program, "starts"));
+      block.appendChild(createMonthField("Fim", program, "ends"));
 
-      const turmas = [...new Set(data
-        .filter(d => d.client === client && d.program === program && infos.includes(d.client_info))
-        .map(d => d.turma)
-      )];
-      block.appendChild(buildCheckboxGroup('Turmas', turmas, `turmas_${program}`));
+      // turmas para este client/program/infos
+      const turmas = [
+        ...new Set(
+          data
+            .filter(
+              (d) =>
+                d.client === client &&
+                d.program === program &&
+                infos.includes(d.client_info)
+            )
+            .map((d) => d.turma)
+        ),
+      ].filter((t) => !isArchived("turmas", t));
+
+      block.appendChild(
+        buildCheckboxGroup("Turmas", turmas, `turmas_${program}`, "turmas")
+      );
 
       return block;
     }
-    
-    /*
-    function renderTextQuestions() {
-       // const container = document.getElementById('textQuestionsBlock');
-       // container.innerHTML = '';
-       // const grouped = {};
-       // const evalSet = new Set();
 
-      data.forEach(d => {
-        if (!isNaN(+d.value)) return;
-        const s = (d.section || '').toLowerCase();
-        if (s.includes('evaluation')) evalSet.add(d.question);
-        else if (s.includes('assessment')) {
-          grouped[d.program] = grouped[d.program] || new Set();
-          grouped[d.program].add(d.question);
-        }
-      });
-      
-      
-
-      function isNum(s) { return /^\d/.test(s); }
-      const specials = ['Reivention','clube rh','HR Club'];
-      const specIdx = s => {
-        const i = specials.indexOf(s);
-        return i === -1 ? Infinity : i;
-      };
-
-      const evalList = Array.from(evalSet).sort((a, b) => {
-        const aN = isNum(a), bN = isNum(b);
-        if (aN && !bN) return -1;
-        if (!aN && bN) return 1;
-        if (aN && bN) return a.localeCompare(b, 'pt');
-        const ai = specIdx(a), bi = specIdx(b);
-        if (ai !== bi) return ai - bi;
-        return a.localeCompare(b, 'pt');
-      });
-
-      const sel = new Set(loadFilters().textQuestions || []);
-      const blk = document.createElement('div');
-      blk.className = 'dynamic-block';
-      const title = document.createElement('h3');
-      title.textContent = 'Perguntas Abertas (por programa - assessment)';
-      blk.appendChild(title);
-
-      Object.entries(grouped).forEach(([prog, qs]) => {
-        const sub = document.createElement('h4');
-        sub.textContent = prog;
-        blk.appendChild(sub);
-
-        const ol = document.createElement('ol');
-        Array.from(qs).sort((a, b) => {
-          const aN = isNum(a), bN = isNum(b);
-          if (aN && !bN) return -1;
-          if (!aN && bN) return 1;
-          return a.localeCompare(b, 'pt');
-        }).forEach(q => {
-          const li = document.createElement('li');
-          const lbl = document.createElement('label');
-          const cb = document.createElement('input');
-          cb.type = 'checkbox';
-          cb.value = q;
-          cb.checked = sel.has(q);
-          cb.onchange = () => {
-            const all = Array.from(blk.querySelectorAll('input:checked')).map(i => i.value);
-            updateFilter('textQuestions', all);
-          };
-          lbl.append(cb, q);
-          li.appendChild(lbl);
-          ol.appendChild(li);
-        });
-        blk.appendChild(ol);
-      });
-
-      if (evalList.length) {
-        const etit = document.createElement('h3');
-        etit.textContent = 'Perguntas de Evaluation (iguais para todos os programas)';
-        blk.appendChild(etit);
-
-        const eol = document.createElement('ol');
-        evalList.forEach(q => {
-          const li = document.createElement('li');
-          const lbl = document.createElement('label');
-          const cb = document.createElement('input'); cb.type = 'checkbox';
-          cb.value = q;
-          cb.checked = sel.has(q);
-          cb.onchange = () => {
-            const all = Array.from(blk.querySelectorAll('input:checked')).map(i => i.value);
-            updateFilter('textQuestions', all);
-          };
-          lbl.append(cb, q);
-          li.appendChild(lbl);
-          eol.appendChild(li);
-        });
-        blk.appendChild(eol);
-      }
-
-      container.appendChild(blk);
-    }
-    */
-   
-    function applyAndGo(download) {
-      const all = loadFilters();
-      localStorage.setItem('reportFilters', JSON.stringify(all));
-      window.location.href = 'report.html' + (download ? '?download=true' : '');
-    }
-
-    function buildCheckboxGroup(label, opts, key) {
-      const w = document.createElement('div');
-      const t = document.createElement('h4');
+    function buildCheckboxGroup(label, opts, key, archiveType) {
+      const w = document.createElement("div");
+      const t = document.createElement("h4");
       t.textContent = label;
       w.appendChild(t);
 
-      const ol = document.createElement('ol');
-      opts.forEach(o => {
-        const li = document.createElement('li');
-        const lbl = document.createElement('label');
-        const cb = document.createElement('input');
-        cb.type = 'checkbox';
+      const info = document.createElement("div");
+      info.className = "info-archived";
+      info.textContent = "(podes arquivar turmas que já não queiras ver)";
+      w.appendChild(info);
+
+      const ol = document.createElement("ol");
+      opts.forEach((o) => {
+        const li = document.createElement("li");
+
+        const span = document.createElement("span");
+        span.className = "option-label";
+
+        const cb = document.createElement("input");
+        cb.type = "checkbox";
         cb.value = o;
         cb.checked = (loadFilters()[key] || []).includes(o);
         cb.onchange = () => {
-          const v = Array.from(ol.querySelectorAll('input:checked')).map(i => i.value);
+          const v = Array.from(
+            ol.querySelectorAll("input[type='checkbox']:checked")
+          ).map((i) => i.value);
           updateFilter(key, v);
         };
-        lbl.append(cb, o);
-        li.appendChild(lbl);
+
+        const labelText = document.createTextNode(o);
+        span.append(cb, labelText);
+
+        const archBtn = document.createElement("button");
+        archBtn.className = "archive-btn";
+        archBtn.type = "button";
+        archBtn.textContent = "🗄 arquivar";
+        archBtn.onclick = () => archiveItem(archiveType, o);
+
+        li.append(span, archBtn);
         ol.appendChild(li);
       });
 
@@ -475,10 +579,99 @@
       return w;
     }
 
-    document.addEventListener('DOMContentLoaded', () => {
+    /**********************************************
+     * 7) ARQUIVAR (GitHub - archived.json)
+     **********************************************/
+    async function archiveItem(typeKey, value) {
+      if (!confirm(`Arquivar "${value}"? Deixará de aparecer nas listas por defeito.`)) {
+        return;
+      }
+
+      if (!archived[typeKey]) archived[typeKey] = [];
+      if (!archived[typeKey].includes(value)) {
+        archived[typeKey].push(value);
+      }
+
+      try {
+        await saveArchivedToGitHub();
+        // Rebuild UI com nova lista de arquivados
+        await fetchDataAndInitUI();
+        alert(`"${value}" arquivado com sucesso.`);
+      } catch (e) {
+        console.error(e);
+        alert("Erro ao arquivar no GitHub. Ver consola para detalhes.");
+      }
+    }
+
+    async function saveArchivedToGitHub() {
+      if (!GH_OWNER || !GH_REPO || !GH_PATH || !GH_TOKEN) {
+        throw new Error("Configuração GitHub incompleta (OWNER/REPO/PATH/TOKEN).");
+      }
+
+      const url = `https://api.github.com/repos/${GH_OWNER}/${GH_REPO}/contents/${GH_PATH}`;
+
+      // 1) Obter sha atual (se existir)
+      let sha = null;
+      try {
+        const res = await fetch(url, {
+          headers: {
+            Authorization: `token ${GH_TOKEN}`,
+            Accept: "application/vnd.github+json",
+          },
+        });
+        if (res.ok) {
+          const info = await res.json();
+          sha = info.sha;
+        }
+      } catch (e) {
+        console.warn("Não foi possível obter SHA de archived.json (pode ser 1ª vez).", e);
+      }
+
+      // 2) Preparar conteúdo novo
+      const contentString = JSON.stringify(archived, null, 2);
+      const encodedContent = btoa(unescape(encodeURIComponent(contentString)));
+
+      const body = {
+        message: "Update archived filters via UI",
+        content: encodedContent,
+        branch: GH_BRANCH,
+      };
+      if (sha) body.sha = sha;
+
+      const putRes = await fetch(url, {
+        method: "PUT",
+        headers: {
+          Authorization: `token ${GH_TOKEN}`,
+          Accept: "application/vnd.github+json",
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(body),
+      });
+
+      if (!putRes.ok) {
+        const txt = await putRes.text();
+        throw new Error("Falha ao gravar archived.json: " + txt);
+      }
+    }
+
+    /**********************************************
+     * 8) APLICAR E ABRIR REPORT
+     **********************************************/
+    function applyAndGo(download) {
+      const all = loadFilters();
+      // Mantemos este comportamento: guardamos filtros em localStorage
+      localStorage.setItem("reportFilters", JSON.stringify(all));
+      window.location.href = "report.html";
+    }
+
+    /**********************************************
+     * 9) EVENTOS
+     **********************************************/
+    document.addEventListener("DOMContentLoaded", () => {
       init();
-    
-      document.getElementById('viewReport').addEventListener('click', () => applyAndGo(false));
+      document
+        .getElementById("viewReport")
+        .addEventListener("click", () => applyAndGo(false));
     });
   </script>
 </body>

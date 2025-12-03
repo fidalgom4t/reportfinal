@@ -996,38 +996,79 @@
     const skipAssessmentChartsForPrograms = ['cio', 'xman', 'ux'];
 
     async function build() {
-      const f = JSON.parse(localStorage.getItem('reportFilters') || '{}');
-      const [data, meta] = await Promise.all([
-        fetch('data.json').then(r => r.json()),
-        fetch('meta.json').then(r => r.json())
-      ]);
-      const LM = createLabelMap(meta.labels), OM = createSortMap(meta.labels);
-      const root = document.getElementById('report');
-      root.innerHTML = '';
-      window.__chartCtx = {};
+  // Ler filtros em bruto
+  const fRaw = JSON.parse(localStorage.getItem('reportFilters') || '{}');
 
-      for (const prog of f.programs || []) {
-        const progId = (prog||'').toLowerCase();
-        const isLocked = LOCKED_PROGRAMS.includes(progId);
-
-        // scope temporal
-        let timeScope = '';
-        const start = (f.starts || {})[prog];
-        const end   = (f.ends || {})[prog];
-        if (start && end) {
-          const names = {'01':'janeiro','02':'fevereiro','03':'março','04':'abril','05':'maio','06':'junho','07':'julho','08':'agosto','09':'setembro','10':'outubro','11':'novembro','12':'dezembro'};
-          const [ys,ms] = start.split('-'); const [ye,me] = end.split('-');
-          timeScope = `${names[ms]} – ${names[me]} ${ye}`;
+  // Normalizar arrays de strings (programs, infos, clients, turmas)
+  const normalizeStringArray = (arr) => {
+    if (!Array.isArray(arr)) return [];
+    return arr
+      .map((v) => {
+        if (typeof v === 'string') return v;
+        if (v && typeof v === 'object') {
+          // caso alguma versão antiga tenha guardado objetos
+          return v.program || v.id || v.name || '';
         }
+        return '';
+      })
+      .filter(Boolean);
+  };
 
-        // filtrar linhas deste programa
-        const selTur = f[`turmas_${prog}`] || [];
-        const rows = data.filter(d =>
-          (f.clients || []).includes(d.client) &&
-          d.program === prog &&
-          selTur.includes(d.turma)
-        );
-        const pm = meta.titles.find(t => t.program_id === prog) || {};
+  // Construir objeto de filtros "limpo"
+  const f = {
+    ...fRaw,
+    client: typeof fRaw.client === 'string' ? fRaw.client : undefined,
+    clients: normalizeStringArray(fRaw.clients),
+    programs: normalizeStringArray(fRaw.programs),
+    infos: normalizeStringArray(fRaw.infos),
+    // começa / fim / trainers e turmas já vêm como objetos de lookup
+    starts: fRaw.starts || {},
+    ends: fRaw.ends || {},
+    trainers: fRaw.trainers || {}
+  };
+
+  // Turmas: manter o mesmo padrão de chaves "turmas_PROG"
+  Object.keys(fRaw)
+    .filter((k) => k.startsWith('turmas_'))
+    .forEach((k) => {
+      f[k] = normalizeStringArray(fRaw[k]);
+    });
+
+  // Agora segue o teu código original, mas usando "f" (normalizado)
+  const [data, meta] = await Promise.all([
+    fetch('data.json').then((r) => r.json()),
+    fetch('meta.json').then((r) => r.json())
+  ]);
+  const LM = createLabelMap(meta.labels), OM = createSortMap(meta.labels);
+  const root = document.getElementById('report');
+  root.innerHTML = '';
+  window.__chartCtx = {};
+
+  for (const prog of f.programs || []) {
+    const progId = (prog || '').toLowerCase();
+    const isLocked = LOCKED_PROGRAMS.includes(progId);
+
+    // scope temporal
+    let timeScope = '';
+    const start = (f.starts || {})[prog];
+    const end   = (f.ends || {})[prog];
+    if (start && end) {
+      const names = {
+        '01':'janeiro','02':'fevereiro','03':'março','04':'abril','05':'maio','06':'junho',
+        '07':'julho','08':'agosto','09':'setembro','10':'outubro','11':'novembro','12':'dezembro'
+      };
+      const [ys,ms] = start.split('-'); const [ye,me] = end.split('-');
+      timeScope = `${names[ms]} – ${names[me]} ${ye}`;
+    }
+
+    // filtrar linhas deste programa
+    const selTur = f[`turmas_${prog}`] || [];
+    const rows = data.filter(d =>
+      (f.clients || []).includes(d.client) &&
+      d.program === prog &&
+      selTur.includes(d.turma)
+    );
+    const pm = meta.titles.find(t => t.program_id === prog) || {};
 
         // hero
         const hero = document.createElement('div');
@@ -1239,7 +1280,7 @@
 
       // end page
       const endPage = document.createElement('div');
-      endPage.className = 'page hero endpage';
+      endPage.className = 'page hero endpage'
       endPage.innerHTML = `
         <img class="bg" src="hourglass-bg.png">
         <div class="hero end-hero">

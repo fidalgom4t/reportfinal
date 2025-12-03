@@ -1,164 +1,466 @@
 <!DOCTYPE html>
-<html lang="pt">
+<html lang="pt-PT">
 <head>
-  <meta charset="UTF-8">
+  <meta charset="UTF-8" />
   <title>Generate Report</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
   <style>
     :root {
       --primary: #007c91;
-      --bg: #f5f5f5;
-      --card: #fff;
-      --border: #ccc;
-      --radius: 6px;
-      --gap: 12px;
+      --primary-soft: #e0f4f7;
+      --bg: #f3f7f9;
+      --card: #ffffff;
+      --border: #dde5ec;
+      --radius: 10px;
+      --shadow-soft: 0 12px 30px rgba(15, 52, 67, 0.08);
+      --text-main: #123047;
+      --text-muted: #6b7a88;
     }
-    *, *::before, *::after { box-sizing: border-box; }
+
+    * { box-sizing: border-box; }
+
     body {
-      margin: 40px auto;
-      padding: 0 var(--gap);
-      max-width: 900px;
-      font-family: 'Segoe UI', sans-serif;
-      background: var(--bg);
-      color: #333;
-    }
-    h2 {
-      text-align: center;
-      color: var(--primary);
-      margin-bottom: var(--gap);
-    }
-    form {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: var(--gap);
-      margin-bottom: var(--gap);
-    }
-    .checkbox-list {
-      background: var(--card);
-      border: 1px solid var(--border);
-      border-radius: var(--radius);
-      padding: var(--gap);
-    }
-    .checkbox-list label {
-      font-weight: bold;
-      color: var(--primary);
-      margin-bottom: 8px;
-      display: block;
-    }
-    .styled-checkbox-list {
-      list-style: none;
       margin: 0;
-      padding: 0;
-      max-height: 160px;
-      overflow-y: auto;
+      padding: 32px 16px 40px;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background: radial-gradient(circle at top, #e5f5ff 0, #f5fafc 45%, #f3f7f9 100%);
+      color: var(--text-main);
+      display: flex;
+      justify-content: center;
     }
-    .styled-checkbox-list li {
+
+    .shell {
+      width: 100%;
+      max-width: 1120px;
+    }
+
+    header h1 {
+      margin: 0 0 4px;
+      font-size: 26px;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+    }
+
+    header p {
+      margin: 0 0 22px;
+      font-size: 13px;
+      color: var(--text-muted);
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: 1.1fr 1fr 1.1fr;
+      gap: 18px;
+    }
+
+    .card {
+      background: var(--card);
+      border-radius: 18px;
+      box-shadow: var(--shadow-soft);
+      padding: 16px 16px 10px;
+      display: flex;
+      flex-direction: column;
+      min-height: 240px;
+      max-height: 300px;
+    }
+
+    .card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
       margin-bottom: 6px;
     }
-    .styled-checkbox-list input[type="checkbox"] {
-      margin-right: 8px;
-    }
-    .select-all-btn {
-      background: transparent;
-      border: 1px solid var(--primary);
+
+    .card-title {
+      font-size: 13px;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
       color: var(--primary);
-      padding: 4px 8px;
-      margin-bottom: 8px;
-      border-radius: var(--radius);
+    }
+
+    .helper-text {
+      font-size: 11px;
+      color: var(--text-muted);
+      margin: 0 2px 6px;
+    }
+
+    .list {
+      margin-top: 4px;
+      padding: 4px 4px 4px 0;
+      overflow-y: auto;
+      flex: 1;
+    }
+
+    .item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 6px;
+      padding: 4px 6px;
+      border-radius: 8px;
+      font-size: 13px;
+    }
+
+    .item:hover { background: #f2f7fb; }
+
+    .item-main {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      flex: 1;
+      min-width: 0;
+    }
+
+    .item label {
+      display: flex;
+      align-items: center;
+      gap: 6px;
       cursor: pointer;
-      font-size: 0.9rem;
+      width: 100%;
     }
-    .actions,
-    .toggle-container {
-      text-align: center;
-      margin-top: var(--gap);
+
+    .item span.text {
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
     }
-    button {
-      padding: 10px 24px;
-      background: var(--primary);
-      color: #fff;
-      border: none;
-      border-radius: var(--radius);
+
+    input[type="checkbox"] {
+      width: 16px;
+      height: 16px;
       cursor: pointer;
-      font-size: 1rem;
     }
-    button:disabled {
-      background: #999;
-      cursor: not-allowed;
+
+    .chip-archive {
+      border: 1px solid var(--border);
+      border-radius: 999px;
+      padding: 0 10px;
+      font-size: 11px;
+      color: var(--text-muted);
+      background: #f6fafc;
+      cursor: pointer;
+      flex-shrink: 0;
     }
+    .chip-archive:hover {
+      border-color: var(--primary);
+      color: var(--primary);
+      background: var(--primary-soft);
+    }
+
+    .btn-ghost {
+      border-radius: 999px;
+      border: 1px solid var(--primary-soft);
+      padding: 4px 10px;
+      font-size: 11px;
+      background: #f5fafb;
+      color: var(--primary);
+      cursor: pointer;
+    }
+    .btn-ghost:hover { background: var(--primary-soft); }
+
+    /* Blocos dinâmicos (Formador / Início / Fim / Turmas) */
+    #dynamicBlocks {
+      margin-top: 18px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
     .dynamic-block {
       background: var(--card);
+      border-radius: 14px;
       border: 1px solid var(--border);
-      border-radius: var(--radius);
-      padding: var(--gap);
-      margin-bottom: var(--gap);
+      box-shadow: var(--shadow-soft);
+      padding: 14px 16px 12px;
     }
-    .dynamic-block h3,
-    .dynamic-block h4 {
+
+    .dynamic-block h3 {
+      margin: 0 0 10px;
+      font-size: 15px;
       color: var(--primary);
-      margin: 0 0 var(--gap) 0;
-      font-weight: bold;
     }
+
+    .dynamic-block h4 {
+      margin: 10px 0 6px;
+      font-size: 13px;
+      color: var(--primary);
+    }
+
     .dynamic-block label {
       display: block;
-      margin-bottom: 6px;
-      font-weight: normal;
-      color: #333;
+      margin-bottom: 4px;
+      font-size: 12px;
+      color: var(--text-main);
     }
+
     .dynamic-block input[type="text"],
     .dynamic-block input[type="month"] {
-      width: calc(100% - 12px);
-      padding: 6px;
+      width: 100%;
+      padding: 6px 8px;
+      border-radius: 8px;
       border: 1px solid var(--border);
-      border-radius: var(--radius);
-      font-size: 1rem;
-      margin-bottom: var(--gap);
+      font-size: 13px;
+      margin-bottom: 6px;
     }
-    .dynamic-block .styled-checkbox-list,
+
     .dynamic-block ol {
-      list-style: none;
       margin: 0;
-      padding: 0 0 0 20px;
+      padding-left: 16px;
+      list-style: none;
+      max-height: 120px;
+      overflow-y: auto;
     }
-    .dynamic-block .styled-checkbox-list li,
+
     .dynamic-block ol li {
-      margin-bottom: 8px;
-      line-height: 1.5;
+      margin-bottom: 4px;
+      font-size: 13px;
     }
-    .dynamic-block input[type="checkbox"] {
-      margin-right: 8px;
+
+    .dynamic-block ol label {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      margin: 0;
+      font-weight: normal;
+    }
+
+    .dynamic-block input[type="checkbox"] { margin-right: 4px; }
+
+    /* Barra inferior */
+    .footer-bar {
+      margin-top: 18px;
+      background: rgba(255, 255, 255, 0.85);
+      border-radius: 999px;
+      box-shadow: 0 10px 26px rgba(15, 52, 67, 0.09);
+      padding: 10px 18px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      font-size: 12px;
+      color: var(--text-muted);
+    }
+
+    .footer-left {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .pill-archived {
+      border-radius: 999px;
+      padding: 4px 10px;
+      background: #f1f6f9;
+      border: 1px solid #d8e4ee;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .badge-count {
+      border-radius: 999px;
+      padding: 2px 7px;
+      font-size: 10px;
+      background: var(--primary-soft);
+      color: var(--primary);
+    }
+
+    .btn-primary {
+      border-radius: 999px;
+      padding: 8px 22px;
+      font-size: 14px;
+      border: none;
+      cursor: pointer;
+      background: #9aa4af;
+      color: white;
+    }
+    .btn-primary.enabled {
+      background: var(--primary);
+      box-shadow: 0 8px 18px rgba(0, 124, 145, 0.35);
+    }
+    .btn-primary.enabled:hover { background: #006173; }
+
+    /* Painel arquivados */
+    .archived-panel {
+      position: absolute;
+      left: 50%;
+      transform: translateX(-50%);
+      bottom: 70px;
+      min-width: 420px;
+      max-width: 620px;
+      background: #ffffff;
+      border-radius: 14px;
+      box-shadow: 0 18px 40px rgba(15, 52, 67, 0.18);
+      padding: 14px 16px 12px;
+      font-size: 12px;
+      color: var(--text-main);
+      display: none;
+    }
+    .archived-panel.visible { display: block; }
+
+    .archived-panel h4 {
+      margin: 0 0 6px;
+      font-size: 13px;
+      color: var(--primary);
+    }
+
+    .archived-list-group { margin-bottom: 6px; }
+
+    .archived-list-group strong {
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--text-muted);
+    }
+
+    .archived-tags {
+      margin-top: 4px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+    }
+
+    .tag {
+      border-radius: 999px;
+      padding: 3px 8px;
+      background: #f3f7fb;
+      border: 1px solid #d9e4f0;
+      font-size: 11px;
+    }
+
+    .tag span {
+      margin-left: 4px;
+      cursor: pointer;
+      color: #b23b3b;
+    }
+
+    @media (max-width: 960px) {
+      .grid { grid-template-columns: 1fr; }
+      .card { max-height: none; }
+      .archived-panel {
+        position: fixed;
+        left: 12px;
+        right: 12px;
+        transform: none;
+        bottom: 82px;
+        max-width: none;
+      }
     }
   </style>
 </head>
 <body>
-  <h2>Generate Report</h2>
+  <div class="shell">
+    <header>
+      <h1>GENERATE REPORT</h1>
+      <p>
+        Escolhe o cliente, o(s) programa(s) e a informação pretendida. Podes arquivar clientes / programas / infos
+        para manter a lista limpa.
+      </p>
+    </header>
 
-  <form id="filtersForm" onsubmit="return false;">
-    <div class="checkbox-list">
-      <label>Cliente</label>
-      <ul id="clientList" class="styled-checkbox-list"></ul>
-    </div>
-    <div class="checkbox-list">
-      <label>Programas</label>
-      <button id="selectAllPrograms" class="select-all-btn" type="button">Selecionar Todos</button>
-      <ul id="programList" class="styled-checkbox-list"></ul>
-    </div>
-    <div class="checkbox-list">
-      <label>Data</label>
-      <button id="selectAllInfos" class="select-all-btn" type="button">Selecionar Todos</button>
-      <ul id="infoList" class="styled-checkbox-list"></ul>
-    </div>
-  </form>
+    <div class="grid">
+      <!-- CLIENTES -->
+      <section class="card" id="card-clients">
+        <div class="card-header">
+          <span class="card-title">Cliente</span>
+        </div>
+        <p class="helper-text">Seleciona exatamente um cliente.</p>
+        <div class="list" id="clientList"></div>
+      </section>
 
-  <div id="dynamicBlocks"></div>
+      <!-- PROGRAMAS -->
+      <section class="card" id="card-programs">
+        <div class="card-header">
+          <span class="card-title">Programas</span>
+          <button class="btn-ghost" id="btnSelectAllPrograms">Selecionar todos</button>
+        </div>
+        <p class="helper-text">Escolhe um ou mais programas para o cliente selecionado.</p>
+        <div class="list" id="programList"></div>
+      </section>
 
-  <div class="actions">
-    <button id="viewReport" disabled>Ver Relatório</button>
+      <!-- INFOS -->
+      <section class="card" id="card-infos">
+        <div class="card-header">
+          <span class="card-title">Data / Info</span>
+          <button class="btn-ghost" id="btnSelectAllInfos">Selecionar todos</button>
+        </div>
+        <p class="helper-text">Filtra anos, turmas ou outras infos conforme os dados.</p>
+        <div class="list" id="infoList"></div>
+      </section>
+    </div>
+
+    <!-- Blocos dinâmicos por programa -->
+    <div id="dynamicBlocks"></div>
+
+    <!-- Barra inferior -->
+    <div class="footer-bar">
+      <div class="footer-left">
+        <div class="pill-archived">
+          <span>🔒 Arquivados</span>
+          <span id="archivedCount" class="badge-count">0</span>
+        </div>
+        <span id="archivedHelper">Guardado no Apps Script (partilhado entre utilizadores).</span>
+      </div>
+
+      <div style="display:flex; align-items:center; gap:10px;">
+        <button class="btn-ghost" id="btnToggleArchived">Ver arquivados ▾</button>
+        <button id="viewReport" class="btn-primary" disabled>Ver relatório</button>
+      </div>
+    </div>
+
+    <!-- Painel de arquivados -->
+    <div id="archivedPanel" class="archived-panel">
+      <h4>Itens arquivados</h4>
+
+      <!-- filtro por cliente -->
+      <div style="margin-bottom:8px; display:flex; gap:6px; align-items:center;">
+        <input
+          id="archivedFilter"
+          type="text"
+          placeholder="Filtrar por cliente..."
+          style="flex:1; padding:4px 8px; font-size:11px; border-radius:6px; border:1px solid #d1dde8;"
+        />
+      </div>
+
+      <div id="archivedContent"></div>
+
+      <!-- bloco para arquivar vários clientes -->
+      <div id="bulkArchiveBlock"
+           style="margin-top:10px; padding-top:8px; border-top:1px solid #e1e8f0;">
+        <div style="font-size:11px; color:var(--text-muted); margin-bottom:4px;">
+          Arquivar vários clientes:
+        </div>
+        <div id="bulkArchiveClientsList"
+             style="max-height:80px; overflow:auto; border:1px solid #e1e8f0; border-radius:6px;
+                    padding:4px 6px; background:#fafcfe;">
+          <!-- checkboxes preenchidos via JS -->
+        </div>
+        <button id="btnBulkArchiveClients"
+                class="btn-ghost"
+                style="margin-top:6px; font-size:11px;">
+          Arquivar selecionados
+        </button>
+      </div>
+
+      <p style="margin:6px 0 0; font-size:11px; color:var(--text-muted);">
+        Nota: remover dos arquivados volta a mostrar o item nas listas acima.
+      </p>
+    </div>
   </div>
 
-
   <script>
-    let data = [];
+    // ====================================================
+    // CONFIG: URL do Apps Script (Web App, termina em /exec)
+    // ====================================================
+    const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbz54-DuWj1knZ4eoreDANYPOzbtRMqeFtxt1NV2vi3u0QLuDbi4mt66bNOgeSJstWKWJA/exec';
 
+    // ====================================================
+    // ESTADO
+    // ====================================================
+    let data = [];
+    let archived = { clients: {}, programs: {}, infos: {} };
+
+    // Filtros
     function loadFilters() {
       return JSON.parse(localStorage.getItem('filters') || '{}');
     }
@@ -171,315 +473,738 @@
       saveFilters(f);
     }
 
-    function init() {
-      // preserve textQuestions, clear only clients/programs/infos
-      const f = loadFilters() || {};
-      delete f.clients;
-      delete f.programs;
-      delete f.clientInfos;
-      saveFilters(f);
-      fetchDataAndInitUI();
-    }
-
-    async function fetchDataAndInitUI() {
-      try {
-        data = await fetch('data.json').then(r => r.json());
-      } catch {
-        alert('Erro ao carregar dados.');
-        return;
+    // ====================================================
+    // APPS SCRIPT: GET / SET ARQUIVADOS
+    // ====================================================
+    async function loadArchivedState() {
+      if (!APPS_SCRIPT_URL || APPS_SCRIPT_URL.startsWith('PASTE_')) {
+        console.warn('APPS_SCRIPT_URL ainda não definido. A usar estado arquivado vazio.');
+        return { clients: {}, programs: {}, infos: {} };
       }
-      populateClients();
-      initFilters();
-      attachSelectAll();
+      try {
+        const res = await fetch(APPS_SCRIPT_URL + '?action=getArchived', { method: 'GET' });
+        if (!res.ok) throw new Error('HTTP ' + res.status);
+        const j = await res.json();
+        return {
+          clients: j.clients || {},
+          programs: j.programs || {},
+          infos: j.infos || {}
+        };
+      } catch (err) {
+        console.warn('Erro ao carregar estado arquivado, a usar vazio:', err);
+        return { clients: {}, programs: {}, infos: {} };
+      }
     }
 
-    function attachSelectAll() {
-      document.getElementById('selectAllPrograms').onclick = () => {
-        const cbs = document.querySelectorAll('#programList input[type="checkbox"]');
-        const vals = [];
-        cbs.forEach(cb => { cb.checked = true; vals.push(cb.value); });
-        updateFilter('programs', vals);
-        // also refresh infos and dynamic blocks
-        const client = loadFilters().clients?.[0];
-        updateInfoList(client);
-        refreshDynamic();
-      };
-      document.getElementById('selectAllInfos').onclick = () => {
-        const cbs = document.querySelectorAll('#infoList input[type="checkbox"]');
-        const vals = [];
-        cbs.forEach(cb => { cb.checked = true; vals.push(cb.value); });
-        updateFilter('clientInfos', vals);
-        refreshDynamic();
-      };
+    async function saveArchivedState() {
+      if (!APPS_SCRIPT_URL || APPS_SCRIPT_URL.startsWith('PASTE_')) return;
+      try {
+        await fetch(APPS_SCRIPT_URL + '?action=setArchived', {
+          method: 'POST',
+          headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+          body: JSON.stringify(archived)
+        });
+      } catch (err) {
+        console.warn('Erro ao gravar estado arquivado:', err);
+      }
     }
 
-    function populateClients() {
-      const clients = [...new Set(data.map(d => d.client))].sort();
+    // ====================================================
+    // RENDER LISTAS
+    // ====================================================
+    function getCurrentClient() {
+      const f = loadFilters();
+      return (f.clients || [])[0] || null;
+    }
+
+    function renderClients() {
       const list = document.getElementById('clientList');
       list.innerHTML = '';
-      clients.forEach(c => createListItem(list, c, 'clients', initFilters));
-    }
 
-    function createListItem(container, text, key, onChange) {
-      const li = document.createElement('li');
-      const lbl = document.createElement('label');
-      const cb = document.createElement('input');
-      cb.type = 'checkbox'; cb.value = text;
-      cb.checked = (loadFilters()[key] || []).includes(text);
-      cb.onchange = () => {
-        const vals = Array.from(container.querySelectorAll('input:checked'))
-                          .map(i => i.value);
-        updateFilter(key, vals);
-        onChange();
-      };
-      lbl.append(cb, text);
-      li.appendChild(lbl);
-      container.appendChild(li);
-    }
-
-    function initFilters() {
       const f = loadFilters();
-      const client = f.clients?.[0];
-      populateList(
-        'programList',
-        client
-          ? [...new Set(data
-              .filter(d => d.client === client)
-              .map(d => d.program)
-            )].sort()
-          : [],
-        'programs',
-        () => { updateInfoList(client); refreshDynamic(); }
-      );
-      updateInfoList(client);
-      refreshDynamic();
+      const selected = f.clients || [];
+
+      const clients = [...new Set(data.map(r => r.client))].sort();
+
+      clients.forEach(client => {
+        if (archived.clients[client]) return;
+
+        const item = document.createElement('div');
+        item.className = 'item';
+
+        const main = document.createElement('div');
+        main.className = 'item-main';
+
+        const label = document.createElement('label');
+        const cb = document.createElement('input');
+        cb.type = 'checkbox';
+        cb.checked = selected.includes(client);
+
+        cb.onchange = () => {
+          const filters = loadFilters();
+          // Apenas um cliente
+          if (cb.checked) {
+            filters.clients = [client];
+          } else {
+            filters.clients = [];
+          }
+          // Quando muda de cliente, limpa programas/infos
+          filters.programs = [];
+          filters.clientInfos = [];
+          saveFilters(filters);
+
+          renderAll();
+        };
+
+        const span = document.createElement('span');
+        span.className = 'text';
+        span.textContent = client;
+
+        label.append(cb, span);
+        main.appendChild(label);
+
+        const archBtn = document.createElement('button');
+        archBtn.className = 'chip-archive';
+        archBtn.textContent = 'Arquivar';
+        archBtn.onclick = () => archiveClient(client);
+
+        item.append(main, archBtn);
+        list.appendChild(item);
+      });
     }
 
-    function updateInfoList(client) {
-      const f = loadFilters();
-      const progs = f.programs || [];
-      const infos = (client && progs.length)
-        ? [...new Set(data
-            .filter(d => d.client === client && progs.includes(d.program))
-            .map(d => d.client_info)
-          )].sort()
-        : [];
-      populateList('infoList', infos, 'clientInfos', refreshDynamic);
-    }
-
-    function populateList(id, items, key, cb) {
-      const list = document.getElementById(id);
+    function renderPrograms() {
+      const list = document.getElementById('programList');
       list.innerHTML = '';
-      items.forEach(i => createListItem(list, i, key, cb));
-      // do not reset filter here, preserve existing selections
+
+      const client = getCurrentClient();
+      if (!client) return;
+
+      const f = loadFilters();
+      const selected = new Set(f.programs || []);
+
+      const programs = [...new Set(
+        data.filter(r => r.client === client).map(r => r.program)
+      )].sort();
+
+      programs.forEach(program => {
+        if (archived.programs[`${client}|${program}`]) return;
+
+        const item = document.createElement('div');
+        item.className = 'item';
+
+        const main = document.createElement('div');
+        main.className = 'item-main';
+
+        const label = document.createElement('label');
+        const cb = document.createElement('input');
+        cb.type = 'checkbox';
+        cb.checked = selected.has(program);
+
+        cb.onchange = () => {
+          const filters = loadFilters();
+          const set = new Set(filters.programs || []);
+          if (cb.checked) set.add(program);
+          else set.delete(program);
+          filters.programs = [...set];
+          saveFilters(filters);
+
+          renderInfos();
+          refreshDynamic();
+          updateViewReportButton();
+        };
+
+        const span = document.createElement('span');
+        span.className = 'text';
+        span.textContent = program;
+
+        label.append(cb, span);
+        main.appendChild(label);
+
+        const archBtn = document.createElement('button');
+        archBtn.className = 'chip-archive';
+        archBtn.textContent = 'Arquivar';
+        archBtn.onclick = () => archiveProgram(client, program);
+
+        item.append(main, archBtn);
+        list.appendChild(item);
+      });
     }
 
-    function createInputField(label, prog, key) {
-      const w = document.createElement('div');
-      const l = document.createElement('label'); l.textContent = label;
-      const i = document.createElement('input'); i.type = 'text';
-      i.value = (loadFilters()[key] || {})[prog] || '';
-      i.oninput = e => {
-        const o = loadFilters()[key] || {};
-        o[prog] = e.target.value;
-        updateFilter(key, o);
-      };
-      w.append(l, i);
-      return w;
+    function renderInfos() {
+      const list = document.getElementById('infoList');
+      list.innerHTML = '';
+
+      const client = getCurrentClient();
+      const f = loadFilters();
+      const programs = f.programs || [];
+      if (!client || !programs.length) return;
+
+      const selected = new Set(f.clientInfos || []);
+
+      const infos = [...new Set(
+        data.filter(r => r.client === client && programs.includes(r.program))
+            .map(r => r.client_info)
+      )].sort();
+
+      infos.forEach(info => {
+        if (archived.infos[`${client}|${info}`]) return;
+
+        const item = document.createElement('div');
+        item.className = 'item';
+
+        const main = document.createElement('div');
+        main.className = 'item-main';
+
+        const label = document.createElement('label');
+        const cb = document.createElement('input');
+        cb.type = 'checkbox';
+        cb.checked = selected.has(info);
+
+        cb.onchange = () => {
+          const filters = loadFilters();
+          const set = new Set(filters.clientInfos || []);
+          if (cb.checked) set.add(info);
+          else set.delete(info);
+          filters.clientInfos = [...set];
+          saveFilters(filters);
+
+          refreshDynamic();
+          updateViewReportButton();
+        };
+
+        const span = document.createElement('span');
+        span.className = 'text';
+        span.textContent = info;
+
+        label.append(cb, span);
+        main.appendChild(label);
+
+        const archBtn = document.createElement('button');
+        archBtn.className = 'chip-archive';
+        archBtn.textContent = 'Arquivar';
+        archBtn.onclick = () => archiveInfo(client, info);
+
+        item.append(main, archBtn);
+        list.appendChild(item);
+      });
     }
 
-    function createMonthField(label, prog, key) {
-      const w = document.createElement('div');
-      const l = document.createElement('label'); l.textContent = label;
-      const i = document.createElement('input'); i.type = 'month';
-      i.value = (loadFilters()[key] || {})[prog] || '';
-      i.onchange = e => {
-        const o = loadFilters()[key] || {};
-        o[prog] = e.target.value;
-        updateFilter(key, o);
+    // ====================================================
+    // BOTÕES “Selecionar todos”
+    // ====================================================
+    function selectAllPrograms() {
+      const client = getCurrentClient();
+      if (!client) return;
+
+      const programs = [...new Set(
+        data.filter(r => r.client === client).map(r => r.program)
+      )].sort().filter(p => !archived.programs[`${client}|${p}`]);
+
+      const f = loadFilters();
+      const allSelected = programs.length &&
+        programs.every(p => (f.programs || []).includes(p));
+
+      f.programs = allSelected ? [] : programs;
+      saveFilters(f);
+
+      renderPrograms();
+      renderInfos();
+      refreshDynamic();
+      updateViewReportButton();
+    }
+
+    function selectAllInfos() {
+      const client = getCurrentClient();
+      if (!client) return;
+
+      const f = loadFilters();
+      const programs = f.programs || [];
+      if (!programs.length) return;
+
+      const infos = [...new Set(
+        data.filter(r => r.client === client && programs.includes(r.program))
+            .map(r => r.client_info)
+      )].sort().filter(info => !archived.infos[`${client}|${info}`]);
+
+      const allSelected = infos.length &&
+        infos.every(i => (f.clientInfos || []).includes(i));
+
+      f.clientInfos = allSelected ? [] : infos;
+      saveFilters(f);
+
+      renderInfos();
+      refreshDynamic();
+      updateViewReportButton();
+    }
+
+    // ====================================================
+    // BLOCO DINÂMICO (Formador / Início / Fim / Turmas)
+    // ====================================================
+    function createInputField(labelText, program, key) {
+      const f = loadFilters();
+      const container = document.createElement('div');
+
+      const label = document.createElement('label');
+      label.textContent = labelText;
+      container.appendChild(label);
+
+      const input = document.createElement('input');
+      input.type = 'text';
+      input.value = (f[key] || {})[program] || '';
+      input.oninput = (e) => {
+        const filters = loadFilters();
+        filters[key] = filters[key] || {};
+        filters[key][program] = e.target.value;
+        saveFilters(filters);
       };
-      w.append(l, i);
-      return w;
+
+      container.appendChild(input);
+      return container;
+    }
+
+    function createMonthField(labelText, program, key) {
+      const f = loadFilters();
+      const container = document.createElement('div');
+
+      const label = document.createElement('label');
+      label.textContent = labelText;
+      container.appendChild(label);
+
+      const input = document.createElement('input');
+      input.type = 'month';
+      input.value = (f[key] || {})[program] || '';
+      input.onchange = (e) => {
+        const filters = loadFilters();
+        filters[key] = filters[key] || {};
+        filters[key][program] = e.target.value;
+        saveFilters(filters);
+      };
+
+      container.appendChild(input);
+      return container;
+    }
+
+    function buildCheckboxGroup(labelText, options, key) {
+      const f = loadFilters();
+      const selected = new Set(f[key] || []);
+
+      const wrapper = document.createElement('div');
+      const title = document.createElement('h4');
+      title.textContent = labelText;
+      wrapper.appendChild(title);
+
+      const list = document.createElement('ol');
+
+      options.forEach(opt => {
+        const li = document.createElement('li');
+        const lab = document.createElement('label');
+        const cb = document.createElement('input');
+        cb.type = 'checkbox';
+        cb.value = opt;
+        cb.checked = selected.has(opt);
+
+        cb.onchange = () => {
+          const filters = loadFilters();
+          const set = new Set(filters[key] || []);
+          if (cb.checked) set.add(opt);
+          else set.delete(opt);
+          filters[key] = [...set];
+          saveFilters(filters);
+        };
+
+        lab.append(cb, document.createTextNode(opt));
+        li.appendChild(lab);
+        list.appendChild(li);
+      });
+
+      wrapper.appendChild(list);
+      return wrapper;
     }
 
     function refreshDynamic() {
       const f = loadFilters();
-      const client = f.clients?.[0];
-      const progs  = f.programs   || [];
-      const infos  = f.clientInfos|| [];
-      const db     = document.getElementById('dynamicBlocks');
-      const vb     = document.getElementById('viewReport');
-// botão toggleQuestions já não existe, portanto removido
+      const client = (f.clients || [])[0];
+      const progs = f.programs || [];
+      const infos = f.clientInfos || [];
 
-      // toggle always enabled
-      // tb.disabled = false;
-      // report only when all filters filled
-      vb.disabled = (!client || !progs.length || !infos.length);
-
+      const db = document.getElementById('dynamicBlocks');
       db.innerHTML = '';
-      if (!client || !progs.length || !infos.length) return;
 
-      progs.forEach(p => db.appendChild(renderBlock(client, p, infos)));
-      //renderTextQuestions();
+      const btn = document.getElementById('viewReport');
+      const enabled = client && progs.length && infos.length;
+      btn.disabled = !enabled;
+      btn.classList.toggle('enabled', enabled);
+
+      if (!enabled) return;
+
+      progs.forEach(program => {
+        const block = document.createElement('div');
+        block.className = 'dynamic-block';
+
+        const h3 = document.createElement('h3');
+        h3.textContent = `Programa: ${program}`;
+        block.appendChild(h3);
+
+        block.appendChild(createInputField('Formador', program, 'trainers'));
+        block.appendChild(createMonthField('Início', program, 'starts'));
+        block.appendChild(createMonthField('Fim', program, 'ends'));
+
+        // Turmas filtradas por client + programa + infos seleccionadas
+        const turmas = [...new Set(
+          data.filter(d =>
+            d.client === client &&
+            d.program === program &&
+            infos.includes(d.client_info)
+          ).map(d => d.turma)
+        )].sort();
+
+        const key = `turmas_${program}`;
+        block.appendChild(buildCheckboxGroup('Turmas', turmas, key));
+
+        db.appendChild(block);
+      });
     }
 
-    function renderBlock(client, program, infos) {
-      const block = document.createElement('div');
-      block.className = 'dynamic-block';
-      const h3 = document.createElement('h3');
-      h3.textContent = `Programa: ${program}`;
-      block.appendChild(h3);
-
-      block.appendChild(createInputField('Formador', program, 'trainers'));
-      block.appendChild(createMonthField('Início', program, 'starts'));
-      block.appendChild(createMonthField('Fim', program, 'ends'));
-
-      const turmas = [...new Set(data
-        .filter(d => d.client === client && d.program === program && infos.includes(d.client_info))
-        .map(d => d.turma)
-      )];
-      block.appendChild(buildCheckboxGroup('Turmas', turmas, `turmas_${program}`));
-
-      return block;
+    function updateViewReportButton() {
+      refreshDynamic(); // já trata do botão
     }
-    
-    /*
-    function renderTextQuestions() {
-       // const container = document.getElementById('textQuestionsBlock');
-       // container.innerHTML = '';
-       // const grouped = {};
-       // const evalSet = new Set();
 
-      data.forEach(d => {
-        if (!isNaN(+d.value)) return;
-        const s = (d.section || '').toLowerCase();
-        if (s.includes('evaluation')) evalSet.add(d.question);
-        else if (s.includes('assessment')) {
-          grouped[d.program] = grouped[d.program] || new Set();
-          grouped[d.program].add(d.question);
+    // ====================================================
+    // ARQUIVAR / DESARQUIVAR
+    // ====================================================
+    function archiveClient(client) {
+      if (!confirm(`Arquivar o cliente "${client}"?`)) return;
+      archiveManyClients([client]);
+    }
+
+    // Arquivo em massa de clientes (sem pop-up por cliente)
+    function archiveManyClients(clientList) {
+      if (!clientList || !clientList.length) return;
+
+      const msg = `Arquivar os seguintes clientes?\n\n${clientList.join(', ')}`;
+      if (!confirm(msg) && clientList.length > 1) return;
+      // Se veio de archiveClient individual, já havia confirm – mas chamamos sempre aqui,
+      // portanto só mostramos uma vez para bulk; para 1 cliente também funciona.
+
+      const f = loadFilters();
+      const currentClient = (f.clients || [])[0];
+      let shouldClearFilters = false;
+
+      clientList.forEach(c => {
+        archived.clients[c] = true;
+        if (currentClient === c) {
+          shouldClearFilters = true;
         }
       });
-      
-      
 
-      function isNum(s) { return /^\d/.test(s); }
-      const specials = ['Reivention','clube rh','HR Club'];
-      const specIdx = s => {
-        const i = specials.indexOf(s);
-        return i === -1 ? Infinity : i;
-      };
-
-      const evalList = Array.from(evalSet).sort((a, b) => {
-        const aN = isNum(a), bN = isNum(b);
-        if (aN && !bN) return -1;
-        if (!aN && bN) return 1;
-        if (aN && bN) return a.localeCompare(b, 'pt');
-        const ai = specIdx(a), bi = specIdx(b);
-        if (ai !== bi) return ai - bi;
-        return a.localeCompare(b, 'pt');
-      });
-
-      const sel = new Set(loadFilters().textQuestions || []);
-      const blk = document.createElement('div');
-      blk.className = 'dynamic-block';
-      const title = document.createElement('h3');
-      title.textContent = 'Perguntas Abertas (por programa - assessment)';
-      blk.appendChild(title);
-
-      Object.entries(grouped).forEach(([prog, qs]) => {
-        const sub = document.createElement('h4');
-        sub.textContent = prog;
-        blk.appendChild(sub);
-
-        const ol = document.createElement('ol');
-        Array.from(qs).sort((a, b) => {
-          const aN = isNum(a), bN = isNum(b);
-          if (aN && !bN) return -1;
-          if (!aN && bN) return 1;
-          return a.localeCompare(b, 'pt');
-        }).forEach(q => {
-          const li = document.createElement('li');
-          const lbl = document.createElement('label');
-          const cb = document.createElement('input');
-          cb.type = 'checkbox';
-          cb.value = q;
-          cb.checked = sel.has(q);
-          cb.onchange = () => {
-            const all = Array.from(blk.querySelectorAll('input:checked')).map(i => i.value);
-            updateFilter('textQuestions', all);
-          };
-          lbl.append(cb, q);
-          li.appendChild(lbl);
-          ol.appendChild(li);
-        });
-        blk.appendChild(ol);
-      });
-
-      if (evalList.length) {
-        const etit = document.createElement('h3');
-        etit.textContent = 'Perguntas de Evaluation (iguais para todos os programas)';
-        blk.appendChild(etit);
-
-        const eol = document.createElement('ol');
-        evalList.forEach(q => {
-          const li = document.createElement('li');
-          const lbl = document.createElement('label');
-          const cb = document.createElement('input'); cb.type = 'checkbox';
-          cb.value = q;
-          cb.checked = sel.has(q);
-          cb.onchange = () => {
-            const all = Array.from(blk.querySelectorAll('input:checked')).map(i => i.value);
-            updateFilter('textQuestions', all);
-          };
-          lbl.append(cb, q);
-          li.appendChild(lbl);
-          eol.appendChild(li);
-        });
-        blk.appendChild(eol);
+      if (shouldClearFilters) {
+        f.clients = [];
+        f.programs = [];
+        f.clientInfos = [];
+        saveFilters(f);
       }
 
-      container.appendChild(blk);
+      renderAll();
+      updateArchivedUI();
+      saveArchivedState();
     }
-    */
-   
-    function applyAndGo(download) {
+
+    function archiveProgram(client, program) {
+      if (!confirm(`Arquivar o programa "${program}" para o cliente "${client}"?`)) return;
+      archived.programs[`${client}|${program}`] = true;
+
+      const f = loadFilters();
+      f.programs = (f.programs || []).filter(p => p !== program);
+      saveFilters(f);
+
+      renderPrograms();
+      renderInfos();
+      refreshDynamic();
+      updateArchivedUI();
+      saveArchivedState();
+    }
+
+    function archiveInfo(client, info) {
+      if (!confirm(`Arquivar a info "${info}" para o cliente "${client}"?`)) return;
+      archived.infos[`${client}|${info}`] = true;
+
+      const f = loadFilters();
+      f.clientInfos = (f.clientInfos || []).filter(i => i !== info);
+      saveFilters(f);
+
+      renderInfos();
+      refreshDynamic();
+      updateArchivedUI();
+      saveArchivedState();
+    }
+
+    function unarchiveClient(client) {
+      delete archived.clients[client];
+      renderAll();
+      updateArchivedUI();
+      saveArchivedState();
+    }
+
+    function unarchiveProgram(client, program) {
+      delete archived.programs[`${client}|${program}`];
+      renderPrograms();
+      updateArchivedUI();
+      saveArchivedState();
+    }
+
+    function unarchiveInfo(client, info) {
+      delete archived.infos[`${client}|${info}`];
+      renderInfos();
+      updateArchivedUI();
+      saveArchivedState();
+    }
+
+    // ====================================================
+    // UI ARQUIVADOS AGRUPADA POR CLIENTE + BULK ARCHIVE
+    // ====================================================
+    function updateArchivedUI() {
+      const clientsArchived = Object.keys(archived.clients);
+      const programsArchived = Object.keys(archived.programs); // "CLIENT|PROG"
+      const infosArchived = Object.keys(archived.infos);       // "CLIENT|INFO"
+
+      const total =
+        clientsArchived.length + programsArchived.length + infosArchived.length;
+      document.getElementById('archivedCount').textContent = total;
+
+      const content = document.getElementById('archivedContent');
+      content.innerHTML = '';
+
+      if (total === 0) {
+        content.textContent = 'Nenhum item arquivado.';
+      } else {
+        // Agrupar por cliente
+        const grouped = {}; // { CLIENTE: { clientArchived, programs:[], infos:[] } }
+
+        clientsArchived.forEach(c => {
+          if (!grouped[c]) grouped[c] = { clientArchived: false, programs: [], infos: [] };
+          grouped[c].clientArchived = true;
+        });
+
+        programsArchived.forEach(key => {
+          const [client, program] = key.split('|');
+          if (!grouped[client]) grouped[client] = { clientArchived: false, programs: [], infos: [] };
+          if (!grouped[client].programs.includes(program)) {
+            grouped[client].programs.push(program);
+          }
+        });
+
+        infosArchived.forEach(key => {
+          const [client, info] = key.split('|');
+          if (!grouped[client]) grouped[client] = { clientArchived: false, programs: [], infos: [] };
+          if (!grouped[client].infos.includes(info)) {
+            grouped[client].infos.push(info);
+          }
+        });
+
+        // Filtro por cliente
+        const filterInput = document.getElementById('archivedFilter');
+        const term = (filterInput?.value || '').trim().toLowerCase();
+
+        const sortedClients = Object.keys(grouped).sort((a, b) =>
+          a.localeCompare(b, 'pt', { sensitivity: 'base' })
+        );
+
+        sortedClients.forEach(client => {
+          if (term && !client.toLowerCase().includes(term)) return;
+
+          const g = grouped[client];
+          const hasPrograms = g.programs.length > 0;
+          const hasInfos = g.infos.length > 0;
+          const hasSomething = g.clientArchived || hasPrograms || hasInfos;
+          if (!hasSomething) return;
+
+          const block = document.createElement('div');
+          block.className = 'archived-list-group';
+          block.style.marginBottom = '8px';
+
+          // Cabeçalho do cliente
+          const header = document.createElement('div');
+          header.style.display = 'flex';
+          header.style.alignItems = 'center';
+          header.style.justifyContent = 'space-between';
+          header.style.marginBottom = '4px';
+
+          const title = document.createElement('strong');
+          title.style.fontSize = '11px';
+          title.style.textTransform = 'uppercase';
+          title.style.letterSpacing = '0.08em';
+          title.style.color = 'var(--text-muted)';
+          title.textContent = client;
+
+          header.appendChild(title);
+
+          // Cliente inteiro arquivado
+          if (g.clientArchived) {
+            const clientTag = document.createElement('span');
+            clientTag.className = 'tag';
+            clientTag.style.marginLeft = '8px';
+            clientTag.innerHTML = `Cliente arquivado <span title="Desarquivar cliente">×</span>`;
+            clientTag.querySelector('span').onclick = () => unarchiveClient(client);
+            header.appendChild(clientTag);
+          }
+
+          block.appendChild(header);
+
+          // Programas
+          if (hasPrograms) {
+            const labelProg = document.createElement('div');
+            labelProg.style.fontSize = '11px';
+            labelProg.style.color = 'var(--text-muted)';
+            labelProg.textContent = 'Programas:';
+            block.appendChild(labelProg);
+
+            const tagsProg = document.createElement('div');
+            tagsProg.className = 'archived-tags';
+
+            g.programs.forEach(program => {
+              const tag = document.createElement('span');
+              tag.className = 'tag';
+              tag.innerHTML = `${program} <span title="Desarquivar programa">×</span>`;
+              tag.querySelector('span').onclick = () => unarchiveProgram(client, program);
+              tagsProg.appendChild(tag);
+            });
+
+            block.appendChild(tagsProg);
+          }
+
+          // Infos / Datas
+          if (hasInfos) {
+            const labelInfo = document.createElement('div');
+            labelInfo.style.fontSize = '11px';
+            labelInfo.style.color = 'var(--text-muted)';
+            labelInfo.style.marginTop = '4px';
+            labelInfo.textContent = 'Infos / Datas:';
+            block.appendChild(labelInfo);
+
+            const tagsInfo = document.createElement('div');
+            tagsInfo.className = 'archived-tags';
+
+            g.infos.forEach(info => {
+              const tag = document.createElement('span');
+              tag.className = 'tag';
+              tag.innerHTML = `${info} <span title="Desarquivar info">×</span>`;
+              tag.querySelector('span').onclick = () => unarchiveInfo(client, info);
+              tagsInfo.appendChild(tag);
+            });
+
+            block.appendChild(tagsInfo);
+          }
+
+          content.appendChild(block);
+        });
+      }
+
+      // Atualizar lista de clientes disponíveis para bulk archive
+      const bulkList = document.getElementById('bulkArchiveClientsList');
+      if (bulkList) {
+        bulkList.innerHTML = '';
+        const allClients = [...new Set(data.map(d => d.client))].sort();
+        const notArchived = allClients.filter(c => !archived.clients[c]);
+
+        if (!notArchived.length) {
+          bulkList.innerHTML =
+            '<span style="font-size:11px; color:var(--text-muted);">Nenhum cliente disponível.</span>';
+        } else {
+          notArchived.forEach(c => {
+            const lbl = document.createElement('label');
+            lbl.style.display = 'flex';
+            lbl.style.alignItems = 'center';
+            lbl.style.gap = '6px';
+            lbl.style.fontSize = '11px';
+
+            const cb = document.createElement('input');
+            cb.type = 'checkbox';
+            cb.value = c;
+
+            lbl.appendChild(cb);
+            lbl.appendChild(document.createTextNode(c));
+            bulkList.appendChild(lbl);
+          });
+        }
+      }
+    }
+
+    function toggleArchivedPanel() {
+      const panel = document.getElementById('archivedPanel');
+      panel.classList.toggle('visible');
+    }
+
+    // ====================================================
+    // VER RELATÓRIO
+    // ====================================================
+    function applyAndGo() {
       const all = loadFilters();
       localStorage.setItem('reportFilters', JSON.stringify(all));
-      window.location.href = 'report.html' + (download ? '?download=true' : '');
+      window.location.href = 'report.html';
     }
 
-    function buildCheckboxGroup(label, opts, key) {
-      const w = document.createElement('div');
-      const t = document.createElement('h4');
-      t.textContent = label;
-      w.appendChild(t);
+    // ====================================================
+    // INIT
+    // ====================================================
+    function renderAll() {
+      renderClients();
+      renderPrograms();
+      renderInfos();
+      refreshDynamic();
+    }
 
-      const ol = document.createElement('ol');
-      opts.forEach(o => {
-        const li = document.createElement('li');
-        const lbl = document.createElement('label');
-        const cb = document.createElement('input');
-        cb.type = 'checkbox';
-        cb.value = o;
-        cb.checked = (loadFilters()[key] || []).includes(o);
-        cb.onchange = () => {
-          const v = Array.from(ol.querySelectorAll('input:checked')).map(i => i.value);
-          updateFilter(key, v);
+    async function init() {
+      try {
+        data = await fetch('data.json').then(r => r.json());
+      } catch (err) {
+        console.error(err);
+        alert('Erro a carregar data.json');
+        return;
+      }
+
+      archived = await loadArchivedState();
+      renderAll();
+      updateArchivedUI();
+
+      document.getElementById('btnSelectAllPrograms').onclick = selectAllPrograms;
+      document.getElementById('btnSelectAllInfos').onclick = selectAllInfos;
+      document.getElementById('btnToggleArchived').onclick = toggleArchivedPanel;
+      document.getElementById('viewReport').onclick = applyAndGo;
+
+      const filter = document.getElementById('archivedFilter');
+      if (filter) {
+        filter.addEventListener('input', updateArchivedUI);
+      }
+
+      // Handler para arquivar vários clientes
+      const bulkBtn = document.getElementById('btnBulkArchiveClients');
+      if (bulkBtn) {
+        bulkBtn.onclick = () => {
+          const list = document.getElementById('bulkArchiveClientsList');
+          if (!list) return;
+          const selected = Array.from(
+            list.querySelectorAll('input[type="checkbox"]:checked')
+          ).map(cb => cb.value);
+          if (!selected.length) {
+            alert('Seleciona pelo menos um cliente para arquivar.');
+            return;
+          }
+          archiveManyClients(selected);
         };
-        lbl.append(cb, o);
-        li.appendChild(lbl);
-        ol.appendChild(li);
-      });
+      }
 
-      w.appendChild(ol);
-      return w;
+      // Fechar painel arquivados ao clicar fora
+      document.addEventListener('click', (e) => {
+        const panel = document.getElementById('archivedPanel');
+        if (!panel.classList.contains('visible')) return;
+        if (!panel.contains(e.target) && !document.getElementById('btnToggleArchived').contains(e.target)) {
+          panel.classList.remove('visible');
+        }
+      });
     }
 
-    document.addEventListener('DOMContentLoaded', () => {
-      init();
-    
-      document.getElementById('viewReport').addEventListener('click', () => applyAndGo(false));
-    });
+    document.addEventListener('DOMContentLoaded', init);
   </script>
 </body>
 </html>

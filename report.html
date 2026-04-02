@@ -973,7 +973,8 @@
         const rows = data.filter(d =>
           (f.clients || []).includes(d.client) &&
           d.program === prog &&
-          selTur.includes(d.turma)
+          (f.clientInfos || []).includes(d.client_info) &&
+          (!selTur.length || selTur.includes(d.turma))
         );
         const pm = meta.titles.find(t => t.program_id === prog) || {};
 

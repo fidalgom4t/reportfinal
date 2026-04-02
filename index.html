@@ -171,6 +171,15 @@
       saveFilters(f);
     }
 
+    function syncArrayFilter(key, allowedItems) {
+      const f = loadFilters();
+      const current = Array.isArray(f[key]) ? f[key] : [];
+      const allowed = new Set(allowedItems);
+      const next = current.filter(item => allowed.has(item));
+      if (next.length !== current.length) updateFilter(key, next);
+      return next;
+    }
+
     function init() {
       // preserve textQuestions, clear only clients/programs/infos
       const f = loadFilters() || {};
@@ -270,8 +279,8 @@
     function populateList(id, items, key, cb) {
       const list = document.getElementById(id);
       list.innerHTML = '';
+      syncArrayFilter(key, items);
       items.forEach(i => createListItem(list, i, key, cb));
-      // do not reset filter here, preserve existing selections
     }
 
     function createInputField(label, prog, key) {
@@ -453,6 +462,8 @@
       const t = document.createElement('h4');
       t.textContent = label;
       w.appendChild(t);
+
+      syncArrayFilter(key, opts);
 
       const ol = document.createElement('ol');
       opts.forEach(o => {

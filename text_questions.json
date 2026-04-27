@@ -14,14 +14,19 @@
       "03. What would be great to get out of this program?",
       "04. You are particularly good at?",
       "05. Could use some improvement?",
-      "06. How would you define Expectations?"
+      "06. How would you define Expectations?",
+      "06. How would you define \"Expectations\"?"
     ],
     "CIO": [
       "02. Given that this program is about COMMUNICATION what would be great for you to take from it?",
       "03. Where would that difference be visible? In which specific situations would that change be more evident?",
       "3. Uma vez que este programa trata de COMUNICAÇÃO, o que seria útil retirar dele? *",
+      "3.Uma vez que este programa trata de COMUNICAÇÃO, o que seria útil retirar dele? *",
       "4. Onde é que essa diferença seria visível? Em que situações específicas seria mais evidente essa alteração?",
-      " 5. Algum comentário adicional? (opcional)"
+      "4. Onde é que essa diferença seria visível? Em que situações específicas seria mais evidente essa alteração? *",
+      "4.Onde é que essa diferença seria visível? Em que situações específicas seria mais evidente essa alteração?  *",
+      " 5. Algum comentário adicional? (opcional)",
+      "5.Algum comentário adicional? (opcional)"
     ],
     "UX": [
       "02. Given that this program is about COMMUNICATION, what would be great for you to take from it?",
